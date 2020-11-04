@@ -1,6 +1,7 @@
 {
     "name": "@typescript-tools/io-ts",
     "version": "0.0.1",
+    "private": true,
     "description": "Internal io-ts codecs",
     "scripts": {
         "prepublishOnly": "npm run clean && npm run compile",
@@ -92,8 +93,5 @@
         "require": [
             "ts-node/register"
         ]
-    },
-    "publishConfig": {
-        "access": "private"
     }
 }
