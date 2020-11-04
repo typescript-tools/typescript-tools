@@ -1,0 +1,17 @@
+{
+    "files": [],
+    "references": [
+        {
+            "path": "internal-dependencies"
+        },
+        {
+            "path": "io-ts"
+        },
+        {
+            "path": "lerna-utils"
+        },
+        {
+            "path": "pin-lerna-package-versions"
+        }
+    ]
+}

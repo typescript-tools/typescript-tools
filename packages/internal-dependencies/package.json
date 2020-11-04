@@ -1,0 +1,109 @@
+{
+    "name": "@typescript-tools/internal-dependencies",
+    "version": "0.0.1",
+    "description": "Calculate package dependencies living in the same monorepo",
+    "main": "dist/src/internal-dependencies.js",
+    "types": "dist/src/internal-dependencies.d.ts",
+    "scripts": {
+        "prepublishOnly": "npm run clean && npm run compile",
+        "compile": "tsc -b .",
+        "watch:compile": "nodemon -e 'ts json' -x 'npm run compile || true'",
+        "clean": "rimraf --no-glob dist",
+        "lint-staged": "lint-staged",
+        "ava": "echo 'No tests defined'",
+        "ava:fail-fast": "ava -v --fail-fast",
+        "ava:serial": "ava -v -s",
+        "watch:ava": "nodemon -e 'ts json' -x 'npm run ava || true'",
+        "watch:ava:fail-fast": "nodemon -e 'ts json' -x 'npm run ava:fail-fast || true'",
+        "watch:ava:serial": "nodemon -e 'ts json' -x 'npm run ava:serial || true'",
+        "watch:ava:bell": "nodemon -e 'ts json' -x 'npm run ava || echo -e \\\\a'",
+        "watch:ava:fail-fast:bell": "nodemon -e 'ts json' -x 'npm run ava:fail-fast || echo -e \\\\a'",
+        "watch:ava:serial:bell": "nodemon -e 'ts json' -x 'npm run ava:serial || echo -e \\\\a'",
+        "lint": "eslint --ext ts .",
+        "lint:fix": "eslint --ext ts --fix .",
+        "prettier:check": "prettier --list-different src/**/*.ts",
+        "prettier:write": "prettier --write src/**/*.ts",
+        "watch:lint": "nodemon -e 'ts js json' -x 'npm run lint || true'",
+        "test": "echo 'No tests defined'",
+        "watch:test": "nodemon -e 'ts json' -x 'npm test || true'",
+        "coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
+        "typedoc": "typedoc"
+    },
+    "lint-staged": {
+        "*.ts": [
+            "eslint --fix",
+            "prettier --write"
+        ]
+    },
+    "pre-commit": "lint-staged",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/typescript-tools/typescript-tools.git"
+    },
+    "author": "Eric Crosson <eric.s.crosson@utexas.edu> (https://github.com/ericcrosson)",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/typescript-tools/typescript-tools/issues"
+    },
+    "homepage": "https://github.com/typescript-tools/typescript-tools",
+    "dependencies": {
+        "@typescript-tools/io-ts": "^0.0.1",
+        "@typescript-tools/lerna-utils": "^0.0.1",
+        "fluture": "^13.0.1",
+        "fp-ts": "^2.8.5",
+        "io-ts": "^2.2.12",
+        "shades": "^2.1.0"
+    },
+    "devDependencies": {
+        "@types/node": "^14.14.6",
+        "@typescript-eslint/eslint-plugin": "^4.6.1",
+        "@typescript-eslint/parser": "^4.6.1",
+        "ava": "^3.13.0",
+        "ava-fast-check": "^3.0.0",
+        "codecov": "^3.8.1",
+        "eslint": "^7.12.1",
+        "fast-check": "^2.6.0",
+        "lint-staged": "^10.5.1",
+        "nyc": "^15.1.0",
+        "pre-commit": "^1.2.2",
+        "prettier": "2.1.2",
+        "rimraf": "^3.0.2",
+        "ts-node": "^9.0.0",
+        "typedoc": "^0.19.2",
+        "typedoc-plugin-markdown": "^3.0.11",
+        "typescript": "^4.0.5"
+    },
+    "files": [
+        "dist/src/"
+    ],
+    "ava": {
+        "files": [
+            "!dist/**/*.d.ts",
+            "test/**/test-*.ts"
+        ],
+        "extensions": [
+            "ts"
+        ],
+        "require": [
+            "ts-node/register"
+        ]
+    },
+    "nyc": {
+        "include": [
+            "src/*.ts"
+        ],
+        "extension": [
+            ".ts"
+        ],
+        "require": [
+            "ts-node/register"
+        ]
+    },
+    "keywords": [
+        "lerna",
+        "dependency"
+    ],
+    "publishConfig": {
+        "access": "private"
+    }
+}

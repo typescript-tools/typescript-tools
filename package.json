@@ -1,22 +1,42 @@
 {
-  "name": "typescript-tools",
-  "version": "0.0.1",
-  "description": "A monorepo of TypeScript tools",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/typescript-tools/typescript-tools"
-  },
-  "keywords": [
-    "typescript",
-    "tools"
-  ],
-  "author": "Eric Crosson",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/typescript-tools/typescript-tools/issues"
-  },
-  "homepage": "https://github.com/typescript-tools/typescript-tools"
+    "name": "typescript-tools",
+    "version": "0.0.1",
+    "description": "A monorepo of TypeScript tools",
+    "scripts": {
+        "make": "npm run bootstrap && npm run link && npm run build",
+        "clean": "lerna run --concurrency 50 clean",
+        "distclean": "find . -name 'node_modules' -type d -prune -exec rm -r '{}' +",
+        "bootstrap": "DEBUG=pin pin-lerna-package-versions . && lerna bootstrap --hoist --strict --force-local",
+        "link": "tsl .",
+        "debug:link": "DEBUG=tsl,fs npm run link",
+        "build": "tsc -b --incremental --verbose packages",
+        "ava": "lerna run ava",
+        "test": "lerna run test",
+        "lint": "lerna run lint",
+        "lerna:version": "lerna version --conventional-commits --include-merged-tags",
+        "lerna:publish": "lerna publish from-package"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/typescript-tools/typescript-tools"
+    },
+    "keywords": [
+        "typescript",
+        "tools"
+    ],
+    "author": "Eric Crosson",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/typescript-tools/typescript-tools/issues"
+    },
+    "homepage": "https://github.com/typescript-tools/typescript-tools",
+    "devDependencies": {
+        "@typescript-tools/pin-lerna-package-versions": "^1.0.0",
+        "@typescript-tools/typescript-build-linker": "^1.0.6",
+        "commitizen": "^4.2.2",
+        "cz-conventional-changelog": "^3.3.0",
+        "lerna": "^3.22.1",
+        "rimraf": "^3.0.2",
+        "ts-node": "^9.0.0"
+    }
 }
