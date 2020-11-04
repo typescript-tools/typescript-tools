@@ -14,7 +14,7 @@
         "test": "lerna run test",
         "lint": "lerna run lint",
         "lerna:version": "lerna version --conventional-commits --include-merged-tags",
-        "lerna:publish": "lerna publish from-package"
+        "lerna:publish": "echo \"Haven't hooked this up with lerna yet, run `npm publish` in each package manually\""
     },
     "repository": {
         "type": "git",
