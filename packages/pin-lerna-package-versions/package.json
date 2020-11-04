@@ -1,6 +1,6 @@
 {
     "name": "@typescript-tools/pin-lerna-package-versions",
-    "version": "0.0.1",
+    "version": "2.0.0",
     "description": "Pin lerna dependencies to latest managed version",
     "main": "dist/src/pin-lerna-package-versions.js",
     "types": "dist/src/pin-lerna-package-versions.d.ts",

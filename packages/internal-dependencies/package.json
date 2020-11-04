@@ -1,6 +1,6 @@
 {
     "name": "@typescript-tools/internal-dependencies",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "description": "Calculate package dependencies living in the same monorepo",
     "main": "dist/src/internal-dependencies.js",
     "types": "dist/src/internal-dependencies.d.ts",
