@@ -3,37 +3,50 @@
 [![NPM Package][]](https://npmjs.org/package/@typescript-tools/internal-dependencies)
 [![Build status][]](https://travis-ci.org/typescript-tools/internal-dependencies)
 [![Code Coverage][]](https://codecov.io/gh/typescript-tools/internal-dependencies)
-[![Dependencies][]](https://david-dm.org/typescript-tools/internal-dependencies)
 
 [License]: https://img.shields.io/badge/License-ISC-blue.svg
 [NPM Package]: https://img.shields.io/npm/v/@typescript-tools/internal-dependencies.svg
 [Build status]: https://travis-ci.org/typescript-tools/internal-dependencies.svg?branch=master
 [Code Coverage]: https://codecov.io/gh/typescript-tools/internal-dependencies/branch/master/graph/badge.svg
-[Dependencies]: https://david-dm.org/typescript-tools/internal-dependencies/status.svg
 
 > Calculate package dependencies living in the same monorepo
 
 ## Install
 
 ``` shell
-npm install @typescript-tools/internal-dependencies
+npm install --save-dev @typescript-tools/internal-dependencies
 ```
 
 ## Use
 
-``` typescript
-import { internalDependencies } from '@typescript-tools/internal-dependencies'
-// TODO: describe usage
+``` shell
+Usage:
+    internal-dependencies [--path] <root> <package>...
+
+Options:
+    root        Root of lerna mono-repository
+    packages    Packages to print dependencies of (also reads from stdin)
+    --path      Print the relative path to each package from root
 ```
 
-## Documentation
+## Example
 
-See [generated documentation](doc/README.md).
+`internal-dependencies` can read one or more package names (the `name`
+property in the package's `package.json`) either as arguments or stdin.
 
-## Related
+It outputs the internal dependencies that the list of packages depends
+upon, either directly or transitively.
 
-TODO
+``` shell
+$ echo @typescript-tools/lerna-utils | node ./packages/internal-dependencies/dist/src/internal-dependencies.js .
+@typescript-tools/io-ts
+```
 
-## Acknowledgments
+Use `--path` to print the path to the dependencies rather than the
+package names.
 
-TODO
+``` shell
+$ internal-dependencies --path . @typescript-tools/internal-dependencies
+packages/io-ts
+packages/lerna-utils
+```

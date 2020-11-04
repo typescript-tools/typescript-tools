@@ -36,7 +36,7 @@ Usage:
     pin-lerna-package-versions <root>
 
 Options:
-    root:    Root of lerna mono-repository
+    root    Root of lerna mono-repository
 `
 
 const CommandLineOptions = t.type({
@@ -45,7 +45,7 @@ const CommandLineOptions = t.type({
 
 type CommandLineOptions = t.TypeOf<typeof CommandLineOptions>;
 
-function mapCommandLineOptions(a: CommandLineOptions): {root: string} {
+function mapOptions(a: CommandLineOptions): {root: string} {
     return {
         root: a['<root>']
     }
@@ -141,7 +141,7 @@ function updateDependencies(
 
 function main(): void {
     pipe(
-        decodeCommandLineArguments(CommandLineOptions, docstring, mapCommandLineOptions),
+        decodeCommandLineArguments(CommandLineOptions, docstring, {map: mapOptions}),
         E.map(options => lernaPackages(options.root)
             .pipe(F.chain(
                 packages => {

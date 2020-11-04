@@ -4,6 +4,9 @@
     "description": "Calculate package dependencies living in the same monorepo",
     "main": "dist/src/internal-dependencies.js",
     "types": "dist/src/internal-dependencies.d.ts",
+    "bin": {
+        "internal-dependencies": "./dist/src/internal-dependencies.js"
+    },
     "scripts": {
         "prepublishOnly": "npm run clean && npm run compile",
         "compile": "tsc -b .",
@@ -52,7 +55,8 @@
         "fluture": "^13.0.1",
         "fp-ts": "^2.8.5",
         "io-ts": "^2.2.12",
-        "shades": "^2.1.0"
+        "shades": "^2.1.0",
+        "ts-pattern": "^1.1.0"
     },
     "devDependencies": {
         "@types/node": "^14.14.6",

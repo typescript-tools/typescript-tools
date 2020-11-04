@@ -56,14 +56,20 @@ export function trace(
 export function decodeCommandLineArguments<C extends t.Mixed, A = t.TypeOf<C>>(
     codec: C,
     docstring: string,
-    f: (decoded: t.TypeOf<C>) => A = t.identity
+    {
+        map = t.identity,
+        input = process.argv.slice(2)
+    }: {
+        map?: (decoded: t.TypeOf<C>) => A,
+        input?: string[]
+    }
 ): E.Either<t.Errors, A> {
     return pipe(
-        process.argv.slice(2),
+        input,
         argv => docopt(docstring, {argv, help: true, exit: true}),
         codec.decode.bind(null),
         E.map(trace(debug.options, 'Arguments')),
-        E.map(f)
+        E.map(map)
     )
 }
 

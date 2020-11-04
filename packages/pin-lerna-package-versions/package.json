@@ -4,6 +4,9 @@
     "description": "Pin lerna dependencies to latest managed version",
     "main": "dist/src/pin-lerna-package-versions.js",
     "types": "dist/src/pin-lerna-package-versions.d.ts",
+    "bin": {
+        "pin-lerna-package-versions": "./dist/src/pin-lerna-package-versions.js"
+    },
     "scripts": {
         "prepublishOnly": "npm run clean && npm run compile",
         "compile": "tsc -b .",
