@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.3](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/lerna-utils@1.0.2...@typescript-tools/lerna-utils@1.0.3) (2020-11-05)
+
+
+### Bug Fixes
+
+* print debug after mapping options ([a5b88cf](https://github.com/typescript-tools/typescript-tools/commit/a5b88cfc3ff2b159cb8c51bf2a38f65dcb5c82cd))
+
+
+
+
+
 ## [1.0.2](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/lerna-utils@1.0.1...@typescript-tools/lerna-utils@1.0.2) (2020-11-05)
 
 **Note:** Version bump only for package @typescript-tools/lerna-utils
