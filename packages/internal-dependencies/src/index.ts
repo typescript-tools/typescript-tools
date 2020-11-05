@@ -89,6 +89,7 @@ function main(): void {
             .pipe(F.map(A.uniq(ordString)))
             .pipe(F.map((dependencies: string[]) => dependencies.forEach(unary(console.log))))
              ),
+        // DISCUSS: folding the either into a future
         E.fold(
             // TODO: use validateErrors to print a human-readable error message
             error => {

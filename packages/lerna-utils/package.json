@@ -1,6 +1,6 @@
 {
     "name": "@typescript-tools/lerna-utils",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "description": "Internal utilities for interacting with a lerna monorepo",
     "main": "dist/src/lerna-utils.js",
     "types": "dist/src/lerna-utils.d.ts",
@@ -47,7 +47,7 @@
     },
     "homepage": "https://github.com/typescript-tools/typescript-tools",
     "dependencies": {
-        "@typescript-tools/io-ts": "^1.0.1",
+        "@typescript-tools/io-ts": "^1.0.2",
         "debug": "^4.2.0",
         "execa": "^4.1.0",
         "fluture": "^13.0.1",
