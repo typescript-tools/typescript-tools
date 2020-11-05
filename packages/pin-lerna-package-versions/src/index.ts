@@ -24,7 +24,8 @@ import {
     lernaPackages,
     readFile,
     writeFile,
-    trace
+    trace,
+    withEncode
 } from '@typescript-tools/lerna-utils'
 
 const debug = {
@@ -39,17 +40,16 @@ Options:
     root    Root of lerna mono-repository
 `
 
-const CommandLineOptions = t.type({
-    '<root>': t.string
-})
+const CommandLineOptions = withEncode(
+    t.type({
+        '<root>': t.string
+    }),
+    a => ({
+        root: a['<root>']
+    })
+)
 
 type CommandLineOptions = t.TypeOf<typeof CommandLineOptions>;
-
-function mapOptions(a: CommandLineOptions): {root: string} {
-    return {
-        root: a['<root>']
-    }
-}
 
 function prettyStringifyJson<E>(
     u: unknown,
@@ -141,7 +141,7 @@ function updateDependencies(
 
 function main(): void {
     pipe(
-        decodeCommandLineArguments(CommandLineOptions, docstring, {map: mapOptions}),
+        decodeCommandLineArguments(CommandLineOptions, docstring),
         E.map(options => lernaPackages(options.root)
             .pipe(F.chain(
                 packages => {
@@ -154,8 +154,14 @@ function main(): void {
                     return F.parallel (Infinity) (packageJsons.map(updateDependencies(dictionary)))
                 }
             ))),
+        // DISCUSS: folding the either into a future
         E.fold(
-            console.error,
+            // TODO: use validateErrors to print a human-readable error message
+            error => {
+                console.error(error)
+                process.exit(1)
+            },
+            // TODO: set non-zero exit code on failure
             F.fork (console.error) (constVoid)
         )
     )

@@ -22,7 +22,8 @@ import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
 import {
     decodeCommandLineArguments,
     DependencyGraph,
-    dependencyGraph
+    dependencyGraph,
+    withEncode
 } from '@typescript-tools/lerna-utils'
 
 const docstring = `
@@ -35,27 +36,20 @@ Options:
     --path      Print the relative path to each package from root
 `
 
-const CommandLineOptions = t.type({
-    '<root>': t.string,
-    '<package>': t.array(t.string),
-    '--path': t.boolean
-})
-
-type CommandLineOptions = t.TypeOf<typeof CommandLineOptions>;
-
-function mapOptions(
-    a: CommandLineOptions
-): {
-    root: string,
-    packages: string[],
-    mode: 'name' | 'path'
-} {
-    return {
+const CommandLineOptions = withEncode(
+    t.type({
+        '<root>': t.string,
+        '<package>': t.array(t.string),
+        '--path': t.boolean
+    }),
+    a => ({
         root: a['<root>'],
         packages: a['<package>'],
         mode: a['--path'] ? 'path' : 'name'
-    }
-}
+    })
+)
+
+type CommandLineOptions = t.TypeOf<typeof CommandLineOptions>;
 
 const unary = <A, B>(f: (a: A) => B) => (a: A): B => f(a)
 
@@ -66,7 +60,6 @@ function main(): void {
             CommandLineOptions,
             docstring,
             {
-                map: mapOptions,
                 input: [
                     ...process.argv.slice(2),
                     // file descriptor '0' is stdin
@@ -97,7 +90,12 @@ function main(): void {
             .pipe(F.map((dependencies: string[]) => dependencies.forEach(unary(console.log))))
              ),
         E.fold(
-            console.error,
+            // TODO: use validateErrors to print a human-readable error message
+            error => {
+                console.error(error)
+                process.exit(1)
+            },
+            // TODO: set non-zero exit code on failure
             F.fork (console.error) (constVoid)
         )
     )

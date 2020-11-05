@@ -52,22 +52,41 @@ export function trace(
     }
 }
 
-export function decodeCommandLineArguments<C extends t.Mixed, A = t.TypeOf<C>>(
+// TODO: pull this into io-ts-types
+export function withEncode<C extends t.Any, O>(
+    codec: C,
+    encode: (...a: Parameters<C['encode']>) => O,
+    name: string = codec.name
+): t.Type<C['_A'], O, C['_I']> {
+
+    function clone<C extends t.Any>(t: C): C {
+        const r = Object.create(Object.getPrototypeOf(t))
+        Object.assign(r, t)
+        return r
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const r: any = clone(codec)
+    r.encode = encode
+    r.name = name
+    return r
+}
+
+export function decodeCommandLineArguments<C extends t.Mixed>(
     codec: C,
     docstring: string,
     {
-        map = t.identity,
         input = process.argv.slice(2)
     }: {
-        map?: (decoded: t.TypeOf<C>) => A,
         input?: string[]
-    }
-): E.Either<t.Errors, A> {
+    } = {}
+): E.Either<t.Errors, C['_O']> {
+    console.log(docopt(docstring, {argv: input, help: true, exit: false}))
     return pipe(
         input,
         argv => docopt(docstring, {argv, help: true, exit: true}),
         codec.decode.bind(null),
-        E.map(map),
+        E.map(codec.encode.bind(null)),
         E.map(trace(debug.options, 'Arguments'))
     )
 }
