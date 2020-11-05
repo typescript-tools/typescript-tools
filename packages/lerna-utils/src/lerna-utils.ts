@@ -22,7 +22,6 @@ import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
 import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
 import { docopt } from 'docopt'
 
-// TODO: pass a prefix in perhaps?
 const debug = {
     options: Debug('options')
 }
@@ -68,8 +67,8 @@ export function decodeCommandLineArguments<C extends t.Mixed, A = t.TypeOf<C>>(
         input,
         argv => docopt(docstring, {argv, help: true, exit: true}),
         codec.decode.bind(null),
-        E.map(trace(debug.options, 'Arguments')),
-        E.map(map)
+        E.map(map),
+        E.map(trace(debug.options, 'Arguments'))
     )
 }
 
