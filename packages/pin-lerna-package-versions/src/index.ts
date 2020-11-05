@@ -25,7 +25,8 @@ import {
     readFile,
     writeFile,
     trace,
-    withEncode
+    withEncode,
+    validationErrors
 } from '@typescript-tools/lerna-utils'
 
 const debug = {
@@ -85,7 +86,7 @@ function packageDictionary(
 
 function updateDependencies(
     dependencies: Record<Package, VersionString>
-): (packageJson: string) => F.FutureInstance<unknown, unknown> {
+): (packageJson: string) => F.FutureInstance<unknown, void> {
     return function updateDependenciesFor(packageJson) {
 
         type NoChanges =
@@ -154,16 +155,12 @@ function main(): void {
                     return F.parallel (Infinity) (packageJsons.map(updateDependencies(dictionary)))
                 }
             ))),
-        // DISCUSS: folding the either into a future
-        E.fold(
-            // TODO: use validateErrors to print a human-readable error message
-            error => {
-                console.error(error)
-                process.exit(1)
-            },
-            // TODO: set non-zero exit code on failure
-            F.fork (console.error) (constVoid)
-        )
+        // FIXME: find a way to remove this type assertion
+        E.getOrElseW(errors => F.reject(validationErrors('argv', errors)) as F.FutureInstance<unknown, void[]>),
+        F.fork (error => {
+            console.error(error)
+            process.exit(1)
+        }) (constVoid)
     )
 }
 

@@ -23,7 +23,8 @@ import {
     decodeCommandLineArguments,
     DependencyGraph,
     dependencyGraph,
-    withEncode
+    withEncode,
+    validationErrors
 } from '@typescript-tools/lerna-utils'
 
 const docstring = `
@@ -89,16 +90,12 @@ function main(): void {
             .pipe(F.map(A.uniq(ordString)))
             .pipe(F.map((dependencies: string[]) => dependencies.forEach(unary(console.log))))
              ),
-        // DISCUSS: folding the either into a future
-        E.fold(
-            // TODO: use validateErrors to print a human-readable error message
-            error => {
-                console.error(error)
-                process.exit(1)
-            },
-            // TODO: set non-zero exit code on failure
-            F.fork (console.error) (constVoid)
-        )
+        // FIXME: find a way to remove this type assertion
+        E.getOrElseW(errors => F.reject(validationErrors('argv', errors)) as F.FutureInstance<unknown, void>),
+        F.fork (error => {
+            console.error(error)
+            process.exit(1)
+        }) (constVoid)
     )
 }
 
