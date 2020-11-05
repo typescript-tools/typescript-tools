@@ -1,6 +1,6 @@
 {
     "name": "@typescript-tools/lerna-utils",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "description": "Internal utilities for interacting with a lerna monorepo",
     "main": "dist/src/lerna-utils.js",
     "types": "dist/src/lerna-utils.d.ts",

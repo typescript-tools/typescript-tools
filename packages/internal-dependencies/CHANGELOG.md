@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.9](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/internal-dependencies@1.0.8...@typescript-tools/internal-dependencies@1.0.9) (2020-11-05)
+
+
+### Bug Fixes
+
+* remove extraneous output ([9e538a5](https://github.com/typescript-tools/typescript-tools/commit/9e538a57f6d86e9e6eb8f04c3a6c1fc024b24271))
+
+
+
+
+
 ## [1.0.8](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/internal-dependencies@1.0.7...@typescript-tools/internal-dependencies@1.0.8) (2020-11-05)
 
 **Note:** Version bump only for package @typescript-tools/internal-dependencies

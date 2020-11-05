@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.0.8](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/pin-lerna-package-versions@2.0.7...@typescript-tools/pin-lerna-package-versions@2.0.8) (2020-11-05)
+
+
+### Bug Fixes
+
+* remove extraneous output ([9e538a5](https://github.com/typescript-tools/typescript-tools/commit/9e538a57f6d86e9e6eb8f04c3a6c1fc024b24271))
+
+
+
+
+
 ## [2.0.7](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/pin-lerna-package-versions@2.0.6...@typescript-tools/pin-lerna-package-versions@2.0.7) (2020-11-05)
 
 **Note:** Version bump only for package @typescript-tools/pin-lerna-package-versions
