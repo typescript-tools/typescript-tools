@@ -1,7 +1,6 @@
 {
     "name": "@typescript-tools/lerna-utils",
-    "version": "0.0.1",
-    "private": true,
+    "version": "1.0.0",
     "description": "Internal utilities for interacting with a lerna monorepo",
     "main": "dist/src/lerna-utils.js",
     "types": "dist/src/lerna-utils.d.ts",
@@ -102,5 +101,8 @@
         "require": [
             "ts-node/register"
         ]
+    },
+    "publishConfig": {
+        "access": "public"
     }
 }

@@ -8,7 +8,7 @@
         "internal-dependencies": "./dist/src/index.js"
     },
     "scripts": {
-        "prepublishOnly": "npm run clean && ncc build -m src/index.ts -o dist/src",
+        "prepublishOnly": "npm run clean && npm run compile",
         "compile": "tsc -b .",
         "watch:compile": "nodemon -e 'ts json' -x 'npm run compile || true'",
         "clean": "rimraf --no-glob dist",
@@ -49,29 +49,30 @@
         "url": "https://github.com/typescript-tools/typescript-tools/issues"
     },
     "homepage": "https://github.com/typescript-tools/typescript-tools",
+    "dependencies": {
+        "@typescript-tools/io-ts": "^0.0.1",
+        "@typescript-tools/lerna-utils": "^0.0.1",
+        "fluture": "^13.0.1",
+        "fp-ts": "^2.8.5",
+        "io-ts": "^2.2.12",
+        "shades": "^2.1.0",
+        "ts-pattern": "^1.1.0"
+    },
     "devDependencies": {
         "@types/node": "^14.14.6",
         "@typescript-eslint/eslint-plugin": "^4.6.1",
         "@typescript-eslint/parser": "^4.6.1",
-        "@typescript-tools/io-ts": "^0.0.1",
-        "@typescript-tools/lerna-utils": "^0.0.1",
-        "@vercel/ncc": "^0.24.1",
         "ava": "^3.13.0",
         "ava-fast-check": "^3.0.0",
         "codecov": "^3.8.1",
         "eslint": "^7.12.1",
         "fast-check": "^2.6.0",
-        "fluture": "^13.0.1",
-        "fp-ts": "^2.8.5",
-        "io-ts": "^2.2.12",
         "lint-staged": "^10.5.1",
         "nyc": "^15.1.0",
         "pre-commit": "^1.2.2",
         "prettier": "2.1.2",
         "rimraf": "^3.0.2",
-        "shades": "^2.1.0",
         "ts-node": "^9.0.0",
-        "ts-pattern": "^1.1.0",
         "typedoc": "^0.19.2",
         "typedoc-plugin-markdown": "^3.0.11",
         "typescript": "^4.0.5"
