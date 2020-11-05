@@ -50,8 +50,8 @@
     },
     "homepage": "https://github.com/typescript-tools/typescript-tools",
     "dependencies": {
-        "@typescript-tools/io-ts": "^0.0.1",
-        "@typescript-tools/lerna-utils": "^0.0.1",
+        "@typescript-tools/io-ts": "^1.0.1",
+        "@typescript-tools/lerna-utils": "^1.0.1",
         "fluture": "^13.0.1",
         "fp-ts": "^2.8.5",
         "io-ts": "^2.2.12",
