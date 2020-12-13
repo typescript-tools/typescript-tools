@@ -12,6 +12,9 @@
         },
         {
             "path": "pin-lerna-package-versions"
+        },
+        {
+            "path": "use-hoisted-version"
         }
     ]
 }

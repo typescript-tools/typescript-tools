@@ -19,12 +19,12 @@ import { match } from 'ts-pattern'
 import { pipe } from 'fp-ts/pipeable'
 import { constVoid, constant } from 'fp-ts/function'
 import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
+import { validationErrors } from '@typescript-tools/io-ts/dist/lib/error'
 import {
     decodeCommandLineArguments,
     DependencyGraph,
     dependencyGraph,
     withEncode,
-    validationErrors
 } from '@typescript-tools/lerna-utils'
 
 const docstring = `

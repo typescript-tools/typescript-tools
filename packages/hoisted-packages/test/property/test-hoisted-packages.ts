@@ -4,10 +4,10 @@ import { testProp, fc } from 'ava-fast-check'
  * Library under test
  */
 
-import { useHoistedVersion } from '../../src/use-hoisted-version'
+import { hoistedPackages } from '../../src/hoisted-packages'
 
 testProp.skip(
-    'TODO: property-test use-hoisted-version',
+    'TODO: property-test hoisted-packages',
     [
         // arbitraries
     ],

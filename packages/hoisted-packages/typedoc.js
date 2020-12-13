@@ -1,6 +1,6 @@
 module.exports = {
     src: [
-        './src/lerna-utils.ts',
+        './src/hoisted-packages.ts',
     ],
     exclude: [
         './node_modules/**/*',
@@ -15,7 +15,7 @@ module.exports = {
     excludeExternals: true,
     excludeNotExported: true,
     readme: 'none',
-    name: 'lerna-utils',
+    name: 'hoisted-packages',
     ignoreCompilerErrors: true,
     plugin: 'typedoc-plugin-markdown',
     listInvalidSymbolLinks: true,

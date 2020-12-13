@@ -12,14 +12,7 @@
         "outDir": "./dist",
         "baseUrl": "./",
         "paths": {
-            "*": [
-                "src/@types/*"
-            ]
+            "*": ["src/@types/*"]
         }
-    },
-    "references": [
-        {
-            "path": "../io-ts"
-        }
-    ]
+    }
 }
