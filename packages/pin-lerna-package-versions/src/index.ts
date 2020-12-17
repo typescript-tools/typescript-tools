@@ -35,19 +35,31 @@ const debug = {
 
 const docstring = `
 Usage:
-    pin-lerna-package-versions <root>
+    pin-lerna-package-versions [--dist-tag=<tag>] <root>
 
 Options:
-    root    Root of lerna mono-repository
+    root                Root of lerna mono-repository
+    --dist-tag=<tag>    Pin versions of internal packages to dist tag
 `
 
 const CommandLineOptions = withEncode(
     t.type({
-        '<root>': t.string
+        '<root>': t.string,
+        '--dist-tag': t.union([t.null, t.string]),
     }),
-    a => ({
-        root: a['<root>']
-    })
+    a => pipe(
+        {
+            root: a['<root>'],
+            distTag: a['--dist-tag'] !== null ? a['--dist-tag'] : undefined,
+        },
+        value => {
+            // FIXME: interested in a better pattern around this
+            if (a['--dist-tag'] === null) {
+                delete value.distTag
+            }
+            return value
+        }
+    )
 )
 
 type CommandLineOptions = t.TypeOf<typeof CommandLineOptions>;
@@ -85,7 +97,8 @@ function packageDictionary(
 }
 
 function updateDependencies(
-    dependencies: Record<Package, VersionString>
+    dependencies: Record<Package, VersionString>,
+    distTag?: string,
 ): (packageJson: string) => F.FutureInstance<unknown, void> {
     return function updateDependenciesFor(packageJson) {
 
@@ -99,7 +112,13 @@ function updateDependencies(
             Object.entries(deps ?? {}).reduce(
             (acc, [pkg, version]) => Object.assign(
                 acc,
-                {[pkg]: O.getOrElse (constant(version)) (R.lookup (pkg) (dependencies)) }
+                {
+                    [pkg]: pipe(
+                        R.lookup (pkg) (dependencies),
+                        O.map(internalVersion => O.getOrElse (constant(internalVersion)) (O.fromNullable(distTag))),
+                        O.getOrElse (constant(version))
+                    )
+                }
             ),
             {} as Record<Package, VersionString>
         )
@@ -152,7 +171,7 @@ function main(): void {
                         .map(pkg => pkg.location)
                         .map(dir => path.resolve(dir, 'package.json'))
 
-                    return F.parallel (Infinity) (packageJsons.map(updateDependencies(dictionary)))
+                    return F.parallel (Infinity) (packageJsons.map(updateDependencies(dictionary, options.distTag)))
                 }
             ))),
         // FIXME: find a way to remove this type assertion
