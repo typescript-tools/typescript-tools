@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.1.0](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/pin-lerna-package-versions@2.0.8...@typescript-tools/pin-lerna-package-versions@2.1.0) (2020-12-17)
+
+
+### Features
+
+* allow pining internal version to dist-tag ([9a1ae72](https://github.com/typescript-tools/typescript-tools/commit/9a1ae72dd2ecb1dfb23103153544b7c4b1af3f38))
+
+
+
+
+
 ## [2.0.8](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/pin-lerna-package-versions@2.0.7...@typescript-tools/pin-lerna-package-versions@2.0.8) (2020-11-05)
 
 
