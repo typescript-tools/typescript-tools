@@ -17,6 +17,7 @@ import { mod } from 'shades'
 import { pipe } from 'fp-ts/function'
 import { constVoid, constant } from 'fp-ts/function'
 import { match } from 'ts-pattern'
+import { withEncode, decodeDocopt } from 'io-ts-docopt'
 import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
 import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
 import { PackageVersion } from '@typescript-tools/io-ts/dist/lib/PackageVersion'
@@ -24,12 +25,10 @@ import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSO
 import { validationErrors } from '@typescript-tools/io-ts/dist/lib/error'
 import { PackageJsonDependencies } from '@typescript-tools/io-ts/dist/lib/PackageJsonDependencies'
 import {
-    decodeCommandLineArguments,
     lernaPackages,
     readFile,
     writeFile,
     trace,
-    withEncode,
     prettyStringifyJson,
 } from '@typescript-tools/lerna-utils'
 
@@ -148,7 +147,7 @@ function updateDependencies(
 
 function main(): void {
     pipe(
-        decodeCommandLineArguments(CommandLineOptions, docstring),
+        decodeDocopt(CommandLineOptions, docstring),
         E.map(options => lernaPackages(options.root)
             .pipe(F.chain(
                 packages => {

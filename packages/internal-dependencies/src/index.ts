@@ -20,12 +20,8 @@ import { pipe } from 'fp-ts/pipeable'
 import { constVoid, constant } from 'fp-ts/function'
 import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
 import { validationErrors } from '@typescript-tools/io-ts/dist/lib/error'
-import {
-    decodeCommandLineArguments,
-    DependencyGraph,
-    dependencyGraph,
-    withEncode,
-} from '@typescript-tools/lerna-utils'
+import { DependencyGraph, dependencyGraph } from '@typescript-tools/lerna-utils'
+import { withEncode, decodeDocopt } from 'io-ts-docopt'
 
 const docstring = `
 Usage:
@@ -57,11 +53,11 @@ const unary = <A, B>(f: (a: A) => B) => (a: A): B => f(a)
 function main(): void {
 
     pipe(
-        decodeCommandLineArguments(
+        decodeDocopt(
             CommandLineOptions,
             docstring,
             {
-                input: [
+                argv: [
                     ...process.argv.slice(2),
                     // file descriptor '0' is stdin
                     ...!process.stdin.isTTY ? fs.readFileSync(0, 'utf-8').trim().split('\n') : []
@@ -90,7 +86,6 @@ function main(): void {
             .pipe(F.map(A.uniq(ordString)))
             .pipe(F.map((dependencies: string[]) => dependencies.forEach(unary(console.log))))
              ),
-        // FIXME: find a way to remove this type assertion
         E.getOrElseW(errors => F.reject(validationErrors('argv', errors)) as F.FutureInstance<unknown, void>),
         F.fork (error => {
             console.error(error)

@@ -12,7 +12,6 @@ import * as O from 'fp-ts/Option'
 import * as NEA from 'fp-ts/NonEmptyArray'
 import * as F from 'fluture'
 import * as most from 'most'
-import Debug from 'debug'
 import execa from 'execa'
 import buffer from 'most-buffer'
 import { constant, flow, pipe } from 'fp-ts/lib/function'
@@ -20,11 +19,6 @@ import { get } from 'shades'
 import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
 import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
 import { PackageJsonDependencies } from '@typescript-tools/io-ts/dist/lib/PackageJsonDependencies'
-import { docopt } from 'docopt'
-
-const debug = {
-    options: Debug('options')
-}
 
 export type DependencyGraph = { [packageName: string]: LernaPackage[] }
 
@@ -50,45 +44,6 @@ export function trace(
         }
         return value
     }
-}
-
-// TODO: use io-ts-types version of withEncode
-export function withEncode<C extends t.Any, O>(
-    codec: C,
-    encode: (...a: Parameters<C['encode']>) => O,
-    name: string = codec.name
-): t.Type<C['_A'], O, C['_I']> {
-
-    function clone<C extends t.Any>(t: C): C {
-        const r = Object.create(Object.getPrototypeOf(t))
-        Object.assign(r, t)
-        return r
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const r: any = clone(codec)
-    r.encode = encode
-    r.name = name
-    return r
-}
-
-// TODO: use io-ts-docopt
-export function decodeCommandLineArguments<C extends t.Mixed>(
-    codec: C,
-    docstring: string,
-    {
-        input = process.argv.slice(2)
-    }: {
-        input?: string[]
-    } = {}
-): E.Either<t.Errors, C['_O']> {
-    return pipe(
-        input,
-        argv => docopt(docstring, {argv, help: true, exit: true}),
-        codec.decode.bind(null),
-        E.map(codec.encode.bind(null)),
-        E.map(trace(debug.options, 'Arguments'))
-    )
 }
 
 export function prettyStringifyJson<E>(
