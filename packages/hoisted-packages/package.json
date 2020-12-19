@@ -1,6 +1,6 @@
 {
     "name": "@typescript-tools/hoisted-packages",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "description": "Determine packages `lerna bootstrap --hoist` will hoist",
     "main": "dist/src/hoisted-packages.js",
     "types": "dist/src/hoisted-packages.d.ts",
