@@ -31,6 +31,7 @@ export const writeFile = (file: fs.PathLike) => (contents: string): F.FutureInst
 export const fromFuture = <L extends Error, R>(future: F.FutureInstance<L, R>): most.Stream<R> =>
     most.fromPromise(F.promise(future))
 
+// TODO: pull into its own external package
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export function trace(
     logger: typeof console.log,
@@ -46,6 +47,7 @@ export function trace(
     }
 }
 
+// TODO: pull into its own package
 export function prettyStringifyJson<E>(
     u: unknown,
     onError: (reason: unknown) => E
@@ -53,6 +55,7 @@ export function prettyStringifyJson<E>(
     return E.tryCatch(() => JSON.stringify(u, null, 4) + '\n', onError)
 }
 
+// TODO: pull into its own package
 /**
  * Get list of all lerna packages from `lerna list --all`.
  */
@@ -80,6 +83,7 @@ export function lernaPackages(
     })
 }
 
+// TODO: pull into its own package
 export function packagePackageJsons(
     root: string
 ): F.FutureInstance<unknown,{
@@ -102,6 +106,7 @@ export function packagePackageJsons(
         ))
 }
 
+// TODO: pull into its own package
 // TODO: rename to denote that this only graphs internal dependencies
 export function dependencyGraph(
     root: string
