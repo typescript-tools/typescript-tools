@@ -14,19 +14,23 @@ import * as F from 'fluture'
 import Debug from 'debug'
 import deepEqual from 'fast-deep-equal'
 import { mod } from 'shades'
-import { pipe } from 'fp-ts/pipeable'
+import { pipe } from 'fp-ts/function'
 import { constVoid, constant } from 'fp-ts/function'
 import { match } from 'ts-pattern'
 import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
+import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
+import { PackageVersion } from '@typescript-tools/io-ts/dist/lib/PackageVersion'
 import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
 import { validationErrors } from '@typescript-tools/io-ts/dist/lib/error'
+import { PackageJsonDependencies } from '@typescript-tools/io-ts/dist/lib/PackageJsonDependencies'
 import {
     decodeCommandLineArguments,
     lernaPackages,
     readFile,
     writeFile,
     trace,
-    withEncode
+    withEncode,
+    prettyStringifyJson,
 } from '@typescript-tools/lerna-utils'
 
 const debug = {
@@ -45,7 +49,7 @@ Options:
 const CommandLineOptions = withEncode(
     t.type({
         '<root>': t.string,
-        '--dist-tag': t.union([t.null, t.string]),
+        '--dist-tag': t.union([t.null, PackageVersion]),
     }),
     a => pipe(
         {
@@ -64,41 +68,18 @@ const CommandLineOptions = withEncode(
 
 type CommandLineOptions = t.TypeOf<typeof CommandLineOptions>;
 
-function prettyStringifyJson<E>(
-    u: unknown,
-    onError: (reason: unknown) => E
-): E.Either<E, string> {
-    return E.tryCatch(() => JSON.stringify(u, null, 4), onError)
-}
-
-const PackageJsonRequired = t.type({
-    name: t.string,
-    version: t.string,
-})
-
-const PackageJsonOptional = t.partial({
-    dependencies: t.record(t.string, t.string),
-    devDependencies: t.record(t.string, t.string),
-})
-
-const PackageJson = t.intersection([PackageJsonRequired, PackageJsonOptional])
-type PackageJson = t.TypeOf<typeof PackageJson>;
-
-type Package = string;
-type VersionString = string;
-
 function packageDictionary(
     packages: LernaPackage[]
-): Record<Package, VersionString> {
+): Record<PackageName, PackageVersion> {
     return packages.reduce(
         (acc, {name, version}) => Object.assign(acc, {[name]: `^${version}`}),
-        {} as Record<Package, VersionString>
+        {} as Record<PackageName, PackageVersion>
     )
 }
 
 function updateDependencies(
-    dependencies: Record<Package, VersionString>,
-    distTag?: string,
+    dependencies: Record<PackageName, PackageVersion>,
+    distTag?: PackageVersion,
 ): (packageJson: string) => F.FutureInstance<unknown, void> {
     return function updateDependenciesFor(packageJson) {
 
@@ -107,31 +88,37 @@ function updateDependencies(
             | { type: 'error', error: Error }
 
         const withLatestDependencies = (
-            deps: Record<Package, VersionString> | undefined
-        ): Record<Package, VersionString> =>
-            Object.entries(deps ?? {}).reduce(
-            (acc, [pkg, version]) => Object.assign(
-                acc,
-                {
-                    [pkg]: pipe(
-                        R.lookup (pkg) (dependencies),
-                        O.map(internalVersion => O.getOrElse (constant(internalVersion)) (O.fromNullable(distTag))),
-                        O.getOrElse (constant(version))
-                    )
-                }
-            ),
-            {} as Record<Package, VersionString>
+            deps: Record<PackageName, PackageVersion> | undefined
+        ): Record<PackageName, PackageVersion> | undefined => pipe(
+            O.fromNullable(deps),
+            O.map(deps => Object.entries(deps).reduce(
+                (acc, [pkg, version]) => Object.assign(
+                    acc,
+                    {
+                        [pkg]: pipe(
+                            R.lookup (pkg) (dependencies),
+                            O.map(internalVersion => O.getOrElse (constant(internalVersion)) (O.fromNullable(distTag))),
+                            O.getOrElse (constant(version))
+                        )
+                    }
+                ),
+                {} as Record<PackageName, PackageVersion>
+            )),
+            O.toUndefined
         )
 
         return readFile(packageJson)
             .pipe(
             F.chain(
-            (string): F.FutureInstance<Error, O.Option<PackageJson>> => pipe(
-                StringifiedJSON(PackageJson).decode(string),
+            (string): F.FutureInstance<Error, O.Option<PackageJsonDependencies>> => pipe(
+                StringifiedJSON(PackageJsonDependencies).decode(string),
                 E.map(originalJson => pipe(
                     originalJson,
                     mod ('dependencies') (withLatestDependencies),
                     mod ('devDependencies') (withLatestDependencies),
+                    mod ('optionalDependencies') (withLatestDependencies),
+                    mod ('peerDependencies') (withLatestDependencies),
+                    R.filter(value => value !== undefined),
                     updatedJson => deepEqual(originalJson, updatedJson)
                         ? O.none
                         : O.some(updatedJson)
@@ -174,18 +161,14 @@ function main(): void {
                     return F.parallel (Infinity) (packageJsons.map(updateDependencies(dictionary, options.distTag)))
                 }
             ))),
-        // FIXME: find a way to remove this type assertion
         E.getOrElseW(errors => F.reject(validationErrors('argv', errors)) as F.FutureInstance<unknown, void[]>),
-        F.fork (error => {
-            console.error(error)
-            process.exit(1)
-        }) (constVoid)
+        F.fork (error => (console.error(error), process.exit(1))) (constVoid)
     )
 }
 
 main()
 
-//  LocalWords:  packageJson devDependencies
+//  LocalWords:  packageJson devDependencies optionalDependencies
 
 // Local Variables:
 // mode: typescript

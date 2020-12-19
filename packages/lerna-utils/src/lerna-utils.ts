@@ -15,11 +15,11 @@ import * as most from 'most'
 import Debug from 'debug'
 import execa from 'execa'
 import buffer from 'most-buffer'
-import { pipe } from 'fp-ts/pipeable'
-import { constant } from 'fp-ts/lib/function'
+import { constant, flow, pipe } from 'fp-ts/lib/function'
 import { get } from 'shades'
 import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
 import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
+import { PackageJsonDependencies } from '@typescript-tools/io-ts/dist/lib/PackageJsonDependencies'
 import { docopt } from 'docopt'
 
 const debug = {
@@ -91,6 +91,13 @@ export function decodeCommandLineArguments<C extends t.Mixed>(
     )
 }
 
+export function prettyStringifyJson<E>(
+    u: unknown,
+    onError: (reason: unknown) => E
+): E.Either<E, string> {
+    return E.tryCatch(() => JSON.stringify(u, null, 4) + '\n', onError)
+}
+
 /**
  * Get list of all lerna packages from `lerna list --all`.
  */
@@ -118,16 +125,34 @@ export function lernaPackages(
     })
 }
 
+export function packagePackageJsons(
+    root: string
+): F.FutureInstance<unknown,{
+    pkg: LernaPackage,
+    contents: E.Json
+}[]> {
+    return lernaPackages(root)
+        .pipe(F.chain(
+            flow(
+                A.map(pkg =>
+                    readFile(path.resolve(pkg.location, 'package.json'))
+                        .pipe(F.chain(contents => pipe(
+                            E.parseJSON(contents, E.toError),
+                            E.map(contents => F.resolve({pkg, contents})),
+                            E.getOrElseW(error => F.reject(`Unable to parse ${pkg.location}/package.json, ${error.message}`))
+                        )))
+                     ),
+                F.parallel(200)
+            )
+        ))
+}
+
+// TODO: rename to denote that this only graphs internal dependencies
 export function dependencyGraph(
     root: string
 ): F.FutureInstance<unknown, DependencyGraph> {
 
-    const Dependencies = t.partial({
-        dependencies: t.record(t.string, t.string),
-        devDependencies: t.record(t.string, t.string),
-        peerDependencies: t.record(t.string, t.string)
-    })
-
+    // REFACTOR: use packagePackageJsons here, `most` is not necessary
     return lernaPackages(root)
         .pipe(F.chain(
             packages => F.attemptP(
@@ -172,10 +197,11 @@ export function dependencyGraph(
                                     acc,
                                     {
                                         [pkg.name]: pipe(
-                                            Dependencies.decode(contents),
+                                            PackageJsonDependencies.decode(contents),
                                             E.map(contents => [
                                                 ...Object.keys(contents.dependencies ?? {}),
                                                 ...Object.keys(contents.devDependencies ?? {}),
+                                                ...Object.keys(contents.optionalDependencies ?? {}),
                                                 ...Object.keys(contents.peerDependencies ?? {}),
                                             ]),
                                             E.map(A.filter(dependency => internalPackages.hasOwnProperty(dependency))),

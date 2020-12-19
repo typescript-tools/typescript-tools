@@ -1,5 +1,6 @@
 import * as t from 'io-ts'
 
+// TODO: replace with the built-in PathReporter.report
 export function validationErrors(
   typeAlias: string,
   errors: t.Errors,

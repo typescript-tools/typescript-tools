@@ -19,7 +19,13 @@
     },
     "references": [
         {
+            "path": "../hoisted-packages"
+        },
+        {
             "path": "../io-ts"
+        },
+        {
+            "path": "../lerna-utils"
         }
     ]
 }

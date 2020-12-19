@@ -1,8 +1,10 @@
 import * as t from 'io-ts'
+import { PackageName } from './PackageName'
+import { PackageVersion } from './PackageVersion'
 
 export const LernaPackage = t.type({
-    name: t.string,
-    version: t.string,
+    name: PackageName,
+    version: PackageVersion,
     location: t.string,
     private: t.boolean
 })
