@@ -1,12 +1,9 @@
 {
-    "name": "@typescript-tools/internal-dependencies",
-    "version": "1.0.10",
-    "description": "Calculate package dependencies living in the same monorepo",
-    "main": "dist/src/index.js",
-    "types": "dist/src/index.d.ts",
-    "bin": {
-        "internal-dependencies": "./dist/src/index.js"
-    },
+    "name": "@typescript-tools/dependency-graph",
+    "version": "1.0.0",
+    "description": "Generate dependency graph of internal packages",
+    "main": "dist/src/dependency-graph.js",
+    "types": "dist/src/dependency-graph.d.ts",
     "scripts": {
         "prepublishOnly": "npm run clean && npm run compile",
         "compile": "tsc -b .",
@@ -42,21 +39,19 @@
         "type": "git",
         "url": "git+https://github.com/typescript-tools/typescript-tools.git"
     },
-    "author": "Eric Crosson <eric.s.crosson@utexas.edu> (https://github.com/ericcrosson)",
+    "author": "Eric Crosson <eric.s.crosson@utexas.edu> (https://github.com/EricCrosson)",
     "license": "ISC",
     "bugs": {
         "url": "https://github.com/typescript-tools/typescript-tools/issues"
     },
     "homepage": "https://github.com/typescript-tools/typescript-tools",
     "dependencies": {
-        "@typescript-tools/dependency-graph": "^1.0.0",
         "@typescript-tools/io-ts": "^1.1.0",
-        "fluture": "^13.0.1",
+        "@typescript-tools/lerna-utils": "^1.1.0",
         "fp-ts": "^2.8.5",
-        "io-ts": "~2.1.3",
-        "io-ts-docopt": "^1.0.0",
-        "shades": "^2.1.0",
-        "ts-pattern": "^1.1.0"
+        "most": "^1.9.0",
+        "most-buffer": "0.0.11",
+        "shades": "^2.1.0"
     },
     "devDependencies": {
         "@types/node": "^14.14.6",
@@ -102,8 +97,10 @@
         ]
     },
     "keywords": [
+        "dependency",
+        "graph",
         "lerna",
-        "dependency"
+        "packages"
     ],
     "publishConfig": {
         "access": "public"

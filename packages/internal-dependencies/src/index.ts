@@ -20,8 +20,9 @@ import { pipe } from 'fp-ts/pipeable'
 import { constVoid, constant } from 'fp-ts/function'
 import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
 import { validationErrors } from '@typescript-tools/io-ts/dist/lib/error'
-import { DependencyGraph, dependencyGraph } from '@typescript-tools/lerna-utils'
+import { dependencyGraph } from '@typescript-tools/dependency-graph'
 import { withEncode, decodeDocopt } from 'io-ts-docopt'
+import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
 
 const docstring = `
 Usage:
@@ -36,7 +37,7 @@ Options:
 const CommandLineOptions = withEncode(
     t.type({
         '<root>': t.string,
-        '<package>': t.array(t.string),
+        '<package>': t.array(PackageName),
         '--path': t.boolean
     }),
     a => ({
@@ -65,15 +66,15 @@ function main(): void {
             }),
         E.map(options => dependencyGraph(options.root)
             .pipe(F.map(
-                // TODO: why is type inferencing breaking down?
-                // I think this is this a bug in fluture?
-                (graph: DependencyGraph) => pipe(
+                // FIXME: bug in fluture's type inferencing
+                (graph: Map<PackageName, LernaPackage[]>) => pipe(
                     options.packages.map(
-                        pkg => O.getOrElse(constant([] as LernaPackage[])) (R.lookup (pkg) (graph))
+                        pkg => O.getOrElse(constant([] as LernaPackage[])) (O.fromNullable(graph.get(pkg)))
                     ),
                     A.flatten
                 )))
             .pipe(F.map(
+                // FIXME: bug in fluture's type inferencing
                 (dependencies: LernaPackage[]) => match(options.mode)
                     .with(
                         'path',

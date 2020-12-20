@@ -2,6 +2,9 @@
     "files": [],
     "references": [
         {
+            "path": "dependency-graph"
+        },
+        {
             "path": "hoisted-packages"
         },
         {
