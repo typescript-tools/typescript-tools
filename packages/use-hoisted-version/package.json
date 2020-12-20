@@ -49,7 +49,7 @@
     },
     "homepage": "https://github.com/typescript-tools/typescript-tools",
     "dependencies": {
-        "@typescript-tools/hoisted-packages": "^0.0.1",
+        "@typescript-tools/hoisted-packages": "^1.1.0",
         "@typescript-tools/io-ts": "^1.1.0",
         "@typescript-tools/lerna-utils": "^1.1.0",
         "debug": "^4.2.0",
