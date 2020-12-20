@@ -5,7 +5,7 @@
     "main": "dist/src/use-hoisted-version.js",
     "types": "dist/src/use-hoisted-version.d.ts",
     "bin": {
-        "use-hoisted-version": "./dist/src/index.js"
+        "use-hoisted-version": "./dist/src/use-hoisted-version.js"
     },
     "scripts": {
         "prepublishOnly": "npm run clean && npm run compile",
