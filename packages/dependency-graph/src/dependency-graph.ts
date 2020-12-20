@@ -19,6 +19,7 @@ import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
 import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
 
 // TODO: use Map over POJO for performance
+// TODO: test this function
 
 const fromFuture = <L extends Error, R>(future: F.FutureInstance<L, R>): most.Stream<R> =>
     most.fromPromise(F.promise(future))
