@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.1](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/use-hoisted-version@1.1.0...@typescript-tools/use-hoisted-version@1.1.1) (2020-12-20)
+
+
+### Bug Fixes
+
+* pin lerna package version ([7905d73](https://github.com/typescript-tools/typescript-tools/commit/7905d73b49562d7569effa88a9d40ce238264c2e))
+
+
+
+
+
 # 1.1.0 (2020-12-19)
 
 
