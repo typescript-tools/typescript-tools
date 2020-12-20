@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.1](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/dependency-graph@1.1.0...@typescript-tools/dependency-graph@1.1.1) (2020-12-20)
+
+
+### Bug Fixes
+
+* expose promisified version of dependencyGraph ([f6a0d59](https://github.com/typescript-tools/typescript-tools/commit/f6a0d591d5bb086661221834eb9afc12b1f0abd4))
+
+
+
+
+
 # [1.1.0](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/dependency-graph@1.0.1...@typescript-tools/dependency-graph@1.1.0) (2020-12-20)
 
 
