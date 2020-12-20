@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.2](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/use-hoisted-version@1.1.1...@typescript-tools/use-hoisted-version@1.1.2) (2020-12-20)
+
+
+### Bug Fixes
+
+* point bin at entrypoint ([7746a86](https://github.com/typescript-tools/typescript-tools/commit/7746a8661eaaf186205d021f1ef8e517e0a504d8))
+
+
+
+
+
 ## [1.1.1](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/use-hoisted-version@1.1.0...@typescript-tools/use-hoisted-version@1.1.1) (2020-12-20)
 
 
