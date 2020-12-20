@@ -24,8 +24,6 @@ import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
 const fromFuture = <L extends Error, R>(future: F.FutureInstance<L, R>): most.Stream<R> =>
     most.fromPromise(F.promise(future))
 
-export { promise } from 'fluture'
-
 /**
  * Generate a DAG of internal dependencies.
  */
@@ -125,3 +123,11 @@ export function dependencyGraph(
             )
         ))
 }
+
+/**
+ * A hack for libraries not using the same version of fluture.
+ */
+export const dependencyGraphPromise = (root: string) => F.promise(
+    dependencyGraph(root)
+        .pipe(F.mapRej(left => new Error(`${left}`)))
+)
