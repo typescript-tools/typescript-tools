@@ -1,6 +1,6 @@
 {
     "name": "@typescript-tools/dependency-graph",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Generate dependency graph of internal packages",
     "main": "dist/src/dependency-graph.js",
     "types": "dist/src/dependency-graph.d.ts",
@@ -47,7 +47,7 @@
     "homepage": "https://github.com/typescript-tools/typescript-tools",
     "dependencies": {
         "@typescript-tools/io-ts": "^1.1.0",
-        "@typescript-tools/lerna-utils": "^1.1.0",
+        "@typescript-tools/lerna-utils": "^1.1.1",
         "fp-ts": "^2.8.5",
         "most": "^1.9.0",
         "most-buffer": "0.0.11",
