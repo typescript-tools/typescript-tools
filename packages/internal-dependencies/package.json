@@ -1,6 +1,6 @@
 {
     "name": "@typescript-tools/internal-dependencies",
-    "version": "1.0.11",
+    "version": "1.0.12",
     "description": "Calculate package dependencies living in the same monorepo",
     "main": "dist/src/index.js",
     "types": "dist/src/index.d.ts",
@@ -49,7 +49,7 @@
     },
     "homepage": "https://github.com/typescript-tools/typescript-tools",
     "dependencies": {
-        "@typescript-tools/dependency-graph": "^1.0.1",
+        "@typescript-tools/dependency-graph": "^1.1.0",
         "@typescript-tools/io-ts": "^1.1.0",
         "fluture": "^13.0.1",
         "fp-ts": "^2.8.5",
