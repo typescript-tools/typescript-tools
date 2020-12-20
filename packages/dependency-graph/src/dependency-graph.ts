@@ -24,6 +24,8 @@ import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
 const fromFuture = <L extends Error, R>(future: F.FutureInstance<L, R>): most.Stream<R> =>
     most.fromPromise(F.promise(future))
 
+export { promise } from 'fluture'
+
 /**
  * Generate a DAG of internal dependencies.
  */
