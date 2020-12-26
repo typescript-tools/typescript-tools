@@ -36,7 +36,6 @@ const debug = {
     manifest: Debug('manifest')
 }
 
-// TODO: drop the `--package-dir`, just take args
 const docstring = `
 Usage:
     update-lerna-manifest <glob>...
