@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/dependency-graph@1.1.1...@typescript-tools/dependency-graph@1.2.0) (2020-12-26)
+
+
+### Features
+
+* add package update-lerna-manifest ([630c66a](https://github.com/typescript-tools/typescript-tools/commit/630c66ac552f55953790d7e5faa476886330ceda))
+
+
+
+
+
 ## [1.1.1](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/dependency-graph@1.1.0...@typescript-tools/dependency-graph@1.1.1) (2020-12-20)
 
 

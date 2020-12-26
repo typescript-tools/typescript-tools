@@ -20,6 +20,9 @@
             "path": "pin-lerna-package-versions"
         },
         {
+            "path": "update-lerna-manifest"
+        },
+        {
             "path": "use-hoisted-version"
         }
     ]
