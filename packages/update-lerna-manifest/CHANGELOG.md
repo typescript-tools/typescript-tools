@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.1](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/update-lerna-manifest@1.2.0...@typescript-tools/update-lerna-manifest@1.2.1) (2020-12-26)
+
+
+### Bug Fixes
+
+* point bin to correct file ([172758a](https://github.com/typescript-tools/typescript-tools/commit/172758a19617035344ef9890fb9aaf7e03dbf931))
+
+
+
+
+
 # [1.2.0](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/update-lerna-manifest@1.1.0...@typescript-tools/update-lerna-manifest@1.2.0) (2020-12-26)
 
 
