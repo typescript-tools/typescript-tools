@@ -24,7 +24,7 @@ This is sometimes the case when e.g. retrofitting an existing monorepo
 with lerna.
 
 It is recommended to hook this tool automatically into the build
-process somewhow, before running `lerna bootstrap`.
+process somehow, before running `lerna bootstrap`.
 
 ## Install
 
@@ -75,3 +75,9 @@ Specifically, it considers a package to be a lerna package if the
 `extends` property ends with `/tsconfig.settings.json`. This may
 result in false positives with your monorepo, in which case tightening
 the `--package-dir` globs would be prudent.
+
+### Top Level `tsconfig.json`
+
+If `update-lerna-manifest` detects a top-level tsonfig.json (like
+[this one](https://github.com/RyanCavanaugh/learn-a#tsconfigjson)) it
+will keep this file up to date too.
