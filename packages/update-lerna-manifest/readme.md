@@ -36,11 +36,20 @@ npm install --save-dev @typescript-tools/update-lerna-manifest
 
 ```
 Usage:
-    update-lerna-manifest --package-dir=<glob>...
+    update-lerna-manifest <glob>...
 
 Options:
-    --package-dir=<glob>    Glob of package directories to search for lerna packages
+    <glob>    Glob of package directories to search for lerna packages
 ```
+
+Example:
+
+``` shell
+npx update-lerna-manifest packages
+```
+
+Note that the glob only needs to point to a parent directory
+containing lerna packages, each glob will be scanned recursively.
 
 `update-lerna-manifest` will search for a `tsconfig.json` file
 extending a parent's tsconfig.json file, like the following:

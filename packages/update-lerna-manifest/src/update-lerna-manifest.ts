@@ -36,20 +36,21 @@ const debug = {
     manifest: Debug('manifest')
 }
 
+// TODO: drop the `--package-dir`, just take args
 const docstring = `
 Usage:
-    update-lerna-manifest --package-dir=<glob>...
+    update-lerna-manifest <glob>...
 
 Options:
-    --package-dir=<glob>    Glob of package directories to search for lerna packages
+    <glob>    Glob of package directories to search for lerna packages
 `
 
 const CommandLineOptions = withEncode(
     t.type({
-        '--package-dir': t.array(t.string),
+        '<glob>': t.array(t.string),
     }),
     a => ({
-        packages: a['--package-dir']
+        globs: a['<glob>']
     })
 )
 
@@ -82,8 +83,8 @@ function main(): void {
     decodeDocopt(CommandLineOptions, docstring)
         .pipe(
             F.map(
-                ({ packages }: CommandLineOptions) => glob.sync(
-                    packages.map(dir => path.resolve(dir, '**', 'tsconfig.json')),
+                ({ globs }: CommandLineOptions) => glob.sync(
+                    globs.map(glob => path.resolve(glob, '**', 'tsconfig.json')),
                     {
                         followSymbolicLinks: false,
                         onlyFiles: true,
