@@ -88,6 +88,8 @@ function main(): void {
                         followSymbolicLinks: false,
                         onlyFiles: true,
                         unique: true,
+                        deep: 2,
+                        ignore: ['node_modules/**']
                     }
                 )
             )
