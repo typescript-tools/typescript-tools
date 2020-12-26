@@ -5,7 +5,7 @@
     "main": "dist/src/update-lerna-manifest.js",
     "types": "dist/src/update-lerna-manifest.d.ts",
     "bin": {
-        "update-lerna-manifest": "./dist/src/index.js"
+        "update-lerna-manifest": "./dist/src/update-lerna-manifest.js"
     },
     "scripts": {
         "prepublishOnly": "npm run clean && npm run compile",
