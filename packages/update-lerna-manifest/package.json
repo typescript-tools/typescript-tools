@@ -1,6 +1,6 @@
 {
     "name": "@typescript-tools/update-lerna-manifest",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "Keep the lerna manifest up to date",
     "main": "dist/src/update-lerna-manifest.js",
     "types": "dist/src/update-lerna-manifest.d.ts",
