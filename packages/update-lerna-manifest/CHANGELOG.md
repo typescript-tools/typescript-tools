@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.0.1](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/update-lerna-manifest@2.0.0...@typescript-tools/update-lerna-manifest@2.0.1) (2020-12-26)
+
+
+### Bug Fixes
+
+* optimize speed of glob resolution ([1d0a572](https://github.com/typescript-tools/typescript-tools/commit/1d0a57271a5612579ab436874eabaa1458b744a1))
+
+
+
+
+
 # [2.0.0](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/update-lerna-manifest@1.2.1...@typescript-tools/update-lerna-manifest@2.0.0) (2020-12-26)
 
 **Note:** Version bump only for package @typescript-tools/update-lerna-manifest
