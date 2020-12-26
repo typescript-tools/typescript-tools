@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.1.0](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/update-lerna-manifest@2.0.1...@typescript-tools/update-lerna-manifest@2.1.0) (2020-12-26)
+
+
+### Features
+
+* update top-level tscsonfig with lerna manifest ([4106a1b](https://github.com/typescript-tools/typescript-tools/commit/4106a1b5a4e397448424b22ec05b05ab539ed5da))
+
+
+
+
+
 ## [2.0.1](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/update-lerna-manifest@2.0.0...@typescript-tools/update-lerna-manifest@2.0.1) (2020-12-26)
 
 
