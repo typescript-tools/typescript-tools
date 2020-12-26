@@ -13,6 +13,7 @@ import * as O from 'fp-ts/Option'
 import * as NEA from 'fp-ts/NonEmptyArray'
 import * as D from 'io-ts-docopt'
 import * as F from 'fluture'
+import Debug from 'debug'
 import deepEqual from 'fast-deep-equal'
 import findUp from 'find-up'
 import glob from 'fast-glob'
@@ -27,8 +28,13 @@ import {
     readFile,
     writeFile,
     prettyStringifyJson,
+    trace,
 } from '@typescript-tools/lerna-utils'
 import { StringEndingWithTsconfigSettingsJson } from './string-ending-with-tsconfig-settings-json'
+
+const debug = {
+    manifest: Debug('manifest')
+}
 
 const docstring = `
 Usage:
@@ -153,6 +159,7 @@ function main(): void {
                                 }),
                                 E.chain(contents => pipe(
                                     prettyStringifyJson(contents, E.toError),
+                                    E.map(trace(debug.manifest, 'Updating lerna manifest')),
                                     E.mapLeft((err): Err => ({ type: 'unable to stringify new lerna.json', err })))
                                 ),
                                 E.map(contents => writeFile (path.join(root, 'lerna.json')) (contents).pipe(F.mapRej((err): Err => ({ type: 'unable to write lerna.json', err })))),
