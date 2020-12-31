@@ -1,9 +1,9 @@
 {
-    "name": "@typescript-tools/hoisted-packages",
-    "version": "1.1.1",
-    "description": "Determine packages `lerna bootstrap --hoist` will hoist",
-    "main": "dist/src/hoisted-packages.js",
-    "types": "dist/src/hoisted-packages.d.ts",
+    "name": "@typescript-tools/package-manifests",
+    "version": "1.0.0",
+    "description": "Read every package's package.json",
+    "main": "dist/src/package-manifests.js",
+    "types": "dist/src/package-manifests.d.ts",
     "scripts": {
         "prepublishOnly": "npm run clean && npm run compile",
         "compile": "tsc -b .",
@@ -48,7 +48,6 @@
     "dependencies": {
         "@typescript-tools/io-ts": "^1.1.0",
         "@typescript-tools/lerna-utils": "^1.1.1",
-        "@typescript-tools/package-manifests": "^1.0.0",
         "fluture": "^13.0.1",
         "fp-ts": "^2.8.5"
     },
@@ -95,11 +94,6 @@
             "ts-node/register"
         ]
     },
-    "keywords": [
-        "lerna",
-        "bootstrap",
-        "hoist"
-    ],
     "publishConfig": {
         "access": "public"
     }

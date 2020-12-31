@@ -55,26 +55,3 @@ export function lernaPackages(
         }
     })
 }
-
-// TODO: pull into its own package
-export function packagePackageJsons(
-    root: string
-): F.FutureInstance<unknown,{
-    pkg: LernaPackage,
-    contents: E.Json
-}[]> {
-    return lernaPackages(root)
-        .pipe(F.chain(
-            flow(
-                A.map(pkg =>
-                    readFile(path.resolve(pkg.location, 'package.json'))
-                        .pipe(F.chain(contents => pipe(
-                            E.parseJSON(contents, E.toError),
-                            E.map(contents => F.resolve({pkg, contents})),
-                            E.getOrElseW(error => F.reject(`Unable to parse ${pkg.location}/package.json, ${error.message}`))
-                        )))
-                     ),
-                F.parallel(200)
-            )
-        ))
-}

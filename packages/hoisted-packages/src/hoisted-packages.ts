@@ -5,7 +5,7 @@ import * as R from 'fp-ts/Record'
 import * as F from 'fluture'
 import { contramap, ordNumber, getDualOrd } from 'fp-ts/Ord'
 import { pipe } from 'fp-ts/function'
-import { packagePackageJsons } from '@typescript-tools/lerna-utils'
+import { packageManifests } from '@typescript-tools/package-manifests'
 import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
 import { PackageVersion } from '@typescript-tools/io-ts/dist/lib/PackageVersion'
 import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
@@ -26,7 +26,7 @@ export function hoistedPackages(
     root: string,
 ): F.FutureInstance<unknown, Map<PackageName, PackageVersion>> {
 
-    return packagePackageJsons(root)
+    return packageManifests(root)
         .pipe(F.map(
             // FIXME: why is this type assertion necessary with F.map? It should be inferred
             (packages: {pkg: LernaPackage, contents: E.Json}[]) => {

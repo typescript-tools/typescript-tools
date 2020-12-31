@@ -23,9 +23,6 @@
         },
         {
             "path": "../lerna-utils"
-        },
-        {
-            "path": "../package-manifests"
         }
     ]
 }
