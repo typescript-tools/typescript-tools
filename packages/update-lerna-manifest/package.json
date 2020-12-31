@@ -50,6 +50,7 @@
     },
     "homepage": "https://github.com/typescript-tools/typescript-tools",
     "dependencies": {
+        "@strong-roots-capital/trace": "^1.0.0",
         "@typescript-tools/lerna-utils": "^1.1.1",
         "debug": "^4.2.0",
         "fast-deep-equal": "^3.1.3",

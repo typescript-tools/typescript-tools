@@ -24,11 +24,11 @@ import { PackageVersion } from '@typescript-tools/io-ts/dist/lib/PackageVersion'
 import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
 import { validationErrors } from '@typescript-tools/io-ts/dist/lib/error'
 import { PackageJsonDependencies } from '@typescript-tools/io-ts/dist/lib/PackageJsonDependencies'
+import { trace } from '@strong-roots-capital/trace'
 import {
     lernaPackages,
     readFile,
     writeFile,
-    trace,
     prettyStringifyJson,
 } from '@typescript-tools/lerna-utils'
 

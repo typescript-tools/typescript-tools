@@ -20,22 +20,6 @@ export const readFile = (file: fs.PathLike): F.FutureInstance<NodeJS.ErrnoExcept
 export const writeFile = (file: fs.PathLike) => (contents: string): F.FutureInstance<NodeJS.ErrnoException, void> =>
     F.node(done => fs.writeFile(file, contents, done))
 
-// TODO: pull into its own external package
-/* eslint-disable @typescript-eslint/no-explicit-any */
-export function trace(
-    logger: typeof console.log,
-    ...tag: any[]
-): <T>(value: T) => T {
-    return function trace<T>(value: T): T {
-        if (tag.length > 0) {
-            logger(...tag, value)
-        } else {
-            logger(value)
-        }
-        return value
-    }
-}
-
 // TODO: pull into its own package
 export function prettyStringifyJson<E>(
     u: unknown,

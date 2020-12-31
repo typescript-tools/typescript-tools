@@ -25,11 +25,11 @@ import { withEncode} from 'io-ts-docopt'
 import { PathReporter } from 'io-ts/lib/PathReporter'
 import { match } from 'ts-pattern'
 import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
+import { trace } from '@strong-roots-capital/trace'
 import {
     readFile as readFile_,
     writeFile as writeFile_,
     prettyStringifyJson,
-    trace,
 } from '@typescript-tools/lerna-utils'
 import { StringEndingWithTsconfigSettingsJson } from './string-ending-with-tsconfig-settings-json'
 
