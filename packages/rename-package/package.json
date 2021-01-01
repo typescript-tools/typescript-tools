@@ -1,6 +1,6 @@
 {
     "name": "@typescript-tools/rename-package",
-    "version": "0.2.0",
+    "version": "1.0.0",
     "description": "Rename an internal package",
     "main": "dist/src/rename-package.js",
     "types": "dist/src/rename-package.d.ts",
