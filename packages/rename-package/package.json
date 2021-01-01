@@ -1,12 +1,9 @@
 {
-    "name": "@typescript-tools/pin-lerna-package-versions",
-    "version": "2.2.1",
-    "description": "Pin lerna dependencies to latest managed version",
-    "main": "dist/src/index.js",
-    "types": "dist/src/index.d.ts",
-    "bin": {
-        "pin-lerna-package-versions": "./dist/src/index.js"
-    },
+    "name": "@typescript-tools/rename-package",
+    "version": "0.0.1",
+    "description": "Rename an internal package",
+    "main": "dist/src/rename-package.js",
+    "types": "dist/src/rename-package.d.ts",
     "scripts": {
         "prepublishOnly": "npm run clean && npm run compile",
         "compile": "tsc -b .",
@@ -42,7 +39,7 @@
         "type": "git",
         "url": "git+https://github.com/typescript-tools/typescript-tools.git"
     },
-    "author": "Eric Crosson <eric.s.crosson@utexas.edu> (https://github.com/ericcrosson)",
+    "author": "Eric Crosson <eric.s.crosson@utexas.edu> (https://github.com/EricCrosson)",
     "license": "ISC",
     "bugs": {
         "url": "https://github.com/typescript-tools/typescript-tools/issues"
@@ -52,15 +49,13 @@
         "@strong-roots-capital/trace": "^1.0.0",
         "@typescript-tools/io-ts": "^1.1.0",
         "@typescript-tools/lerna-utils": "^1.1.1",
+        "@typescript-tools/package-manifests": "^1.0.0",
         "@typescript-tools/stringify-json": "^1.0.0",
         "debug": "^4.2.0",
         "fast-deep-equal": "^3.1.3",
         "fluture": "^13.0.1",
         "fp-ts": "^2.9.3",
-        "io-ts": "~2.1.3",
-        "io-ts-docopt": "^1.0.0",
-        "shades": "^2.1.0",
-        "ts-pattern": "^1.1.0"
+        "io-ts-docopt": "^1.0.0"
     },
     "devDependencies": {
         "@types/debug": "^4.1.5",
@@ -107,9 +102,9 @@
         ]
     },
     "keywords": [
-        "pin",
+        "rename",
         "lerna",
-        "version"
+        "package"
     ],
     "publishConfig": {
         "access": "public"

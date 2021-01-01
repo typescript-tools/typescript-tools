@@ -26,6 +26,12 @@
         },
         {
             "path": "../lerna-utils"
+        },
+        {
+            "path": "../monorepo-root"
+        },
+        {
+            "path": "../stringify-json"
         }
     ]
 }

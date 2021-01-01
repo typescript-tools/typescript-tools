@@ -14,19 +14,20 @@ import * as F from 'fluture'
 import * as D from 'io-ts-docopt'
 import { PathReporter } from 'io-ts/lib/PathReporter'
 import { pipe, flow, constant, constVoid } from 'fp-ts/function'
-import { withEncode } from 'io-ts-types'
+import { withEncode } from 'io-ts-docopt'
 import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
 import { PackageJsonDependencies } from '@typescript-tools/io-ts/dist/lib/PackageJsonDependencies'
 import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
 import { PackageVersion } from '@typescript-tools/io-ts/dist/lib/PackageVersion'
 import { hoistedPackages } from '@typescript-tools/hoisted-packages'
-import { readFile, writeFile, prettyStringifyJson } from '@typescript-tools/lerna-utils'
+import { readFile, writeFile } from '@typescript-tools/lerna-utils'
+import { stringifyJSON } from '@typescript-tools/stringify-json'
+import { monorepoRoot, MonorepoRootErr } from '@typescript-tools/monorepo-root'
 import { trace } from '@strong-roots-capital/trace'
 import { mod } from 'shades'
-import findUp from 'find-up'
+import { match } from 'ts-pattern'
 import Debug from 'debug'
 import deepEqual from 'fast-deep-equal'
-import { match } from 'ts-pattern'
 
 const debug = {
     cmd: Debug('hoist')
@@ -37,7 +38,7 @@ Usage:
     use-hoisted-version <package>
 
 Options:
-    package    Package for which to update dependencies
+    <package>    Package for which to update dependencies
 `
 
 const CommandLineOptions = withEncode(
@@ -50,6 +51,7 @@ const CommandLineOptions = withEncode(
 )
 
 type Err =
+    | MonorepoRootErr
     | { type: 'docopt decode', err: string }
     | { type: 'package not in monorepo' }
     | { type: 'unable to parse package.json', err: string }
@@ -60,12 +62,6 @@ type Err =
 const decodeDocopt = flow(
     D.decodeDocopt,
     E.mapLeft((err): Err => ({ type: 'docopt decode', err: PathReporter.report(E.left(err)).join('\n') })),
-)
-const findup = flow(
-    findUp.sync as (name: string | readonly string[], options?: findUp.Options) => string | undefined,
-    O.fromNullable,
-    O.map(path.dirname),
-    E.fromOption((): Err => ({ type: 'package not in monorepo' })),
 )
 
 const updateDependencies =
@@ -110,7 +106,7 @@ const updateDependencies =
                 E.fromOption((): Err => ({ type: 'no-op' })),
                 E.map(trace(debug.cmd, 'Updating file', packageJson)),
                 E.chain(updates => pipe(
-                    prettyStringifyJson(updates, E.toError),
+                    stringifyJSON(updates, E.toError),
                     E.mapLeft((err): Err => ({ type: 'unable to stringify package.json', err }))
                 )),
                 E.map(
@@ -127,9 +123,9 @@ const updateDependencies =
 
 function main(): void {
     pipe(
-        decodeDocopt(CommandLineOptions, docstring, { help: true, exit: true }),
+        decodeDocopt(CommandLineOptions, docstring),
         E.chain(options => pipe(
-            findup('lerna.json', { cwd: options.package, type: 'file' }),
+            monorepoRoot(options.package) as E.Either<Err, string>,
             E.map(root => ({ options, root }))
         )),
         E.map(

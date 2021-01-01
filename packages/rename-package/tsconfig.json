@@ -19,7 +19,13 @@
     },
     "references": [
         {
+            "path": "../io-ts"
+        },
+        {
             "path": "../lerna-utils"
+        },
+        {
+            "path": "../package-manifests"
         },
         {
             "path": "../stringify-json"

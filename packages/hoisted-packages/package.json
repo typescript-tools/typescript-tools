@@ -50,7 +50,7 @@
         "@typescript-tools/lerna-utils": "^1.1.1",
         "@typescript-tools/package-manifests": "^1.0.0",
         "fluture": "^13.0.1",
-        "fp-ts": "^2.8.5"
+        "fp-ts": "^2.9.3"
     },
     "devDependencies": {
         "@types/node": "^14.14.6",

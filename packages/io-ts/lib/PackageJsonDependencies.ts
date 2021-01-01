@@ -9,4 +9,6 @@ export const PackageJsonDependencies = t.partial({
     peerDependencies: t.record(PackageName, PackageVersion),
 })
 
+// DISCUSS: why does the computed type use {} instead of a typed record?
+// Really crimping my type-inferencing style
 export type PackageJsonDependencies = t.TypeOf<typeof PackageJsonDependencies>;

@@ -24,12 +24,12 @@ import { PackageVersion } from '@typescript-tools/io-ts/dist/lib/PackageVersion'
 import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
 import { validationErrors } from '@typescript-tools/io-ts/dist/lib/error'
 import { PackageJsonDependencies } from '@typescript-tools/io-ts/dist/lib/PackageJsonDependencies'
+import { stringifyJSON } from '@typescript-tools/stringify-json'
 import { trace } from '@strong-roots-capital/trace'
 import {
     lernaPackages,
     readFile,
     writeFile,
-    prettyStringifyJson,
 } from '@typescript-tools/lerna-utils'
 
 const debug = {
@@ -131,7 +131,7 @@ function updateDependencies(
                 E.fromOption((): NoChanges => ({ type: 'no-op' })),
                 E.map(trace(debug.cmd, 'Updating file', packageJson)),
                 E.chain(updates => pipe(
-                    prettyStringifyJson(updates, E.toError),
+                    stringifyJSON(updates, E.toError),
                     E.mapLeft((error): NoChanges => ({ type: 'error', error }))
                 )),
                 E.map(writeFile(packageJson)),

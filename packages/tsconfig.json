@@ -17,7 +17,19 @@
             "path": "lerna-utils"
         },
         {
+            "path": "monorepo-root"
+        },
+        {
+            "path": "package-manifests"
+        },
+        {
             "path": "pin-lerna-package-versions"
+        },
+        {
+            "path": "rename-package"
+        },
+        {
+            "path": "stringify-json"
         },
         {
             "path": "update-lerna-manifest"

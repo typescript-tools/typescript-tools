@@ -26,10 +26,10 @@ import { PathReporter } from 'io-ts/lib/PathReporter'
 import { match } from 'ts-pattern'
 import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
 import { trace } from '@strong-roots-capital/trace'
+import { stringifyJSON } from '@typescript-tools/stringify-json'
 import {
     readFile as readFile_,
     writeFile as writeFile_,
-    prettyStringifyJson,
 } from '@typescript-tools/lerna-utils'
 import { StringEndingWithTsconfigSettingsJson } from './string-ending-with-tsconfig-settings-json'
 
@@ -139,6 +139,7 @@ function main(): void {
                 NEA.fromArray,
                 E.fromOption((): Err => ({ type: 'found no matching packages' })),
                 E.chain(packages => pipe(
+                    // TODO: use monorepo-root package
                     findup('lerna.json', { cwd: NEA.head(packages) }),
                     E.map(root => ({
                         root,
@@ -172,7 +173,7 @@ function main(): void {
                                     : E.right((manifest.packages = packages, manifest))
                                 ),
                                 E.chain(contents => pipe(
-                                    prettyStringifyJson(contents, E.toError),
+                                    stringifyJSON(contents, E.toError),
                                     E.map(trace(debug.manifest, 'Updating lerna manifest')),
                                     E.mapLeft((err): Err => ({ type: 'unable to stringify json', json: contents, err }))
                                 )),
@@ -205,7 +206,7 @@ function main(): void {
                                     : E.right((manifest.references = references, manifest))
                                 ),
                                 E.chain(contents => pipe(
-                                    prettyStringifyJson(contents, E.toError),
+                                    stringifyJSON(contents, E.toError),
                                     E.mapLeft((err): Err => ({ type: 'unable to stringify json', json: contents, err }))
                                 )),
                                 E.map(writeFile(path.join(root, 'tsconfig.json'))),

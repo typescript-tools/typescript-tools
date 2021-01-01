@@ -21,14 +21,6 @@ export const writeFile = (file: fs.PathLike) => (contents: string): F.FutureInst
     F.node(done => fs.writeFile(file, contents, done))
 
 // TODO: pull into its own package
-export function prettyStringifyJson<E>(
-    u: unknown,
-    onError: (reason: unknown) => E
-): E.Either<E, string> {
-    return E.tryCatch(() => JSON.stringify(u, null, 4) + '\n', onError)
-}
-
-// TODO: pull into its own package
 /**
  * Get list of all lerna packages from `lerna list --all`.
  */
