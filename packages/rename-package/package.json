@@ -4,6 +4,9 @@
     "description": "Rename an internal package",
     "main": "dist/src/rename-package.js",
     "types": "dist/src/rename-package.d.ts",
+    "bin": {
+        "rename-package": "./dist/src/rename-package.js"
+    },
     "scripts": {
         "prepublishOnly": "npm run clean && npm run compile",
         "compile": "tsc -b .",
