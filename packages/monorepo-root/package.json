@@ -1,6 +1,6 @@
 {
     "name": "@typescript-tools/monorepo-root",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Find the monorepo root directory",
     "main": "dist/src/monorepo-root.js",
     "types": "dist/src/monorepo-root.d.ts",
