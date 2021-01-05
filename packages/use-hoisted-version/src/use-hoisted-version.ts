@@ -12,9 +12,9 @@ import * as O from 'fp-ts/Option'
 import * as R from 'fp-ts/Record'
 import * as F from 'fluture'
 import * as D from 'io-ts-docopt'
+import { withEncode } from 'io-ts-docopt'
 import { PathReporter } from 'io-ts/lib/PathReporter'
 import { pipe, flow, constant, constVoid } from 'fp-ts/function'
-import { withEncode } from 'io-ts-docopt'
 import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
 import { PackageJsonDependencies } from '@typescript-tools/io-ts/dist/lib/PackageJsonDependencies'
 import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
@@ -105,8 +105,8 @@ const updateDependencies =
                 updates,
                 E.fromOption((): Err => ({ type: 'no-op' })),
                 E.map(trace(debug.cmd, 'Updating file', packageJson)),
-                E.chain(updates => pipe(
-                    stringifyJSON(updates, E.toError),
+                E.chain(flow(
+                    stringifyJSON(E.toError),
                     E.mapLeft((err): Err => ({ type: 'unable to stringify package.json', err }))
                 )),
                 E.map(

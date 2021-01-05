@@ -14,7 +14,7 @@ import * as F from 'fluture'
 import Debug from 'debug'
 import deepEqual from 'fast-deep-equal'
 import { mod } from 'shades'
-import { pipe } from 'fp-ts/function'
+import { pipe, flow } from 'fp-ts/function'
 import { constVoid, constant } from 'fp-ts/function'
 import { match } from 'ts-pattern'
 import { withEncode, decodeDocopt } from 'io-ts-docopt'
@@ -130,8 +130,8 @@ function updateDependencies(
                 updates,
                 E.fromOption((): NoChanges => ({ type: 'no-op' })),
                 E.map(trace(debug.cmd, 'Updating file', packageJson)),
-                E.chain(updates => pipe(
-                    stringifyJSON(updates, E.toError),
+                E.chain(flow(
+                    stringifyJSON(E.toError),
                     E.mapLeft((error): NoChanges => ({ type: 'error', error }))
                 )),
                 E.map(writeFile(packageJson)),

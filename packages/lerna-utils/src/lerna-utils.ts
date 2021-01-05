@@ -3,10 +3,8 @@
  * Internal utilities for interacting with a lerna monorepo
  */
 
-import * as path from 'path'
 import * as fs from 'fs'
 import * as t from 'io-ts'
-import * as A from 'fp-ts/Array'
 import * as E from 'fp-ts/Either'
 import * as F from 'fluture'
 import execa from 'execa'

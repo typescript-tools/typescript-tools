@@ -17,6 +17,9 @@
             "path": "lerna-utils"
         },
         {
+            "path": "merge-package-locks"
+        },
+        {
             "path": "monorepo-root"
         },
         {

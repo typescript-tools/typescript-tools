@@ -172,10 +172,10 @@ function main(): void {
                                     ? E.left({ type: 'no-op' } as Err)
                                     : E.right((manifest.packages = packages, manifest))
                                 ),
-                                E.chain(contents => pipe(
-                                    stringifyJSON(contents, E.toError),
+                                E.chain(json => pipe(
+                                    stringifyJSON (E.toError) (json),
                                     E.map(trace(debug.manifest, 'Updating lerna manifest')),
-                                    E.mapLeft((err): Err => ({ type: 'unable to stringify json', json: contents, err }))
+                                    E.mapLeft((err): Err => ({ type: 'unable to stringify json', json, err }))
                                 )),
                                 E.map(writeFile(path.join(root, 'lerna.json'))),
                                 E.getOrElseW(F.reject)
@@ -205,9 +205,9 @@ function main(): void {
                                     ? E.left({ type: 'no-op' } as Err)
                                     : E.right((manifest.references = references, manifest))
                                 ),
-                                E.chain(contents => pipe(
-                                    stringifyJSON(contents, E.toError),
-                                    E.mapLeft((err): Err => ({ type: 'unable to stringify json', json: contents, err }))
+                                E.chain(json => pipe(
+                                    stringifyJSON (E.toError) (json),
+                                    E.mapLeft((err): Err => ({ type: 'unable to stringify json', json, err }))
                                 )),
                                 E.map(writeFile(path.join(root, 'tsconfig.json'))),
                                 E.getOrElseW(F.reject)

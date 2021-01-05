@@ -79,8 +79,8 @@ const decodeDocopt = <C extends t.Mixed>(codec: C, docstring: string): F.FutureI
     E.getOrElse(err => F.reject(err) as F.FutureInstance<Err, C['_O']>),
 )
 
-const stringifyJSON = (value: unknown) => pipe(
-    StringifjJSON_(value, E.toError),
+const stringifyJSON = flow(
+    StringifjJSON_(E.toError),
     E.mapLeft((err): Err => ({ type: 'unable to stringify package.json', err }))
 )
 

@@ -8,10 +8,8 @@ import * as E from 'fp-ts/Either'
 /**
  * Stringify `value` as JSON, with `space`-space indention.
  */
-export function stringifyJSON<E>(
-    value: unknown,
+export const stringifyJSON = <E>(
     onError: (reason: unknown) => E,
     space = 4
-): E.Either<E, string> {
-    return E.tryCatch(() => JSON.stringify(value, null, space) + '\n', onError)
-}
+) => (value: unknown): E.Either<E, string> =>
+    E.tryCatch(() => JSON.stringify(value, null, space) + '\n', onError)
