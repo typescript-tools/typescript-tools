@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/lerna-utils@1.2.0...@typescript-tools/lerna-utils@1.3.0) (2021-01-05)
+
+
+### Features
+
+* add tool merge-package-locks ([765c4ad](https://github.com/typescript-tools/typescript-tools/commit/765c4ad9de6e7a752f68332d896b5eb5c564109d))
+
+
+
+
+
 # [1.2.0](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/lerna-utils@1.1.1...@typescript-tools/lerna-utils@1.2.0) (2021-01-01)
 
 
