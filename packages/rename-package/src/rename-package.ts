@@ -28,9 +28,6 @@ import { stringifyJSON as StringifjJSON_ } from '@typescript-tools/stringify-jso
 import Debug from 'debug'
 import deepEqual from 'fast-deep-equal'
 
-// DISCUSS: do we get alphabetical ordering of imports for free? or
-// do we need to add that explicitly. I think I saw it
-
 const debug = {
     cmd: Debug('rename')
 }
