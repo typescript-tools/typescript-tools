@@ -1,0 +1,98 @@
+{
+    "name": "@typescript-tools/add-internal-packages-to-lockfiles",
+    "version": "1.0.0",
+    "description": "Add published internal packages to lockfiles",
+    "homepage": "https://github-personal/typescript-tools/typescript-tools",
+    "bugs": {
+        "url": "https://github-personal/typescript-tools/typescript-tools/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github-personal/typescript-tools/typescript-tools.git"
+    },
+    "license": "ISC",
+    "author": "Eric Crosson <eric.s.crosson@utexas.edu> (https://github-personal/eric.s.crosson@utexas.edu)",
+    "main": "dist/src/index.js",
+    "types": "dist/src/index.d.ts",
+    "files": [
+        "dist/src/"
+    ],
+    "bin": {
+        "add-internal-packages-to-lockfiles": "./dist/src/index.js"
+    },
+    "scripts": {
+        "prepublishOnly": "npm run compile",
+        "ava": "echo 'No tests defined'",
+        "clean": "rimraf --no-glob dist",
+        "compile": "tsc --build --incremental .",
+        "coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
+        "lint": "eslint --ext ts .",
+        "lint:fix": "eslint --ext ts --fix .",
+        "lint-staged": "lint-staged",
+        "prettier:check": "prettier --list-different src/**/*.ts",
+        "prettier:write": "prettier --write src/**/*.ts",
+        "test": "echo 'No tests defined'",
+        "watch:ava": "nodemon -e 'ts json' -x 'npm run ava -- -s -v --fail-fast || true'",
+        "watch:compile": "nodemon -e 'ts json' -x 'npm run compile || true'",
+        "watch:lint": "nodemon -e 'ts js json' -x 'npm run lint || true'",
+        "watch:test": "nodemon -e 'ts json' -x 'npm test || true'"
+    },
+    "pre-commit": "lint-staged",
+    "lint-staged": {
+        "*.ts": [
+            "eslint --fix",
+            "prettier --write"
+        ]
+    },
+    "dependencies": {},
+    "devDependencies": {
+        "@types/node": "^14.14.6",
+        "@typescript-eslint/eslint-plugin": "^4.6.1",
+        "@typescript-eslint/parser": "^4.6.1",
+        "ava": "^3.13.0",
+        "ava-fast-check": "^3.0.0",
+        "codecov": "^3.8.1",
+        "eslint": "^7.12.1",
+        "fast-check": "^2.6.0",
+        "lint-staged": "^10.5.1",
+        "nyc": "^15.1.0",
+        "pre-commit": "^1.2.2",
+        "prettier": "2.1.2",
+        "rimraf": "^3.0.2",
+        "ts-node": "^9.0.0",
+        "typescript": "^4.0.5"
+    },
+    "ava": {
+        "extensions": [
+            "ts"
+        ],
+        "files": [
+            "!dist/**/*.d.ts",
+            "test/**/test-*.ts"
+        ],
+        "require": [
+            "ts-node/register"
+        ]
+    },
+    "nyc": {
+        "extension": [
+            ".ts"
+        ],
+        "include": [
+            "src/*.ts"
+        ],
+        "require": [
+            "ts-node/register"
+        ]
+    },
+    "keywords": [
+        "add",
+        "published",
+        "lerna",
+        "package",
+        "lockfile"
+    ],
+    "publishConfig": {
+        "access": "public"
+    }
+}

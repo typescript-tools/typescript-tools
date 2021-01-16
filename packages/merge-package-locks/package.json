@@ -42,7 +42,7 @@
         "type": "git",
         "url": "git+https://github.com/typescript-tools/typescript-tools.git"
     },
-    "author": "Eric Crosson <ericcrosson@bitgo.com> (https://github.com/ericcrosson@bitgo.com)",
+    "author": "Eric Crosson <eric.s.crosson@utexas.edu> (https://github.com/eric.s.crosson@utexas.edu)",
     "license": "ISC",
     "bugs": {
         "url": "https://github.com/typescript-tools/typescript-tools/issues"
