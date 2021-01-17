@@ -8,7 +8,7 @@ import * as t from 'io-ts'
 import * as E from 'fp-ts/Either'
 import * as F from 'fluture'
 import execa from 'execa'
-import { flow, pipe } from 'fp-ts/lib/function'
+import { pipe } from 'fp-ts/lib/function'
 import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
 import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
 

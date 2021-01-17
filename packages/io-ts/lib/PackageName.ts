@@ -6,7 +6,7 @@ export interface PackageNameBrand {
 
 export const PackageName = t.brand(
     t.string,
-    (_s): _s is t.Branded<string, PackageNameBrand> => true,
+    (_): _ is t.Branded<string, PackageNameBrand> => true,
     'PackageName'
 )
 

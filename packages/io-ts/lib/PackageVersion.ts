@@ -9,7 +9,7 @@ export interface PackageVersionBrand {
 
 export const PackageVersion = t.brand(
     t.string,
-    (_s): _s is t.Branded<string, PackageVersionBrand> => true,
+    (_): _ is t.Branded<string, PackageVersionBrand> => true,
     'PackageVersion'
 )
 

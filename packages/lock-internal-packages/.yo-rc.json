@@ -1,0 +1,8 @@
+{
+  "generator-typescript-package": {
+    "promptValues": {
+      "scope": "@typescript-tools",
+      "copyrightHolder": "Eric Crosson"
+    }
+  }
+}

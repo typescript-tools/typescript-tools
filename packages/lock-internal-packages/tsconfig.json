@@ -19,6 +19,9 @@
     },
     "references": [
         {
+            "path": "../dependency-graph"
+        },
+        {
             "path": "../io-ts"
         },
         {
@@ -26,6 +29,9 @@
         },
         {
             "path": "../lerna-utils"
+        },
+        {
+            "path": "../stringify-json"
         }
     ]
 }

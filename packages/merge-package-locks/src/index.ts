@@ -48,7 +48,7 @@ const CommandLineOptions = withEncode(
 )
 
 // Temporary helper to infer types, see https://github.com/fluture-js/Fluture/issues/455
-export function map<RA, RB>(mapper: (value: RA) => RB):
+function map<RA, RB>(mapper: (value: RA) => RB):
   <L>(source: F.FutureInstance<L, RA>) => F.FutureInstance<L, RB> {
   return F.map (mapper)
 }
