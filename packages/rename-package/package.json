@@ -1,6 +1,6 @@
 {
     "name": "@typescript-tools/rename-package",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "description": "Rename an internal package",
     "main": "dist/src/rename-package.js",
     "types": "dist/src/rename-package.d.ts",
@@ -50,9 +50,9 @@
     "homepage": "https://github.com/typescript-tools/typescript-tools",
     "dependencies": {
         "@strong-roots-capital/trace": "^1.0.0",
-        "@typescript-tools/io-ts": "^1.3.0",
-        "@typescript-tools/lerna-utils": "^1.3.0",
-        "@typescript-tools/package-manifests": "^1.1.1",
+        "@typescript-tools/io-ts": "^1.4.0",
+        "@typescript-tools/lerna-utils": "^1.4.0",
+        "@typescript-tools/package-manifests": "^1.1.2",
         "@typescript-tools/stringify-json": "^1.2.0",
         "debug": "^4.2.0",
         "fast-deep-equal": "^3.1.3",
