@@ -38,7 +38,7 @@ Usage:
     use-hoisted-version <package>
 
 Options:
-    <package>    Package for which to update dependencies
+    <package>    Path to package for which to update dependencies
 `
 
 const CommandLineOptions = withEncode(
