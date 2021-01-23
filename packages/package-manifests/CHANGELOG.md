@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/package-manifests@1.1.2...@typescript-tools/package-manifests@2.0.0) (2021-01-23)
+
+**Note:** Version bump only for package @typescript-tools/package-manifests
+
+
+
+
+
 ## [1.1.2](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/package-manifests@1.1.1...@typescript-tools/package-manifests@1.1.2) (2021-01-17)
 
 **Note:** Version bump only for package @typescript-tools/package-manifests

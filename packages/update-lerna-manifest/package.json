@@ -1,6 +1,6 @@
 {
     "name": "@typescript-tools/update-lerna-manifest",
-    "version": "2.3.1",
+    "version": "3.0.0",
     "description": "Keep the lerna manifest up to date",
     "main": "dist/src/update-lerna-manifest.js",
     "types": "dist/src/update-lerna-manifest.d.ts",
@@ -50,7 +50,7 @@
     "homepage": "https://github.com/typescript-tools/typescript-tools",
     "dependencies": {
         "@strong-roots-capital/trace": "^1.0.0",
-        "@typescript-tools/lerna-utils": "^1.4.0",
+        "@typescript-tools/lerna-utils": "^2.0.0",
         "@typescript-tools/stringify-json": "^1.2.0",
         "debug": "^4.2.0",
         "fast-deep-equal": "^3.1.3",

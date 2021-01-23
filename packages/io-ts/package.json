@@ -1,6 +1,6 @@
 {
     "name": "@typescript-tools/io-ts",
-    "version": "1.4.0",
+    "version": "2.0.0",
     "description": "Internal io-ts codecs",
     "scripts": {
         "prepublishOnly": "npm run clean && npm run compile",

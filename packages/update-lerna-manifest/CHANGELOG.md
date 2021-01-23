@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/update-lerna-manifest@2.3.1...@typescript-tools/update-lerna-manifest@3.0.0) (2021-01-23)
+
+**Note:** Version bump only for package @typescript-tools/update-lerna-manifest
+
+
+
+
+
 ## [2.3.1](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/update-lerna-manifest@2.3.0...@typescript-tools/update-lerna-manifest@2.3.1) (2021-01-17)
 
 **Note:** Version bump only for package @typescript-tools/update-lerna-manifest
