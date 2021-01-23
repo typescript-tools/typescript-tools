@@ -10,27 +10,27 @@ import * as t from 'io-ts'
 import * as E from 'fp-ts/Either'
 import * as O from 'fp-ts/Option'
 import * as R from 'fp-ts/Record'
-import * as F from 'fluture'
+import * as T from 'fp-ts/Task'
+import * as TE from 'fp-ts/TaskEither'
+import * as IO from 'fp-ts/IO'
+import * as Console from 'fp-ts/Console'
 import Debug from 'debug'
 import deepEqual from 'fast-deep-equal'
+import { PathReporter } from 'io-ts/lib/PathReporter'
 import { mod } from 'shades'
 import { pipe, flow } from 'fp-ts/function'
-import { constVoid, constant } from 'fp-ts/function'
+import { constant } from 'fp-ts/function'
 import { match } from 'ts-pattern'
-import { withEncode, decodeDocopt } from 'io-ts-docopt'
+import { withEncode, decodeDocopt as decodeDocopt_ } from 'io-ts-docopt'
 import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
 import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
 import { PackageVersion } from '@typescript-tools/io-ts/dist/lib/PackageVersion'
 import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
-import { validationErrors } from '@typescript-tools/io-ts/dist/lib/error'
 import { PackageJsonDependencies } from '@typescript-tools/io-ts/dist/lib/PackageJsonDependencies'
 import { stringifyJSON } from '@typescript-tools/stringify-json'
 import { trace } from '@strong-roots-capital/trace'
-import {
-    lernaPackages,
-    readFile,
-    writeFile,
-} from '@typescript-tools/lerna-utils'
+import { lernaPackages, PackageDiscoveryError } from '@typescript-tools/lerna-packages'
+import { readFile as readFile_, writeFile as writeFile_ } from '@typescript-tools/lerna-utils'
 
 const debug = {
     cmd: Debug('pin')
@@ -67,6 +67,35 @@ const CommandLineOptions = withEncode(
 
 type CommandLineOptions = t.TypeOf<typeof CommandLineOptions>;
 
+type Err =
+    | PackageDiscoveryError
+    | { type: 'docopt decode', error: string }
+    | { type: 'unexpected file contents',  filename: string, error: string }
+    | { type: 'unable to read file', filename: string, error: NodeJS.ErrnoException }
+    | { type: 'unable to write file', filename: string, error: NodeJS.ErrnoException }
+
+// Widens the type of a particular Err into Err
+const err = (error: Err): Err => error
+
+const decodeDocopt = flow(
+    decodeDocopt_,
+    E.mapLeft(errors => PathReporter.report(E.left(errors)).join('\n')),
+    E.mapLeft(error => err({ type: 'docopt decode', error })),
+    TE.fromEither
+)
+
+const readFile = (filename: string): TE.TaskEither<Err, string> => pipe(
+    readFile_(filename),
+    TE.mapLeft(error => err({ type: 'unable to read file', filename, error }))
+)
+
+const writeFile = (filename: string) => (contents: string) => pipe(
+    contents,
+    trace(debug.cmd, `Writing file ${filename}`),
+    writeFile_(filename),
+    TE.mapLeft(error => err({ type: 'unable to write file', filename, error }))
+)
+
 function packageDictionary(
     packages: LernaPackage[]
 ): Record<PackageName, PackageVersion> {
@@ -79,8 +108,8 @@ function packageDictionary(
 function updateDependencies(
     dependencies: Record<PackageName, PackageVersion>,
     distTag?: PackageVersion,
-): (packageJson: string) => F.FutureInstance<unknown, void> {
-    return function updateDependenciesFor(packageJson) {
+) {
+    return function updateDependenciesFor(packageJson: string) {
 
         type NoChanges =
             | { type: 'no-op' }
@@ -106,64 +135,71 @@ function updateDependencies(
             O.toUndefined
         )
 
-        return readFile(packageJson)
-            .pipe(
-            F.chain(
-            (string): F.FutureInstance<Error, O.Option<PackageJsonDependencies>> => pipe(
-                StringifiedJSON(PackageJsonDependencies).decode(string),
-                E.map(originalJson => pipe(
-                    originalJson,
-                    mod ('dependencies') (withLatestDependencies),
-                    mod ('devDependencies') (withLatestDependencies),
-                    mod ('optionalDependencies') (withLatestDependencies),
-                    mod ('peerDependencies') (withLatestDependencies),
-                    R.filter(value => value !== undefined),
-                    updatedJson => deepEqual(originalJson, updatedJson)
-                        ? O.none
-                        : O.some(updatedJson)
-                )),
-                E.map(F.resolve),
-                E.getOrElseW(() => F.reject(new Error(`Could not parse JSON from '${packageJson}'`)))
-            )
-        ))
-            .pipe(F.chain(updates => pipe(
+        return pipe(
+            readFile(packageJson),
+            TE.chain(
+                (string): TE.TaskEither<Err, O.Option<PackageJsonDependencies>> => pipe(
+                    StringifiedJSON(PackageJsonDependencies).decode(string),
+                    E.map(originalJson => pipe(
+                        originalJson,
+                        mod ('dependencies') (withLatestDependencies),
+                        mod ('devDependencies') (withLatestDependencies),
+                        mod ('optionalDependencies') (withLatestDependencies),
+                        mod ('peerDependencies') (withLatestDependencies),
+                        R.filter(value => value !== undefined),
+                        updatedJson => deepEqual(originalJson, updatedJson)
+                            ? O.none
+                            : O.some(updatedJson)
+                    )),
+                    E.mapLeft(errors => PathReporter.report(E.left(errors)).join('\n')),
+                    E.mapLeft(error => err({ type: 'unexpected file contents', filename: packageJson, error })),
+                    TE.fromEither
+                )
+            ),
+            TE.chain(updates => pipe(
                 updates,
                 E.fromOption((): NoChanges => ({ type: 'no-op' })),
-                E.map(trace(debug.cmd, 'Updating file', packageJson)),
                 E.chain(flow(
                     stringifyJSON(E.toError),
                     E.mapLeft((error): NoChanges => ({ type: 'error', error }))
                 )),
                 E.map(writeFile(packageJson)),
                 E.getOrElseW(
-                    error => match<NoChanges, F.FutureInstance<Error, undefined>>(error)
-                        .with({ type: 'no-op' }, () => F.resolve(undefined))
-                        .with({ type: 'error' }, ({ error }) => F.reject(error))
+                    error => match<NoChanges, TE.TaskEither<Err, void>>(error)
+                        .with({ type: 'no-op' }, () => TE.right(undefined))
+                        .with({ type: 'error' }, ({ error }) => TE.left(error) as TE.TaskEither<Err, void>)
                         .run()
                 )
-            )))
+            ))
+        )
     }
 }
 
-function main(): void {
-    pipe(
-        decodeDocopt(CommandLineOptions, docstring),
-        E.map(options => lernaPackages(options.root)
-            .pipe(F.chain(
-                packages => {
-                    const dictionary = packageDictionary(packages)
+const main: T.Task<void> = pipe(
+    decodeDocopt(CommandLineOptions, docstring),
+    TE.chain(options => pipe(
+        lernaPackages(options.root),
+        TE.chain(
+            packages => {
+                const dictionary = packageDictionary(packages)
 
-                    const packageJsons = packages
-                        .map(pkg => pkg.location)
-                        .map(dir => path.resolve(dir, 'package.json'))
+                const packageJsons = packages
+                    .map(pkg => pkg.location)
+                    .map(dir => path.resolve(dir, 'package.json'))
 
-                    return F.parallel (Infinity) (packageJsons.map(updateDependencies(dictionary, options.distTag)))
-                }
-            ))),
-        E.getOrElseW(errors => F.reject(validationErrors('argv', errors)) as F.FutureInstance<unknown, void[]>),
-        F.fork (error => (console.error(error), process.exit(1))) (constVoid)
+                return TE.sequenceArray(packageJsons.map(updateDependencies(dictionary, options.distTag)))
+            }
+        )
+    )),
+    TE.fold(
+        flow(
+            Console.error,
+            IO.chain(() => process.exit(1) as IO.IO<void>),
+            T.fromIO
+        ),
+        constant(T.of(undefined))
     )
-}
+)
 
 main()
 

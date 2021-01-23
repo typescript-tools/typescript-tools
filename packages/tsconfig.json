@@ -20,12 +20,6 @@
             "path": "lerna-utils"
         },
         {
-            "path": "lock-internal-packages"
-        },
-        {
-            "path": "merge-package-locks"
-        },
-        {
             "path": "monorepo-root"
         },
         {
@@ -35,10 +29,10 @@
             "path": "pin-lerna-package-versions"
         },
         {
-            "path": "rename-package"
+            "path": "stringify-json"
         },
         {
-            "path": "stringify-json"
+            "path": "typescript-build-linker"
         },
         {
             "path": "update-lerna-manifest"

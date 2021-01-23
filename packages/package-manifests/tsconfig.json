@@ -25,6 +25,9 @@
             "path": "../lerna-utils"
         },
         {
+            "path": "../lerna-packages"
+        },
+        {
             "path": "../monorepo-root"
         }
     ]

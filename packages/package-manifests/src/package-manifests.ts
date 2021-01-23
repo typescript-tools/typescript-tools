@@ -4,39 +4,57 @@
  */
 
 import * as path from 'path'
-import * as F from 'fluture'
 import * as A from 'fp-ts/Array'
 import * as E from 'fp-ts/Either'
+import * as TE from 'fp-ts/TaskEither'
 import { pipe, flow } from 'fp-ts/function'
-import { lernaPackages, readFile } from '@typescript-tools/lerna-utils'
+import { readFile as readFile_ } from '@typescript-tools/lerna-utils'
+import { lernaPackages as lernaPackages_, PackageDiscoveryError } from '@typescript-tools/lerna-packages'
 import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
-import { monorepoRoot } from '@typescript-tools/monorepo-root'
+import { monorepoRoot as monorepoRoot_, MonorepoRootErr } from '@typescript-tools/monorepo-root'
 
 // FIXME: I think the errors in here and in lernaPackages can be
 // cleaned up (narrowed from unknown)
 
+export type PackageManifestsError =
+    | MonorepoRootErr
+    | PackageDiscoveryError
+    | { type: 'unable to read file', filename: string, error: NodeJS.ErrnoException }
+    | { type: 'unable to parse json', filename: string, error: Error }
+
+// Widens the type of a particular DependencyGraphError into a DependencyGraphError
+const err = (error: PackageManifestsError): PackageManifestsError => error
+
+const monorepoRoot = flow(monorepoRoot_, E.mapLeft(err), TE.fromEither)
+const lernaPackages = flow(lernaPackages_, TE.mapLeft(err))
+
+const readFile = (filename: string) => pipe(
+    readFile_(filename),
+    TE.mapLeft(error => err({ type: 'unable to read file', filename, error }))
+)
+
 export function packageManifests(
     somePathInMonorepo?: string
-): F.FutureInstance<unknown,{
-    pkg: LernaPackage,
-    contents: E.Json,
-}[]> {
+): TE.TaskEither<PackageManifestsError, ReadonlyArray<{ pkg: LernaPackage, contents: E.Json }>> {
     return pipe(
         monorepoRoot(somePathInMonorepo),
-        E.map(root => lernaPackages(root)
-            .pipe(F.chain(
-                flow(
-                    A.map(pkg =>
-                        readFile(path.resolve(pkg.location, 'package.json'))
-                            .pipe(F.chain(contents => pipe(
-                                E.parseJSON(contents, E.toError),
-                                E.map(contents => F.resolve({pkg, contents})),
-                                E.getOrElseW(error => F.reject(`Unable to parse ${pkg.location}/package.json, ${error.message}`))
-                            )))
-                         ),
-                    F.parallel(200)
+        TE.chain(lernaPackages),
+        TE.chain(flow(
+            A.map(pkg => {
+                const filename = path.resolve(pkg.location, 'package.json')
+                return pipe(
+                    readFile(filename),
+                    TE.chain(contents => pipe(
+                        E.parseJSON(contents, E.toError),
+                        E.map(contents => ({ pkg, contents })),
+                        E.mapLeft(error => err({ type: 'unable to parse json', filename, error })),
+                        TE.fromEither
+                    ))
                 )
-            ))),
-        E.getOrElseW(F.reject)
+            }),
+            value => value,
+            TE.sequenceArray,
+        )),
+        value => value,
     )
 }

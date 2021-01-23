@@ -47,8 +47,6 @@
     "homepage": "https://github.com/typescript-tools/typescript-tools",
     "dependencies": {
         "@typescript-tools/io-ts": "^1.4.0",
-        "execa": "^4.1.0",
-        "fluture": "^13.0.1",
         "fp-ts": "^2.9.3"
     },
     "devDependencies": {

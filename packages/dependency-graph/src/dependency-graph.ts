@@ -9,20 +9,15 @@ import * as A from 'fp-ts/Array'
 import * as O from 'fp-ts/Option'
 import * as E from 'fp-ts/Either'
 import * as R from 'fp-ts/Record'
-import * as F from 'fluture'
+import * as TE from 'fp-ts/TaskEither'
 import { PathReporter } from 'io-ts/lib/PathReporter'
-import { constant, pipe } from 'fp-ts/lib/function'
+import { constant, pipe, flow } from 'fp-ts/lib/function'
 import { readFile as readFile_ } from '@typescript-tools/lerna-utils'
 import { lernaPackages as lernaPackages_, PackageDiscoveryError } from '@typescript-tools/lerna-packages'
 import { PackageJsonDependencies } from '@typescript-tools/io-ts/dist/lib/PackageJsonDependencies'
 import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
 import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
-
-// Temporary helper to infer types, see https://github.com/fluture-js/Fluture/issues/455
-function map<RA, RB>(mapper: (value: RA) => RB):
-  <L>(source: F.FutureInstance<L, RA>) => F.FutureInstance<L, RB> {
-  return F.map (mapper)
-}
+import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
 
 // REFACTOR: move this to our io-ts package
 export type PackageManifest =
@@ -31,58 +26,51 @@ export type PackageManifest =
 
 export type DependencyGraphError =
     | PackageDiscoveryError
-    | { type: 'unable to read file', file: string, err: NodeJS.ErrnoException }
-    | { type: 'unable to parse file', file: string, err: Error }
-    | { type: 'unexpected file contents', file: string, err: string }
+    | { type: 'unable to read file', filename: string, error: NodeJS.ErrnoException }
+    | { type: 'unexpected file contents', filename: string, error: string }
 
 // Widens the type of a particular DependencyGraphError into a DependencyGraphError
-const error = (error: DependencyGraphError): DependencyGraphError => error
+const err = (error: DependencyGraphError): DependencyGraphError => error
 
-const lernaPackages = (root?: string): F.FutureInstance<DependencyGraphError, LernaPackage[]> => pipe(
-    lernaPackages_(root),
-    F.mapRej(error)
+const lernaPackages = flow(lernaPackages_, TE.mapLeft(err))
+
+const readFile = (filename: string) => pipe(
+    readFile_(filename),
+    TE.mapLeft(error => err({ type: 'unable to read file', filename, error }))
 )
 
-const readFile = (file: string): F.FutureInstance<DependencyGraphError, string> => pipe(
-    readFile_(file),
-    F.mapRej(err => error({ type: 'unable to read file', file, err }))
-)
-
-const parseJson = (file: string) => (contents: string): F.FutureInstance<DependencyGraphError, E.Json> => pipe(
-    E.parseJSON(contents, E.toError),
-    E.map(F.resolve),
-    E.getOrElseW(err => F.reject(error({ type: 'unable to parse file', file, err })))
-)
-
-const decode = <C extends t.Mixed>(codec: C) => (file: string) => (value: unknown): F.FutureInstance<DependencyGraphError, t.TypeOf<C>> => pipe(
-    codec.decode(value),
-    E.mapLeft(errors => PathReporter.report(E.left(errors)).join('\n')),
-    E.map(F.resolve),
-    E.getOrElseW(err => F.reject(error({ type: 'unexpected file contents', file, err })))
-)
+const decode = <C extends t.Mixed>(codec: C) =>
+    (filename: string) =>
+    (value: unknown): TE.TaskEither<DependencyGraphError, t.TypeOf<C>> =>
+    pipe(
+        codec.decode(value),
+        E.mapLeft(errors => PathReporter.report(E.left(errors)).join('\n')),
+        E.mapLeft(error => err({ type: 'unexpected file contents', filename, error })),
+        TE.fromEither
+    )
 
 /**
  * Generate a DAG of internal dependencies.
  */
 export function dependencyGraph(
     root?: string,
-): F.FutureInstance<DependencyGraphError, Map<PackageName, PackageManifest[]>> {
+    options: { recursive: boolean } = { recursive: true },
+): TE.TaskEither<DependencyGraphError, Map<PackageName, PackageManifest[]>> {
 
     return pipe(
         lernaPackages(root),
-        F.chain(packages => pipe(
+        TE.chain(packages => pipe(
             packages,
             // REFACTOR: use These to report all errors instead of just the first
             A.map(pkg => pipe(
                 path.resolve(pkg.location, 'package.json'),
                 readFile,
-                F.chain(parseJson(pkg.location)),
-                F.chain(decode (PackageJsonDependencies) (pkg.location)),
-                map(manifest => ({ ...pkg, ...manifest }))
+                TE.chain(decode (StringifiedJSON(PackageJsonDependencies)) (pkg.location)),
+                TE.map(manifest => ({ ...pkg, ...manifest }))
             )),
-            F.parallel(Infinity),
+            TE.sequenceArray,
         )),
-        map(manifests => {
+        TE.map(manifests => {
 
             // map of a package name to its metadata
             const internalPackages = manifests.reduce(
@@ -125,7 +113,7 @@ export function dependencyGraph(
                     })
                     next = pipe(
                         next,
-                        A.chain(dependency => internalDependencies[dependency.name] ?? []),
+                        A.chain(dependency => options.recursive ? internalDependencies[dependency.name] : [] ?? []),
                         A.filter(dependency => !processed.has(dependency.name))
                     )
                 } while (!A.isEmpty(next))
@@ -140,12 +128,3 @@ export function dependencyGraph(
         }),
     )
 }
-
-// TODO: record who's using this so we know when it is safe to delete it
-/**
- * A hack for libraries not using the same version of fluture.
- */
-export const dependencyGraphPromise = (root: string) => F.promise(
-    dependencyGraph(root)
-        .pipe(F.mapRej(left => new Error(`${left}`)))
-)

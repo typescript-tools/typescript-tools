@@ -4,8 +4,8 @@
  */
 
 import * as t from 'io-ts'
-import * as F from 'fluture'
 import * as E from 'fp-ts/Either'
+import * as TE from 'fp-ts/TaskEither'
 import { pipe, absurd } from 'fp-ts/function'
 import { PathReporter } from 'io-ts/lib/PathReporter'
 import { monorepoRoot as monorepoRoot_, MonorepoRootErr } from '@typescript-tools/monorepo-root'
@@ -26,10 +26,11 @@ const monorepoRoot = (): E.Either<PackageDiscoveryError, string> => pipe(
     E.mapLeft(error),
 )
 
-const decodeLernaPackages = (packages: string): E.Either<PackageDiscoveryError, LernaPackage[]> => pipe(
+const decodeLernaPackages = (packages: string): TE.TaskEither<PackageDiscoveryError, LernaPackage[]> => pipe(
     StringifiedJSON(t.array(LernaPackage)).decode(packages),
     E.mapLeft(errors => PathReporter.report(E.left(errors)).join('\n')),
     E.mapLeft(err => error({ type: 'unable to decode list of packages', err })),
+    TE.fromEither,
 )
 
 /**
@@ -37,30 +38,18 @@ const decodeLernaPackages = (packages: string): E.Either<PackageDiscoveryError, 
  */
 export function lernaPackages(
     root?: string,
-): F.FutureInstance<PackageDiscoveryError, LernaPackage[]> {
+): TE.TaskEither<PackageDiscoveryError, LernaPackage[]> {
 
     return pipe(
         E.fromNullable (absurd) (root),
         E.orElse(monorepoRoot),
-        E.map(root => F.Future<PackageDiscoveryError, LernaPackage[]>((reject, resolve) => {
-
-            const subcommand = execa.command(
-                'npx lerna list --all --json',
-                { cwd: root }
-            )
-
-            subcommand
-                .then(({ stdout }) => pipe(
-                    decodeLernaPackages(stdout),
-                    E.fold(reject, resolve)
-                ))
-                .catch(err => reject(error({ type: 'unable to discover internal packages', err })))
-
-            return function onCancel() {
-                subcommand.cancel()
-            }
-        })),
-        E.mapLeft(error),
-        E.getOrElseW(F.reject)
+        TE.fromEither,
+        TE.chain(root => TE.tryCatch(
+            () => execa.command('npx lerna list --all --json', { cwd: root }),
+            err => error({ type: 'unable to discover internal packages', err }),
+        )),
+        TE.map(({ stdout }) => stdout),
+        TE.chain(decodeLernaPackages),
+        TE.mapLeft(error),
     )
 }

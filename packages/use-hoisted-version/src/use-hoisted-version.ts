@@ -10,17 +10,20 @@ import * as t from 'io-ts'
 import * as E from 'fp-ts/Either'
 import * as O from 'fp-ts/Option'
 import * as R from 'fp-ts/Record'
-import * as F from 'fluture'
+import * as T from 'fp-ts/Task'
+import * as TE from 'fp-ts/TaskEither'
+import * as IO from 'fp-ts/IO'
+import * as Console from 'fp-ts/Console'
 import * as D from 'io-ts-docopt'
 import { withEncode } from 'io-ts-docopt'
 import { PathReporter } from 'io-ts/lib/PathReporter'
-import { pipe, flow, constant, constVoid } from 'fp-ts/function'
+import { pipe, flow, constant } from 'fp-ts/function'
 import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
 import { PackageJsonDependencies } from '@typescript-tools/io-ts/dist/lib/PackageJsonDependencies'
 import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
 import { PackageVersion } from '@typescript-tools/io-ts/dist/lib/PackageVersion'
-import { hoistedPackages } from '@typescript-tools/hoisted-packages'
-import { readFile, writeFile } from '@typescript-tools/lerna-utils'
+import { hoistedPackages, PackageManifestsError } from '@typescript-tools/hoisted-packages'
+import { readFile as readFile_, writeFile as writeFile_ } from '@typescript-tools/lerna-utils'
 import { stringifyJSON } from '@typescript-tools/stringify-json'
 import { monorepoRoot, MonorepoRootErr } from '@typescript-tools/monorepo-root'
 import { trace } from '@strong-roots-capital/trace'
@@ -52,21 +55,39 @@ const CommandLineOptions = withEncode(
 
 type Err =
     | MonorepoRootErr
-    | { type: 'docopt decode', err: string }
+    | PackageManifestsError
+    | { type: 'docopt decode', error: string }
     | { type: 'package not in monorepo' }
-    | { type: 'unable to parse package.json', err: string }
-    | { type: 'unable to write package.json', err: unknown }
-    | { type: 'unable to stringify package.json', err: Error }
+    | { type: 'unable to read file', filename: string, error: NodeJS.ErrnoException }
+    | { type: 'unable to parse file', filename: string, error: string }
+    | { type: 'unable to write file', filename: string, error: unknown }
+    | { type: 'unable to stringify package.json', error: Error }
     | { type: 'no-op' }
+
+// Widens the type of a particular Err into Err
+const err = (error: Err): Err => error
 
 const decodeDocopt = flow(
     D.decodeDocopt,
-    E.mapLeft((err): Err => ({ type: 'docopt decode', err: PathReporter.report(E.left(err)).join('\n') })),
+    E.mapLeft(error => err({ type: 'docopt decode', error: PathReporter.report(E.left(error)).join('\n') })),
+    TE.fromEither
+)
+
+const readFile = (filename: string): TE.TaskEither<Err, string> => pipe(
+    readFile_(filename),
+    TE.mapLeft(error => err({ type: 'unable to read file', filename, error }))
+)
+
+const writeFile = (filename: string) => (contents: string) => pipe(
+    contents,
+    trace(debug.cmd, `Writing file ${filename}`),
+    writeFile_(filename),
+    TE.mapLeft(error => err({ type: 'unable to write file', filename, error }))
 )
 
 const updateDependencies =
     (packageJson: string) =>
-    (hoistedPackages: Map<PackageName, PackageVersion>): F.FutureInstance<unknown, void> => {
+    (hoistedPackages: Map<PackageName, PackageVersion>) => {
 
         const withHoistedDependencies = (
             deps: Record<PackageName, PackageVersion> | undefined
@@ -82,60 +103,69 @@ const updateDependencies =
             O.toUndefined
         )
 
-        return readFile(packageJson)
-            .pipe(F.chain(
-                (contents) => pipe(
-                    StringifiedJSON(PackageJsonDependencies).decode(contents),
-                    E.map(originalJson => pipe(
-                        originalJson,
-                        mod ('dependencies') (withHoistedDependencies),
-                        mod ('devDependencies') (withHoistedDependencies),
-                        mod ('optionalDependencies') (withHoistedDependencies),
-                        mod ('peerDependencies') (withHoistedDependencies),
-                        R.filter(value => value !== undefined),
-                        updatedJson => deepEqual(originalJson, updatedJson)
-                            ? O.none
-                            : O.some(updatedJson)
-                    )),
-                    E.map(F.resolve),
-                    E.getOrElseW(() => F.reject({ type: 'unable to parse parse package.json', err: `Could not parse JSON from '${packageJson}` }))
-                )
-            ))
-            .pipe(F.chain(updates => pipe(
+        return pipe(
+            readFile(packageJson),
+            TE.chain((contents) => pipe(
+                StringifiedJSON(PackageJsonDependencies).decode(contents),
+                E.map(originalJson => pipe(
+                    originalJson,
+                    mod ('dependencies') (withHoistedDependencies),
+                    mod ('devDependencies') (withHoistedDependencies),
+                    mod ('optionalDependencies') (withHoistedDependencies),
+                    mod ('peerDependencies') (withHoistedDependencies),
+                    R.filter(value => value !== undefined),
+                    updatedJson => deepEqual(originalJson, updatedJson)
+                        ? O.none
+                        : O.some(updatedJson)
+                )),
+                E.mapLeft(errors => PathReporter.report(E.left(errors)).join('\n')),
+                E.mapLeft(error => err({ type: 'unable to parse file', filename: packageJson, error })),
+                TE.fromEither
+            )),
+            TE.chain(updates => pipe(
                 updates,
-                E.fromOption((): Err => ({ type: 'no-op' })),
+                E.fromOption(() => err({ type: 'no-op' })),
                 E.map(trace(debug.cmd, 'Updating file', packageJson)),
                 E.chain(flow(
                     stringifyJSON(E.toError),
-                    E.mapLeft((err): Err => ({ type: 'unable to stringify package.json', err }))
+                    E.mapLeft(error => err({ type: 'unable to stringify package.json', error }))
                 )),
-                E.map(
-                    updates => writeFile(packageJson) (updates)
-                        .pipe(F.mapRej((err): Err => ({ type: 'unable to write package.json', err })))
-                ),
-                E.getOrElseW(
-                    error => match<Err, F.FutureInstance<Err, undefined>>(error)
-                        .with({ type: 'no-op' }, () => F.resolve(undefined))
-                        .otherwise(() => F.reject(error))
+                TE.fromEither,
+                TE.chain(updates => pipe(
+                    writeFile(packageJson) (updates),
+                    TE.mapLeft(error => err({ type: 'unable to write file', filename: packageJson, error }))
+                )),
+                TE.orElse(
+                    error => match<Err, TE.TaskEither<Err, void>>(error)
+                        .with({ type: 'no-op' }, () => TE.of(undefined))
+                        .otherwise(() => TE.left(error))
                 )
-            )))
+            )),
+        )
     }
 
-function main(): void {
-    pipe(
-        decodeDocopt(CommandLineOptions, docstring),
-        E.chain(options => pipe(
-            monorepoRoot(options.package) as E.Either<Err, string>,
-            E.map(root => ({ options, root }))
-        )),
-        E.map(
-            ({options, root}) => hoistedPackages(root)
-                .pipe(F.chain(updateDependencies(path.resolve(options.package, 'package.json'))))
+const main: T.Task<void> = pipe(
+    decodeDocopt(CommandLineOptions, docstring),
+    TE.chain(options => pipe(
+        monorepoRoot(options.package) as E.Either<Err, string>,
+        E.map(root => ({ options, root })),
+        TE.fromEither
+    )),
+    TE.chain(
+        ({options, root}) => pipe(
+            hoistedPackages(root),
+            TE.chain(updateDependencies(path.resolve(options.package, 'package.json')))
+        )
+    ),
+    TE.fold(
+        flow(
+            Console.error,
+            IO.chain(() => process.exit(1) as IO.IO<void>),
+            T.fromIO
         ),
-        E.getOrElseW(errors => F.reject(errors) as F.FutureInstance<Err, void>),
-        F.fork (error => (console.error(error), process.exit(1))) (constVoid)
+        constant(T.of(undefined))
     )
-}
+)
 
 main()
 

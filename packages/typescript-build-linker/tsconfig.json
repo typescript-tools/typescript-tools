@@ -19,13 +19,19 @@
     },
     "references": [
         {
+            "path": "../dependency-graph"
+        },
+        {
             "path": "../io-ts"
         },
         {
             "path": "../lerna-utils"
         },
         {
-            "path": "../package-manifests"
+            "path": "../lerna-packages"
+        },
+        {
+            "path": "../monorepo-root"
         },
         {
             "path": "../stringify-json"
