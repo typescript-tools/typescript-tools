@@ -170,7 +170,7 @@ const linkChildrenPackages = (root: string) =>
             A.array,
         ) (packages, pkg => [
             // map parent directories into relative paths from root
-            relativePath(root, path.dirname(pkg.location)).replace(/^.*\//, ''),
+            relativePath(path.resolve(root), path.dirname(pkg.location)).replace(/^.*?\//, ''),
             [pkg]
         ])),
 
@@ -231,9 +231,8 @@ const linkPackageDependencies = (root: string) =>
         ) (packages, pkg => [pkg.name as string, pkg.location])),
 
         TE.chain(lernaPackages => pipe(
-            dependencyGraph(),
+            dependencyGraph(root),
             TE.map(mapToRecord),
-            TE.map(value => value),
             TE.map(R.reduceWithIndex(
                 {} as Record<Path, string[]>,
                 (packageName, acc, dependencies) => Object.assign(
