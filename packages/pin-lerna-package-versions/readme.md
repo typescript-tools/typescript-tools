@@ -21,10 +21,11 @@ npm install --save-dev @typescript-tools/pin-lerna-package-versions
 
 ``` shell
 Usage:
-    pin-lerna-package-versions <root>
+    pin-lerna-package-versions [--dist-tag=<tag>] [<root>]
 
 Options:
-    root    Root of lerna mono-repository
+    root                Root of lerna mono-repository, defaults to cwd
+    --dist-tag=<tag>    Pin versions of internal packages to dist tag
 ```
 
 ## Related

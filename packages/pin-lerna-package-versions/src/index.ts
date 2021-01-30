@@ -38,21 +38,21 @@ const debug = {
 
 const docstring = `
 Usage:
-    pin-lerna-package-versions [--dist-tag=<tag>] <root>
+    pin-lerna-package-versions [--dist-tag=<tag>] [<root>]
 
 Options:
-    root                Root of lerna mono-repository
+    root                Root of lerna mono-repository, defaults to cwd
     --dist-tag=<tag>    Pin versions of internal packages to dist tag
 `
 
 const CommandLineOptions = withEncode(
     t.type({
-        '<root>': t.string,
+        '<root>': t.union([t.null, t.string]),
         '--dist-tag': t.union([t.null, PackageVersion]),
     }),
     a => pipe(
         {
-            root: a['<root>'],
+            root: a['<root>'] !== null ? a['<root>'] : undefined,
             distTag: a['--dist-tag'] !== null ? a['--dist-tag'] : undefined,
         },
         value => {
