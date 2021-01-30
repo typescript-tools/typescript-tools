@@ -136,10 +136,7 @@ const mapToRecord = <K extends string, V>(map: Map<K, V>): Record<K, V> => Array
 const parentDirectory = (directory: string): O.Option<string> =>
     match<string, O.Option<string>>(directory)
         .with('.', constant(O.none))
-        .otherwise(() => pipe(
-            path.dirname(directory),
-            O.fromPredicate(path => path !== '.')
-        ))
+        .otherwise(() => O.some(path.dirname(directory)))
 
 const ancestors = (directory: string): [string, string][] => {
 
