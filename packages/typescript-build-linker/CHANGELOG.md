@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.1.2](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/typescript-build-linker@2.1.1...@typescript-tools/typescript-build-linker@2.1.2) (2021-01-30)
+
+
+### Bug Fixes
+
+* write top-level tsconfig.json ([fbe4f62](https://github.com/typescript-tools/typescript-tools/commit/fbe4f629480a29f771e668b45fe87352170980d9))
+
+
+
+
+
 ## [2.1.1](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/typescript-build-linker@2.1.0...@typescript-tools/typescript-build-linker@2.1.1) (2021-01-30)
 
 
