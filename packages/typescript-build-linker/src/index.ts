@@ -271,8 +271,6 @@ const linkPackageDependencies = (root: string) =>
 
 const exit = (code: 0 | 1): IO.IO<void> => () => process.exit(code)
 
-// FIXME: top-level tsconfig.json has incomplete contents
-
 const main: T.Task<void> =
     pipe(
         decodeDocopt(CommandLineOptions, docstring),
