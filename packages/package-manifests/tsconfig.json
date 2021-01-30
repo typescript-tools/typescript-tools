@@ -22,10 +22,10 @@
             "path": "../io-ts"
         },
         {
-            "path": "../lerna-utils"
+            "path": "../lerna-packages"
         },
         {
-            "path": "../lerna-packages"
+            "path": "../lerna-utils"
         },
         {
             "path": "../monorepo-root"

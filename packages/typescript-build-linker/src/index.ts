@@ -12,6 +12,7 @@ import * as E from 'fp-ts/Either'
 import * as O from 'fp-ts/Option'
 import * as T from 'fp-ts/Task'
 import * as R from 'fp-ts/Record'
+import * as S from 'fp-ts/Set'
 import * as IO from 'fp-ts/IO'
 import * as TE from 'fp-ts/TaskEither'
 import * as Console from 'fp-ts/Console'
@@ -20,12 +21,12 @@ import { withEncode } from 'io-ts-docopt'
 import { getLastSemigroup } from 'fp-ts/lib/Semigroup'
 import { sequenceS } from 'fp-ts/Apply'
 import { PathReporter } from 'io-ts/lib/PathReporter'
-import { pipe, flow, constVoid, constant } from 'fp-ts/function'
+import { pipe, flow, constVoid, constant, Endomorphism, identity } from 'fp-ts/function'
 import { readFile as readFile_, writeFile as writeFile_ } from '@typescript-tools/lerna-utils'
 import { stringifyJSON as stringifyJSON_ } from '@typescript-tools/stringify-json'
 import { lernaPackages as lernaPackages_, PackageDiscoveryError } from '@typescript-tools/lerna-packages'
 import { monorepoRoot as monorepoRoot_, MonorepoRootErr } from '@typescript-tools/monorepo-root'
-import { TsConfig, TsConfigReference } from '@typescript-tools/io-ts/dist/lib/TsConfig'
+import { TsConfig } from '@typescript-tools/io-ts/dist/lib/TsConfig'
 import { dependencyGraph as dependencyGraph_, DependencyGraphError } from '@typescript-tools/dependency-graph'
 import { withFallback } from 'io-ts-types/lib/withFallback'
 import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
@@ -35,6 +36,8 @@ import { trace } from '@strong-roots-capital/trace'
 import relativePath from 'get-relative-path'
 import Debug from 'debug'
 import deepEqual from 'fast-deep-equal'
+import { match } from 'ts-pattern'
+import { eqString } from 'fp-ts/lib/Eq'
 
 const debug = {
     cmd: Debug('link')
@@ -68,7 +71,7 @@ type Err =
     | { type: 'unable to write file', filename: string, error: NodeJS.ErrnoException }
 
 // Widens the type of a particular Err into Err
-const err = (error: Err): Err => error
+const err: Endomorphism<Err> = identity
 
 const monorepoRoot = flow(monorepoRoot_, E.mapLeft(err), TE.fromEither)
 const lernaPackages = flow(lernaPackages_, TE.mapLeft(err))
@@ -130,6 +133,33 @@ const mapToRecord = <K extends string, V>(map: Map<K, V>): Record<K, V> => Array
         {} as Record<K, V>
     )
 
+const parentDirectory = (directory: string): O.Option<string> =>
+    match<string, O.Option<string>>(directory)
+        .with('.', constant(O.none))
+        .otherwise(() => pipe(
+            path.dirname(directory),
+            O.fromPredicate(path => path !== '.')
+        ))
+
+const ancestors = (directory: string): [string, string][] => {
+
+    const ancestors: [string, string][] = []
+    let parent = parentDirectory(directory)
+
+    while (O.isSome(parent)) {
+        pipe(
+            parent,
+            O.map(parent_ => {
+                ancestors.push([parent_, path.basename(directory)])
+                directory = parent_
+                parent = parentDirectory(parent_)
+            })
+        )
+    }
+
+    return ancestors
+}
+
 const linkChildrenPackages = (root: string) =>
     pipe(
         lernaPackages(root),
@@ -144,21 +174,26 @@ const linkChildrenPackages = (root: string) =>
             [pkg]
         ])),
 
-        // create the references objects
-        TE.map(R.map(A.map(pkg => ({ path: path.basename(pkg.location) })))),
+        // isolate the lerna package directory
+        TE.map(R.map(A.map(pkg => path.basename(pkg.location)))),
 
-        // create grandparent references
-        // note: currently only considers one generation of ancestor
-        // feature: make this calculation less rigid
-        TE.map(R.reduceWithIndex(
-            {} as Record<string, TsConfigReference[]>,
-            (parent, acc, references) => Object.assign(
-                acc,
-                { [parent]: references },
-                // TODO: this needs to be a set
-                { [path.dirname(parent)]: [{ path: parent }] }
-            )
+        // create ancestor references
+        TE.map(packagesByDirectory => R.fromFoldableMap(
+            S.getUnionMonoid<string>(eqString),
+            A.array,
+        ) (
+            pipe(
+                Object.entries(packagesByDirectory),
+                A.chain(([directory, packages]) => [
+                    ...ancestors(directory),
+                    ...packages.map(pkg => [directory, pkg]),
+                ])
+            ),
+            ([directory, pkg]) => [directory, new Set([pkg])],
         )),
+
+        // map set of children packages to set of children project references
+        TE.map(R.map(packages => Array.from(packages).map(pkg => ({ path: pkg })))),
 
         // map to write instructions
         TE.map(R.mapWithIndex((parentDirectory, references) => {
@@ -234,6 +269,10 @@ const linkPackageDependencies = (root: string) =>
         TE.map(constVoid)
     )
 
+const exit = (code: 0 | 1): IO.IO<void> => () => process.exit(code)
+
+// FIXME: top-level tsconfig.json has incomplete contents
+
 const main: T.Task<void> =
     pipe(
         decodeDocopt(CommandLineOptions, docstring),
@@ -248,7 +287,7 @@ const main: T.Task<void> =
         TE.fold(
             flow(
                 Console.error,
-                IO.chain(() => process.exit(1) as IO.IO<void>),
+                IO.chain(() => exit(1)),
                 T.fromIO
             ),
             constant(T.of(undefined))
