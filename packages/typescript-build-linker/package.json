@@ -1,6 +1,6 @@
 {
     "name": "@typescript-tools/typescript-build-linker",
-    "version": "2.0.1",
+    "version": "2.0.2",
     "description": "Link together TypeScript packages in a monorepo",
     "homepage": "https://github.com/typescript-tools/typescript-tools",
     "bugs": {
@@ -18,7 +18,7 @@
         "dist/src/"
     ],
     "bin": {
-        "typescript-build-linker": "./dist/src/index.js"
+        "typescript-build-linker": "dist/src/index.js"
     },
     "scripts": {
         "prepublishOnly": "npm run compile",
