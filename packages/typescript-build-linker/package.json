@@ -1,6 +1,6 @@
 {
     "name": "@typescript-tools/typescript-build-linker",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "description": "Link together TypeScript packages in a monorepo",
     "homepage": "https://github.com/typescript-tools/typescript-tools",
     "bugs": {
