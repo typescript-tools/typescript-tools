@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.1.0](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/pin-lerna-package-versions@3.0.0...@typescript-tools/pin-lerna-package-versions@3.1.0) (2021-01-30)
+
+
+### Bug Fixes
+
+* make root argument optional in pin-lerna-package-versions ([1a554e6](https://github.com/typescript-tools/typescript-tools/commit/1a554e665cf09e73e893e98121134f37ea4b852b))
+
+
+### Features
+
+* handle monorepos of arbitrary depth ([47ad3c2](https://github.com/typescript-tools/typescript-tools/commit/47ad3c22b269dc4c6b1b8e4c4dbd525bbb7165db))
+
+
+
+
+
 # [3.0.0](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/pin-lerna-package-versions@2.4.1...@typescript-tools/pin-lerna-package-versions@3.0.0) (2021-01-23)
 
 **Note:** Version bump only for package @typescript-tools/pin-lerna-package-versions

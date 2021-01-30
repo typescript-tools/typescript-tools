@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.1.0](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/typescript-build-linker@2.0.3...@typescript-tools/typescript-build-linker@2.1.0) (2021-01-30)
+
+
+### Features
+
+* handle monorepos of arbitrary depth ([47ad3c2](https://github.com/typescript-tools/typescript-tools/commit/47ad3c22b269dc4c6b1b8e4c4dbd525bbb7165db))
+
+
+
+
+
 ## [2.0.3](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/typescript-build-linker@2.0.1...@typescript-tools/typescript-build-linker@2.0.3) (2021-01-30)
 
 
