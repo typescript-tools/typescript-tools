@@ -160,20 +160,21 @@ const ancestors = (directory: string): [string, string][] => {
 const linkChildrenPackages = (root: string) =>
     pipe(
         lernaPackages(root),
-
         // map parents to children
         TE.map(packages => R.fromFoldableMap(
             A.getMonoid<LernaPackage>(),
             A.array,
         ) (packages, pkg => [
             // map parent directories into relative paths from root
-            relativePath(path.resolve(root), path.dirname(pkg.location)).replace(/^.*?\//, ''),
+            root === path.dirname(pkg.location)
+            // treat the case where package is a direct child of monorepo-root,
+            // because relativePath returns '../<root>' most irregularly
+                ? '.'
+                : relativePath(root + '/', path.dirname(pkg.location)),
             [pkg]
         ])),
-
         // isolate the lerna package directory
         TE.map(R.map(A.map(pkg => path.basename(pkg.location)))),
-
         // create ancestor references
         TE.map(packagesByDirectory => R.fromFoldableMap(
             S.getUnionMonoid<string>(eqString),
@@ -188,10 +189,8 @@ const linkChildrenPackages = (root: string) =>
             ),
             ([directory, pkg]) => [directory, new Set([pkg])],
         )),
-
         // map set of children packages to set of children project references
         TE.map(R.map(packages => Array.from(packages).map(pkg => ({ path: pkg })))),
-
         // map to write instructions
         TE.map(R.mapWithIndex((parentDirectory, references) => {
             const tsconfigFile = path.resolve(root, parentDirectory, 'tsconfig.json')
