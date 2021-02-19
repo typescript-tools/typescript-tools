@@ -149,8 +149,8 @@ const main: T.Task<void> =
             )),
             TE.fromEither
         )),
-        TE.chain(({root, packages}: {root: string, packages: readonly string[]}) => {
-            const updateLernaManifest = pipe(
+        TE.chain(({root, packages}: {root: string, packages: readonly string[]}) =>
+            pipe(
                 readFile(path.join(root, 'lerna.json')),
                 TE.chain(contents => {
                     const LernaManifest = StringifiedJSON(
@@ -174,51 +174,13 @@ const main: T.Task<void> =
                     )
                 }),
                 // do not report a no-op as an error
-                TE.orElse(err =>
-                    match<Err, TE.TaskEither<Err, void>>(err)
+                TE.orElse(
+                    err => match<Err, TE.TaskEither<Err, void>>(err)
                         .with({ type: 'no-op' }, () => TE.of(undefined))
-                        .otherwise(() => TE.left(err))
-                         )
-            )
-
-            const updateTopLevelTsconfig = pipe(
-                readFile(path.join(root, 'tsconfig.json')),
-                TE.chain(contents => {
-                    const TsconfigManifest = StringifiedJSON(
-                        t.type({
-                            references: t.array(t.type({path: t.string}))
-                        })
-                    )
-                    const references = packages.map(pkg => ({path: pkg}))
-                    return pipe(
-                        decode (TsconfigManifest) ('tsconfig.json') (contents),
-                        E.chain(manifest =>
-                            deepEqual(manifest.references, references)
-                            ? E.left({ type: 'no-op' } as Err)
-                            : E.right((manifest.references = references, manifest))
-                               ),
-                        E.chain(json => pipe(
-                            stringifyJSON (E.toError) (json),
-                                E.mapLeft(error => err({ type: 'unable to stringify json', json, error }))
-                        )),
-                        TE.fromEither,
-                        TE.chain(writeFile(path.join(root, 'tsconfig.json'))),
-                    )
-                }),
-                value => value,
-                // do not report some errors, since this is ancillary functionality
-                TE.orElse(err =>
-                    match<Err, TE.TaskEither<Err, void>>(err)
-                        .with({ type: 'no-op' }, () => TE.of(undefined))
-                        .with({ type: 'unable to stringify json' }, () => TE.of(undefined))
-                        .with({ type: 'unable to read file' }, () => TE.of(undefined))
                         .otherwise(() => TE.left(err))
                 )
             )
-
-            return TE.sequenceArray([updateLernaManifest, updateTopLevelTsconfig])
-        }),
-
+        ),
         TE.fold(
             flow(
                 Console.error,
