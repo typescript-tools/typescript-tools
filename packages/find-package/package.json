@@ -1,6 +1,6 @@
 {
     "name": "@typescript-tools/find-package",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Find lerna package by path or name",
     "homepage": "https://github.com/typescript-tools/typescript-tools",
     "bugs": {
@@ -43,8 +43,8 @@
         ]
     },
     "dependencies": {
-        "@typescript-tools/lerna-packages": "^2.0.0",
-        "@typescript-tools/io-ts": "^2.0.0",
+        "@typescript-tools/io-ts": "^2.1.0",
+        "@typescript-tools/lerna-packages": "^2.1.0",
         "fp-ts": "^2.9.3"
     },
     "devDependencies": {

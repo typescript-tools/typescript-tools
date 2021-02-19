@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/stringify-json@1.2.0...@typescript-tools/stringify-json@1.3.0) (2021-02-19)
+
+
+### Features
+
+* add tool link-local-dependencies ([3bce081](https://github.com/typescript-tools/typescript-tools/commit/3bce081bf09141cb8fd6867eb59d4b9dc45276c0))
+
+
+
+
+
 # [1.2.0](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/stringify-json@1.1.0...@typescript-tools/stringify-json@1.2.0) (2021-01-05)
 
 
