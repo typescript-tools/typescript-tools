@@ -17,6 +17,7 @@ import * as T from 'fp-ts/Task'
 import * as TE from 'fp-ts/TaskEither'
 import * as IO from 'fp-ts/IO'
 import * as Console from 'fp-ts/Console'
+import * as PathReporter from 'io-ts/lib/PathReporter'
 import Debug from 'debug'
 import deepEqual from 'fast-deep-equal'
 import findUp from 'find-up'
@@ -24,7 +25,6 @@ import glob from 'fast-glob'
 import { ordString } from 'fp-ts/Ord'
 import { pipe, flow, constant } from 'fp-ts/function'
 import { withEncode} from 'io-ts-docopt'
-import { PathReporter } from 'io-ts/lib/PathReporter'
 import { match } from 'ts-pattern'
 import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
 import { trace } from '@strong-roots-capital/trace'
@@ -73,14 +73,14 @@ const err = (error: Err): Err => error
 
 const decodeDocopt = flow(
     D.decodeDocopt,
-    E.mapLeft(errors => PathReporter.report(E.left(errors)).join('\n')),
+    E.mapLeft(errors => PathReporter.failure(errors).join('\n')),
     E.mapLeft(error => err({ type: 'docopt decode', error })),
     TE.fromEither
 )
 
 const decode = <C extends t.Mixed>(codec: C) => (filename: string) => (contents: unknown) => pipe(
     codec.decode(contents),
-    E.mapLeft(errors => PathReporter.report(E.left(errors)).join('\n')),
+    E.mapLeft(errors => PathReporter.failure(errors).join('\n')),
     E.mapLeft(error => err({ type: 'json parse error', filename, error })),
 )
 
@@ -117,16 +117,14 @@ const main: T.Task<void> =
         TE.chain(candidates => {
             const isCandidate = (candidate: string) => pipe(
                 readFile(candidate),
-                TE.chain((contents) => (
-                    TE.of({
-                        file: candidate,
-                        isLernaPackage: StringifiedJSON(
-                            t.type({
-                                extends: StringEndingWithTsconfigSettingsJson
-                            })
-                        ).is(contents)
-                    })
-                ))
+                TE.chain((contents) => TE.of({
+                    file: candidate,
+                    isLernaPackage: StringifiedJSON(
+                        t.type({
+                            extends: StringEndingWithTsconfigSettingsJson
+                        })
+                    ).is(contents)
+                }))
             )
 
             return TE.sequenceArray(candidates.map(isCandidate))

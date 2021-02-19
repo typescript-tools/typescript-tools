@@ -17,10 +17,10 @@ import * as IO from 'fp-ts/IO'
 import * as TE from 'fp-ts/TaskEither'
 import * as Console from 'fp-ts/Console'
 import * as D from 'io-ts-docopt'
+import * as PathReporter from 'io-ts/lib/PathReporter'
 import { withEncode } from 'io-ts-docopt'
 import { getLastSemigroup } from 'fp-ts/lib/Semigroup'
 import { sequenceS } from 'fp-ts/Apply'
-import { PathReporter } from 'io-ts/lib/PathReporter'
 import { pipe, flow, constVoid, constant, Endomorphism, identity } from 'fp-ts/function'
 import { readFile as readFile_, writeFile as writeFile_ } from '@typescript-tools/lerna-utils'
 import { stringifyJSON as stringifyJSON_ } from '@typescript-tools/stringify-json'
@@ -83,7 +83,7 @@ const dependencyGraph = (root?: string) => pipe(
 
 const decodeDocopt = flow(
     D.decodeDocopt,
-    E.mapLeft(errors => PathReporter.report(E.left(errors)).join('\n')),
+    E.mapLeft(errors => PathReporter.failure(errors).join('\n')),
     E.mapLeft(error => err({ type: 'docopt decode', error })),
     TE.fromEither
 )
@@ -95,7 +95,7 @@ const readFile = (filename: string): TE.TaskEither<Err, string> => pipe(
 
 const decodeFile = <C extends t.Mixed>(codec: C) => (filename: string) => (contents: string): TE.TaskEither<Err, C['_A']> => pipe(
     StringifiedJSON(codec).decode(contents),
-    E.mapLeft(errors => PathReporter.report(E.left(errors)).join('\n')),
+    E.mapLeft(errors => PathReporter.failure(errors).join('\n')),
     E.mapLeft(error => err({ type: 'unexpected file contents', filename, error })),
     TE.fromEither
 )

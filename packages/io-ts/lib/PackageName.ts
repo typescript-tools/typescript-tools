@@ -1,4 +1,5 @@
 import * as t from 'io-ts'
+import * as E from 'fp-ts/Eq'
 
 export interface PackageNameBrand {
     readonly PackageName: unique symbol;
@@ -11,3 +12,5 @@ export const PackageName = t.brand(
 )
 
 export type PackageName = t.TypeOf<typeof PackageName>;
+
+export const Eq: E.Eq<PackageName> = E.eqString

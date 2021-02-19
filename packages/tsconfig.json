@@ -5,6 +5,9 @@
             "path": "dependency-graph"
         },
         {
+            "path": "find-package"
+        },
+        {
             "path": "hoisted-packages"
         },
         {
@@ -18,6 +21,9 @@
         },
         {
             "path": "lerna-utils"
+        },
+        {
+            "path": "link-local-dependencies"
         },
         {
             "path": "monorepo-root"

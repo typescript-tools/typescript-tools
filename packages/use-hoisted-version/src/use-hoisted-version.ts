@@ -15,8 +15,8 @@ import * as TE from 'fp-ts/TaskEither'
 import * as IO from 'fp-ts/IO'
 import * as Console from 'fp-ts/Console'
 import * as D from 'io-ts-docopt'
+import * as PathReporter from 'io-ts/lib/PathReporter'
 import { withEncode } from 'io-ts-docopt'
-import { PathReporter } from 'io-ts/lib/PathReporter'
 import { pipe, flow, constant } from 'fp-ts/function'
 import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
 import { PackageJsonDependencies } from '@typescript-tools/io-ts/dist/lib/PackageJsonDependencies'
@@ -69,7 +69,7 @@ const err = (error: Err): Err => error
 
 const decodeDocopt = flow(
     D.decodeDocopt,
-    E.mapLeft(error => err({ type: 'docopt decode', error: PathReporter.report(E.left(error)).join('\n') })),
+    E.mapLeft(error => err({ type: 'docopt decode', error: PathReporter.failure(error).join('\n') })),
     TE.fromEither
 )
 
@@ -118,7 +118,7 @@ const updateDependencies =
                         ? O.none
                         : O.some(updatedJson)
                 )),
-                E.mapLeft(errors => PathReporter.report(E.left(errors)).join('\n')),
+                E.mapLeft(errors => PathReporter.failure(errors).join('\n')),
                 E.mapLeft(error => err({ type: 'unable to parse file', filename: packageJson, error })),
                 TE.fromEither
             )),

@@ -5,6 +5,8 @@
  * Pin lerna dependencies to latest managed version
  */
 
+import Debug from 'debug'
+import deepEqual from 'fast-deep-equal'
 import * as path from 'path'
 import * as t from 'io-ts'
 import * as E from 'fp-ts/Either'
@@ -14,9 +16,7 @@ import * as T from 'fp-ts/Task'
 import * as TE from 'fp-ts/TaskEither'
 import * as IO from 'fp-ts/IO'
 import * as Console from 'fp-ts/Console'
-import Debug from 'debug'
-import deepEqual from 'fast-deep-equal'
-import { PathReporter } from 'io-ts/lib/PathReporter'
+import * as PathReporter from 'io-ts/lib/PathReporter'
 import { mod } from 'shades'
 import { pipe, flow } from 'fp-ts/function'
 import { constant } from 'fp-ts/function'
@@ -79,7 +79,7 @@ const err = (error: Err): Err => error
 
 const decodeDocopt = flow(
     decodeDocopt_,
-    E.mapLeft(errors => PathReporter.report(E.left(errors)).join('\n')),
+    E.mapLeft(errors => PathReporter.failure(errors).join('\n')),
     E.mapLeft(error => err({ type: 'docopt decode', error })),
     TE.fromEither
 )
@@ -151,7 +151,7 @@ function updateDependencies(
                             ? O.none
                             : O.some(updatedJson)
                     )),
-                    E.mapLeft(errors => PathReporter.report(E.left(errors)).join('\n')),
+                    E.mapLeft(errors => PathReporter.failure(errors).join('\n')),
                     E.mapLeft(error => err({ type: 'unexpected file contents', filename: packageJson, error })),
                     TE.fromEither
                 )

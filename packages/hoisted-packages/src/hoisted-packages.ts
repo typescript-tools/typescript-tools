@@ -50,9 +50,9 @@ export function hoistedPackages(
              * }
              */
             const depsToInstall = packages.reduce(
-                (acc, {pkg, contents}) => {
+                (acc, manifest) => {
                     pipe(
-                        PackageJsonDependencies.decode(contents),
+                        PackageJsonDependencies.decode(manifest.contents),
                         // BUG(io-ts): why are these decoded records not typed?
                         E.map(json => Object.assign(
                             {} as Record<PackageName, PackageVersion>,
@@ -70,7 +70,7 @@ export function hoistedPackages(
                                 O.fromNullable(dependency.get(version)),
                                 O.getOrElse(() => dependency.set(version, new Set()).get(version)!)
                             )
-                            version_.add(pkg.name)
+                            version_.add(manifest.package.name)
                         }))
                     )
                     return acc

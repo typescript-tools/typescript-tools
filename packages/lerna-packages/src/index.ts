@@ -6,8 +6,8 @@
 import * as t from 'io-ts'
 import * as E from 'fp-ts/Either'
 import * as TE from 'fp-ts/TaskEither'
+import * as PathReporter from 'io-ts/lib/PathReporter'
 import { pipe, absurd } from 'fp-ts/function'
-import { PathReporter } from 'io-ts/lib/PathReporter'
 import { monorepoRoot as monorepoRoot_, MonorepoRootErr } from '@typescript-tools/monorepo-root'
 import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
 import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
@@ -28,7 +28,7 @@ const monorepoRoot = (): E.Either<PackageDiscoveryError, string> => pipe(
 
 const decodeLernaPackages = (packages: string): TE.TaskEither<PackageDiscoveryError, LernaPackage[]> => pipe(
     StringifiedJSON(t.array(LernaPackage)).decode(packages),
-    E.mapLeft(errors => PathReporter.report(E.left(errors)).join('\n')),
+    E.mapLeft(errors => PathReporter.failure(errors).join('\n')),
     E.mapLeft(err => error({ type: 'unable to decode list of packages', err })),
     TE.fromEither,
 )

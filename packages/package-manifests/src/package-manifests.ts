@@ -4,7 +4,6 @@
  */
 
 import * as path from 'path'
-import * as A from 'fp-ts/Array'
 import * as E from 'fp-ts/Either'
 import * as TE from 'fp-ts/TaskEither'
 import { pipe, flow } from 'fp-ts/function'
@@ -12,9 +11,6 @@ import { readFile as readFile_ } from '@typescript-tools/lerna-utils'
 import { lernaPackages as lernaPackages_, PackageDiscoveryError } from '@typescript-tools/lerna-packages'
 import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
 import { monorepoRoot as monorepoRoot_, MonorepoRootErr } from '@typescript-tools/monorepo-root'
-
-// FIXME: I think the errors in here and in lernaPackages can be
-// cleaned up (narrowed from unknown)
 
 export type PackageManifestsError =
     | MonorepoRootErr
@@ -33,28 +29,27 @@ const readFile = (filename: string) => pipe(
     TE.mapLeft(error => err({ type: 'unable to read file', filename, error }))
 )
 
+const packageJson = (lernaPackage: LernaPackage) =>
+    path.resolve(lernaPackage.location, 'package.json')
+
+export const packageManifest = (
+    lernaPackage: LernaPackage,
+): TE.TaskEither<PackageManifestsError, { package: LernaPackage, contents: E.Json }> => pipe(
+    readFile(packageJson(lernaPackage)),
+    TE.chain(contents => pipe(
+        E.parseJSON(contents, E.toError),
+        E.map(contents => ({ package: lernaPackage, contents })),
+        E.mapLeft(error => err({ type: 'unable to parse json', filename: packageJson(lernaPackage), error })),
+        TE.fromEither
+    ))
+)
+
 export function packageManifests(
     somePathInMonorepo?: string
-): TE.TaskEither<PackageManifestsError, ReadonlyArray<{ pkg: LernaPackage, contents: E.Json }>> {
+): TE.TaskEither<PackageManifestsError, ReadonlyArray<{ package: LernaPackage, contents: E.Json }>> {
     return pipe(
         monorepoRoot(somePathInMonorepo),
         TE.chain(lernaPackages),
-        TE.chain(flow(
-            A.map(pkg => {
-                const filename = path.resolve(pkg.location, 'package.json')
-                return pipe(
-                    readFile(filename),
-                    TE.chain(contents => pipe(
-                        E.parseJSON(contents, E.toError),
-                        E.map(contents => ({ pkg, contents })),
-                        E.mapLeft(error => err({ type: 'unable to parse json', filename, error })),
-                        TE.fromEither
-                    ))
-                )
-            }),
-            value => value,
-            TE.sequenceArray,
-        )),
-        value => value,
+        TE.chain(TE.traverseArray(packageManifest)),
     )
 }

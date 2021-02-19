@@ -15,8 +15,8 @@ import * as T from 'fp-ts/Task'
 import * as TE from 'fp-ts/TaskEither'
 import * as IO from 'fp-ts/IO'
 import * as Console from 'fp-ts/Console'
+import * as PathReporter from 'io-ts/lib/PathReporter'
 import { ordString } from 'fp-ts/Ord'
-import { PathReporter } from 'io-ts/lib/PathReporter'
 import { get } from 'shades'
 import { match } from 'ts-pattern'
 import { pipe } from 'fp-ts/pipeable'
@@ -66,7 +66,7 @@ const decodeDocopt = <C extends t.Mixed>(
     options: DocoptOption,
 ) => pipe(
     decodeDocopt_(codec, docstring, options),
-    E.mapLeft((err): Err => ({ type: 'docopt decode', err: PathReporter.report(E.left(err)).join('\n') })),
+    E.mapLeft((err): Err => ({ type: 'docopt decode', err: PathReporter.failure(err).join('\n') })),
     TE.fromEither
 )
 

@@ -10,7 +10,7 @@ import * as O from 'fp-ts/Option'
 import * as E from 'fp-ts/Either'
 import * as R from 'fp-ts/Record'
 import * as TE from 'fp-ts/TaskEither'
-import { PathReporter } from 'io-ts/lib/PathReporter'
+import * as PathReporter from 'io-ts/lib/PathReporter'
 import { constant, pipe, flow } from 'fp-ts/lib/function'
 import { readFile as readFile_ } from '@typescript-tools/lerna-utils'
 import { lernaPackages as lernaPackages_, PackageDiscoveryError } from '@typescript-tools/lerna-packages'
@@ -44,7 +44,7 @@ const decode = <C extends t.Mixed>(codec: C) =>
     (value: unknown): TE.TaskEither<DependencyGraphError, t.TypeOf<C>> =>
     pipe(
         codec.decode(value),
-        E.mapLeft(errors => PathReporter.report(E.left(errors)).join('\n')),
+        E.mapLeft(errors => PathReporter.failure(errors).join('\n')),
         E.mapLeft(error => err({ type: 'unexpected file contents', filename, error })),
         TE.fromEither
     )

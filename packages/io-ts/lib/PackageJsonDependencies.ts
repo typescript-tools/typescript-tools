@@ -12,3 +12,13 @@ export const PackageJsonDependencies = t.partial({
 // DISCUSS: why does the computed type use {} instead of a typed record?
 // Really crimping my type-inferencing style
 export type PackageJsonDependencies = t.TypeOf<typeof PackageJsonDependencies>;
+
+export const dependencies = (
+    manifest: PackageJsonDependencies,
+): [PackageName, PackageVersion][] => [
+        ...Object.entries(manifest.dependencies ?? {}),
+        ...Object.entries(manifest.devDependencies ?? {}),
+        ...Object.entries(manifest.optionalDependencies ?? {}),
+        ...Object.entries(manifest.peerDependencies ?? {})
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ] as any
