@@ -1,6 +1,6 @@
 {
     "name": "@typescript-tools/typescript-build-linker",
-    "version": "2.2.0",
+    "version": "2.2.1",
     "description": "Link together TypeScript packages in a monorepo",
     "homepage": "https://github.com/typescript-tools/typescript-tools",
     "bugs": {
@@ -45,9 +45,9 @@
         ]
     },
     "dependencies": {
-        "@typescript-tools/dependency-graph": "^2.1.0",
+        "@typescript-tools/dependency-graph": "^2.1.1",
         "@typescript-tools/io-ts": "^2.1.0",
-        "@typescript-tools/lerna-packages": "^2.1.0",
+        "@typescript-tools/lerna-packages": "^2.2.0",
         "@typescript-tools/lerna-utils": "^2.1.0",
         "@typescript-tools/monorepo-root": "^1.3.0",
         "@typescript-tools/stringify-json": "^1.3.0",

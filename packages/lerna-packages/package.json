@@ -1,6 +1,6 @@
 {
     "name": "@typescript-tools/lerna-packages",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "description": "Discover internal packages",
     "homepage": "https://github.com/typescript-tools/typescript-tools",
     "bugs": {

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/lerna-packages@2.1.0...@typescript-tools/lerna-packages@2.2.0) (2021-02-20)
+
+
+### Features
+
+* find monorepo root before running npx ([2a25e79](https://github.com/typescript-tools/typescript-tools/commit/2a25e795a06867f39d1a9ac8533cbcf2b87582bc))
+
+
+
+
+
 # [2.1.0](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/lerna-packages@2.0.0...@typescript-tools/lerna-packages@2.1.0) (2021-02-19)
 
 
