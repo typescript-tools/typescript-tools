@@ -49,7 +49,7 @@ export const findPackageIn =
     )
 
 /**
- * Returns absolute path to the specified package.
+ * Returns specified package metadata.
  */
 export const findPackage = (
     pathInsideMonorepo: string,
