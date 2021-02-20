@@ -17,6 +17,7 @@ const err = (path: string): MonorepoRootError => ({
 })
 
 const findup = (target: string, cwd: string) => pipe(
+    // FIXME: this should be async
     findUp.sync(target, { cwd, type: 'file' }),
     E.fromNullable(err(cwd)),
     E.map(path.dirname)
