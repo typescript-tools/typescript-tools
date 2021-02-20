@@ -1,6 +1,6 @@
 {
     "name": "@typescript-tools/pin-lerna-package-versions",
-    "version": "3.2.1",
+    "version": "3.2.2",
     "description": "Pin lerna dependencies to latest managed version",
     "main": "dist/src/index.js",
     "types": "dist/src/index.d.ts",
@@ -50,9 +50,9 @@
     "homepage": "https://github.com/typescript-tools/typescript-tools",
     "dependencies": {
         "@strong-roots-capital/trace": "^1.0.0",
-        "@typescript-tools/io-ts": "^2.1.0",
-        "@typescript-tools/lerna-packages": "^2.2.0",
-        "@typescript-tools/lerna-utils": "^2.1.0",
+        "@typescript-tools/io-ts": "^2.2.0",
+        "@typescript-tools/lerna-packages": "^2.2.1",
+        "@typescript-tools/lerna-utils": "^2.1.1",
         "@typescript-tools/stringify-json": "^1.3.0",
         "debug": "^4.2.0",
         "fast-deep-equal": "^3.1.3",

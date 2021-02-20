@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/io-ts@2.1.0...@typescript-tools/io-ts@2.2.0) (2021-02-20)
+
+
+### Features
+
+* add package link-dependency-executables ([3a3777b](https://github.com/typescript-tools/typescript-tools/commit/3a3777b9ac86aeccd09f0e55a728272ef22a9f96))
+
+
+
+
+
 # [2.1.0](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/io-ts@2.0.0...@typescript-tools/io-ts@2.1.0) (2021-02-19)
 
 

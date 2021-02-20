@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.3](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/link-local-dependencies@1.1.2...@typescript-tools/link-local-dependencies@1.1.3) (2021-02-20)
+
+
+### Bug Fixes
+
+* pull bin-only errors into bin ([3dbcb64](https://github.com/typescript-tools/typescript-tools/commit/3dbcb64ba2c4d0e806fdaeef66fe6321fe1fc04c))
+* remove lib from fp-ts import ([ac9dfd0](https://github.com/typescript-tools/typescript-tools/commit/ac9dfd09999ca932f11f47ec2e9901b145a2f807))
+
+
+
+
+
 ## [1.1.2](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/link-local-dependencies@1.1.1...@typescript-tools/link-local-dependencies@1.1.2) (2021-02-20)
 
 **Note:** Version bump only for package @typescript-tools/link-local-dependencies
