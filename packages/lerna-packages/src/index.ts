@@ -8,13 +8,13 @@ import * as E from 'fp-ts/Either'
 import * as TE from 'fp-ts/TaskEither'
 import * as PathReporter from 'io-ts/lib/PathReporter'
 import { pipe } from 'fp-ts/function'
-import { monorepoRoot as monorepoRoot_, MonorepoRootErr } from '@typescript-tools/monorepo-root'
+import { monorepoRoot as monorepoRoot_, MonorepoRootError } from '@typescript-tools/monorepo-root'
 import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
 import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
 import execa from 'execa'
 
 export type PackageDiscoveryError =
-    | MonorepoRootErr
+    | MonorepoRootError
     | { type: 'unable to discover internal packages', error: unknown }
     | { type: 'unable to decode list of packages', error: string }
 

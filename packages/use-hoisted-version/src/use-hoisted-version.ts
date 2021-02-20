@@ -25,7 +25,7 @@ import { PackageVersion } from '@typescript-tools/io-ts/dist/lib/PackageVersion'
 import { hoistedPackages, PackageManifestsError } from '@typescript-tools/hoisted-packages'
 import { readFile as readFile_, writeFile as writeFile_ } from '@typescript-tools/lerna-utils'
 import { stringifyJSON } from '@typescript-tools/stringify-json'
-import { monorepoRoot, MonorepoRootErr } from '@typescript-tools/monorepo-root'
+import { monorepoRoot, MonorepoRootError } from '@typescript-tools/monorepo-root'
 import { trace } from '@strong-roots-capital/trace'
 import { mod } from 'shades'
 import { match } from 'ts-pattern'
@@ -54,7 +54,7 @@ const CommandLineOptions = withEncode(
 )
 
 type Err =
-    | MonorepoRootErr
+    | MonorepoRootError
     | PackageManifestsError
     | { type: 'docopt decode', error: string }
     | { type: 'package not in monorepo' }

@@ -25,7 +25,7 @@ import { pipe, flow, constVoid, constant, Endomorphism, identity } from 'fp-ts/f
 import { readFile as readFile_, writeFile as writeFile_ } from '@typescript-tools/lerna-utils'
 import { stringifyJSON as stringifyJSON_ } from '@typescript-tools/stringify-json'
 import { lernaPackages as lernaPackages_, PackageDiscoveryError } from '@typescript-tools/lerna-packages'
-import { monorepoRoot as monorepoRoot_, MonorepoRootErr } from '@typescript-tools/monorepo-root'
+import { monorepoRoot as monorepoRoot_, MonorepoRootError } from '@typescript-tools/monorepo-root'
 import { TsConfig } from '@typescript-tools/io-ts/dist/lib/TsConfig'
 import { dependencyGraph as dependencyGraph_, DependencyGraphError } from '@typescript-tools/dependency-graph'
 import { withFallback } from 'io-ts-types/lib/withFallback'
@@ -61,7 +61,7 @@ const CommandLineOptions = withEncode(
 )
 
 type Err =
-    | MonorepoRootErr
+    | MonorepoRootError
     | PackageDiscoveryError
     | DependencyGraphError
     | { type: 'docopt decode', error: string }

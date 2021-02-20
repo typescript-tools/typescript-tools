@@ -19,10 +19,10 @@
     },
     "references": [
         {
-            "path": "../lerna-packages"
+            "path": "../io-ts"
         },
         {
-            "path": "../io-ts"
+            "path": "../lerna-packages"
         }
     ]
 }

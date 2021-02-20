@@ -8,11 +8,10 @@ import findUp from 'find-up'
 import * as E from 'fp-ts/Either'
 import { pipe, constant } from 'fp-ts/function'
 
-// REFACTOR: TODO: rename this to ...Error
-export type MonorepoRootErr =
+export type MonorepoRootError =
     | { type: 'cannot find lerna manifest upwards from known path', path: string }
 
-const err = (path: string): MonorepoRootErr => ({
+const err = (path: string): MonorepoRootError => ({
     type: 'cannot find lerna manifest upwards from known path',
     path
 })
@@ -27,10 +26,10 @@ const findup = (target: string, cwd: string) => pipe(
  * Find the monorepo root directory, searching upwards from `path`.
  */
 export function monorepoRoot(
-    path?: string
-): E.Either<MonorepoRootErr, string> {
+    pathInsideMonorepo?: string
+): E.Either<MonorepoRootError, string> {
     return pipe(
-        E.fromNullable (err('')) (path),
+        E.fromNullable (err('')) (pathInsideMonorepo),
         E.chain(from => findup('lerna.json', from)),
         E.alt(
             () => pipe(

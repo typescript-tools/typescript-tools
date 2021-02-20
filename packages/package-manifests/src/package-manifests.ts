@@ -10,10 +10,10 @@ import { pipe, flow } from 'fp-ts/function'
 import { readFile as readFile_ } from '@typescript-tools/lerna-utils'
 import { lernaPackages as lernaPackages_, PackageDiscoveryError } from '@typescript-tools/lerna-packages'
 import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
-import { monorepoRoot as monorepoRoot_, MonorepoRootErr } from '@typescript-tools/monorepo-root'
+import { monorepoRoot as monorepoRoot_, MonorepoRootError } from '@typescript-tools/monorepo-root'
 
 export type PackageManifestsError =
-    | MonorepoRootErr
+    | MonorepoRootError
     | PackageDiscoveryError
     | { type: 'unable to read file', filename: string, error: NodeJS.ErrnoException }
     | { type: 'unable to parse json', filename: string, error: Error }
