@@ -9,7 +9,10 @@ import * as Console from 'fp-ts/Console'
 import * as PathReporter from 'io-ts/lib/PathReporter'
 import { pipe, flow, Endomorphism, identity } from 'fp-ts/lib/function'
 import { withEncode, decodeDocopt as decodeDocopt_ } from 'io-ts-docopt'
-import { linkLocalDependencies, LinkLocalDependenciesError } from './index'
+import {
+    linkLocalDependencies as linkLocalDependencies_,
+    LinkLocalDependenciesError as LinkLocalDependenciesError_,
+} from './index'
 
 const docstring = `
 Usage:
@@ -28,6 +31,10 @@ const CommandLineOptions = withEncode(
     })
 )
 
+type LinkLocalDependenciesError =
+    | LinkLocalDependenciesError_
+    | { type: 'docopt decode', error: string }
+
 const err: Endomorphism<LinkLocalDependenciesError> = identity
 
 const decodeDocopt = flow(
@@ -38,6 +45,8 @@ const decodeDocopt = flow(
     )),
     TE.fromEither
 )
+
+const linkLocalDependencies = flow(linkLocalDependencies_, TE.mapLeft(err))
 
 const exit = (code: 0 | 1) => () => process.exit(code)
 

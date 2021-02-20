@@ -30,7 +30,6 @@ export type LinkLocalDependenciesError =
     | FindPackageError
     | PackageDiscoveryError
     | PackageManifestsError
-    | { type: 'docopt decode', error: string }
     | { type: 'unable to decode package manifest', error: string }
     | { type: 'unable to create directory', path: string, error: Error }
     | { type: 'unable to create symlink', target: string, path: string, error: Error }
@@ -140,6 +139,7 @@ const symlinkPackage = (targetPackage: string) => (lernaPackage: LernaPackage) =
 export const linkLocalDependencies = (
     packagePathOrName: string,
 ): TE.TaskEither<LinkLocalDependenciesError, void> => pipe(
+    // FIXME: this should be exposed as a parameter
     lernaPackages(process.cwd()),
     TE.chain(packages => internalPackageDependencies (packages) (packagePathOrName)),
     TE.chain(TE.traverseArray(symlinkPackage(packagePathOrName))),
