@@ -12,7 +12,7 @@ import * as M from 'fp-ts/Map'
 import * as O from 'fp-ts/Option'
 import * as TE from 'fp-ts/TaskEither'
 import * as PathReporter from 'io-ts/lib/PathReporter'
-import { Endomorphism, identity, pipe, flow, constVoid } from 'fp-ts/lib/function'
+import { Endomorphism, identity, pipe, flow, constVoid } from 'fp-ts/function'
 import { trace } from '@strong-roots-capital/trace'
 import { findPackageIn as findPackageIn_, FindPackageError } from '@typescript-tools/find-package'
 import { packageManifest as packageManifest_, PackageManifestsError } from '@typescript-tools/package-manifests'
@@ -20,7 +20,7 @@ import { lernaPackages as lernaPackages_, PackageDiscoveryError } from '@typescr
 import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
 import { PackageJsonDependencies, dependencies } from '@typescript-tools/io-ts/dist/lib/PackageJsonDependencies'
 import { PackageName, Eq as eqPackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
-import { getFirstSemigroup } from 'fp-ts/lib/Semigroup'
+import { getFirstSemigroup } from 'fp-ts/Semigroup'
 
 const debug = {
     cmd: Debug('link')
@@ -135,7 +135,6 @@ const symlinkPackage = (targetPackage: string) => (lernaPackage: LernaPackage) =
         path.relative(path.dirname(symlinkLocation), lernaPackage.location),
         symlinkLocation,
     )
-
 }
 
 export const linkLocalDependencies = (
