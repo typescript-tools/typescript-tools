@@ -21,12 +21,12 @@ npm install --save-dev @typescript-tools/internal-dependencies
 
 ``` shell
 Usage:
-    internal-dependencies [--path] <root> <package>...
+    internal-dependencies [--root <root>] [--path] <package>...
 
 Options:
-    root        Root of lerna mono-repository
-    packages    Packages to print dependencies of (also reads from stdin)
-    --path      Print the relative path to each package from root
+    packages         Packages to print dependencies of (also reads from stdin)
+    --root=<root>    Root of lerna mono-repository
+    --path           Print the relative path to each package from root
 ```
 
 ## Example
@@ -38,7 +38,7 @@ It outputs the internal dependencies that the list of packages depends
 upon, either directly or transitively.
 
 ``` shell
-$ echo @typescript-tools/lerna-utils | node ./packages/internal-dependencies/dist/src/internal-dependencies.js .
+$ echo @typescript-tools/lerna-utils | node ./packages/internal-dependencies/dist/src/internal-dependencies.js
 @typescript-tools/io-ts
 ```
 
@@ -46,7 +46,7 @@ Use `--path` to print the path to the dependencies rather than the
 package names.
 
 ``` shell
-$ internal-dependencies --path . @typescript-tools/internal-dependencies
+$ internal-dependencies --path @typescript-tools/internal-dependencies
 packages/io-ts
 packages/lerna-utils
 ```

@@ -20,45 +20,51 @@ import { ordString } from 'fp-ts/Ord'
 import { get } from 'shades'
 import { match } from 'ts-pattern'
 import { pipe } from 'fp-ts/pipeable'
-import { constant, flow } from 'fp-ts/function'
+import { constant, Endomorphism, flow } from 'fp-ts/function'
 import { dependencyGraph as dependencyGraph_, DependencyGraphError } from '@typescript-tools/dependency-graph'
 import { withEncode, decodeDocopt as decodeDocopt_ } from 'io-ts-docopt'
 import { DocoptOption } from 'docopt'
 import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
+import { monorepoRoot, MonorepoRootError } from '@typescript-tools/monorepo-root'
 
 const docstring = `
 Usage:
-    internal-dependencies [--path] <root> <package>...
+    internal-dependencies [--root <root>] [--path] <package>...
 
 Options:
-    root        Root of lerna mono-repository
-    packages    Packages to print dependencies of (also reads from stdin)
-    --path      Print the relative path to each package from root
+    packages         Packages to print dependencies of (also reads from stdin)
+    --root=<root>    Root of lerna mono-repository
+    --path           Print the relative path to each package from root
 `
 
 const CommandLineOptions = withEncode(
-    t.type({
-        '<root>': t.string,
-        '<package>': t.array(PackageName),
-        '--path': t.boolean
-    }),
+    t.intersection([
+        t.type({
+            '<package>': t.array(PackageName),
+            '--path': t.boolean
+        }),
+        t.partial({
+            '--root': t.string,
+        }),
+    ]),
     a => ({
-        root: a['<root>'],
+        root: a['--root'],
         packages: a['<package>'],
         mode: a['--path'] ? 'path' : 'name'
     })
 )
 
-type CommandLineOptions = t.TypeOf<typeof CommandLineOptions>;
+type CommandLineOptions = t.OutputOf<typeof CommandLineOptions>;
 
 const unary = <A, B>(f: (a: A) => B) => (a: A): B => f(a)
 
 type Err =
     | DependencyGraphError
+    | MonorepoRootError
     | { type: 'docopt decode', err: string }
 
 // Widens the type of a particular Err into an Err
-const error = (error: Err): Err => error
+const error: Endomorphism<Err> = t.identity
 
 const decodeDocopt = <C extends t.Mixed>(
     codec: C,
@@ -70,10 +76,22 @@ const decodeDocopt = <C extends t.Mixed>(
     TE.fromEither
 )
 
+const findMonorepoRoot = (a: CommandLineOptions) =>
+    pipe(
+        O.fromNullable(a.root),
+        O.fold(
+            flow(monorepoRoot, E.mapLeft(error)),
+            E.right,
+        ),
+        E.map(root => Object.assign(a, { root })),
+        TE.fromEither,
+    )
+
 const dependencyGraph = flow(dependencyGraph_, TE.mapLeft(error))
 
-function main(): void {
+const exit = (code: 0 | 1): IO.IO<void> => () => process.exit(code)
 
+const main: T.Task<void> =
     pipe(
         decodeDocopt(
             CommandLineOptions,
@@ -86,6 +104,7 @@ function main(): void {
                 ]
             }
         ),
+        TE.chain(findMonorepoRoot),
         TE.chain(options => pipe(
             dependencyGraph(options.root),
             TE.map(graph => pipe(
@@ -105,16 +124,15 @@ function main(): void {
                         .map(location => path.relative(options.root, location))
                 )
                 .otherwise(() => dependencies.map(get('name')))
-               ),
+            ),
             TE.map(A.uniq(ordString)),
-            TE.map((dependencies: string[]) => dependencies.forEach(unary(console.log)))
+            TE.map((dependencies: string[]) => dependencies.forEach(unary(console.log))),
         )),
         TE.fold(
-            flow(Console.error, IO.chain(() => process.exit(1)), T.fromIO),
+            flow(Console.error, IO.chain(() => exit(1)), T.fromIO),
             constant(T.of(undefined))
-        )
+        ),
     )
-}
 
 main()
 
