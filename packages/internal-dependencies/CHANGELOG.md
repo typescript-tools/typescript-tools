@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.1.4](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/internal-dependencies@2.1.3...@typescript-tools/internal-dependencies@2.1.4) (2021-03-04)
+
+
+### Bug Fixes
+
+* docopt parsing ([14565fb](https://github.com/typescript-tools/typescript-tools/commit/14565fb7a8593d604f8010f0112ec2029598fa1b))
+
+
+
+
+
 ## [2.1.3](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/internal-dependencies@2.1.2...@typescript-tools/internal-dependencies@2.1.3) (2021-03-04)
 
 
