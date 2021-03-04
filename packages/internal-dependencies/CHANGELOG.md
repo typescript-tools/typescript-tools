@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.1.3](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/internal-dependencies@2.1.2...@typescript-tools/internal-dependencies@2.1.3) (2021-03-04)
+
+
+### Bug Fixes
+
+* run program by invoking task ([70bfd73](https://github.com/typescript-tools/typescript-tools/commit/70bfd73bf38baeb6824afaf8291b9f31746e3307))
+
+
+
+
+
 ## [2.1.2](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/internal-dependencies@2.1.1...@typescript-tools/internal-dependencies@2.1.2) (2021-02-20)
 
 **Note:** Version bump only for package @typescript-tools/internal-dependencies
