@@ -38,17 +38,13 @@ Options:
 `
 
 const CommandLineOptions = withEncode(
-    t.intersection([
-        t.type({
-            '<package>': t.array(PackageName),
-            '--path': t.boolean
-        }),
-        t.partial({
-            '--root': t.string,
-        }),
-    ]),
+    t.type({
+        '<package>': t.array(PackageName),
+        '--path': t.boolean,
+        '--root': t.union([t.null, t.string]),
+    }),
     a => ({
-        root: a['--root'],
+        root: a['--root'] !== null ? a['--root'] : undefined,
         packages: a['<package>'],
         mode: a['--path'] ? 'path' : 'name'
     })
