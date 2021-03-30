@@ -22,7 +22,16 @@
             "path": "../dependency-graph"
         },
         {
+            "path": "../find-package"
+        },
+        {
             "path": "../io-ts"
+        },
+        {
+            "path": "../lerna-packages"
+        },
+        {
+            "path": "../monorepo-root"
         }
     ]
 }
