@@ -31,7 +31,7 @@ npm install @typescript-tools/tsconfig-includes
 
 ```
 Usage:
-    tsconfig-includes <tsconfig>
+    tsconfig-includes <tsconfig>...
 
 Options:
     tsconfig    Path to tsconfig for which to enumerate included files

@@ -7,6 +7,7 @@
 
 import Debug from 'debug'
 import * as fs from 'fs'
+import * as path from 'path'
 import * as t from 'io-ts'
 import * as A from 'fp-ts/ReadonlyArray'
 import * as E from 'fp-ts/Either'
@@ -17,7 +18,7 @@ import * as Console from 'fp-ts/Console'
 import * as PathReporter from 'io-ts/lib/PathReporter'
 import { withEncode, decodeDocopt as decodeDocopt_ } from 'io-ts-docopt'
 import { Endomorphism, identity, pipe, flow, constVoid } from 'fp-ts/function'
-import { withFallback } from 'io-ts-types'
+import { nonEmptyArray, withFallback } from 'io-ts-types'
 import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
 import { trace } from '@strong-roots-capital/trace'
 import glob from 'fast-glob'
@@ -38,7 +39,7 @@ type TSConfig = t.TypeOf<typeof TSConfig>
 
 const docstring = `
 Usage:
-    tsconfig-includes <tsconfig>
+    tsconfig-includes <tsconfig>...
 
 Options:
     tsconfig    Path to tsconfig for which to enumerate included files
@@ -46,10 +47,10 @@ Options:
 
 const CommandLineOptions = withEncode(
     t.type({
-        '<tsconfig>': t.string,
+        '<tsconfig>': nonEmptyArray(t.string),
     }),
     (a) => ({
-        tsconfig: a['<tsconfig>'],
+        tsconfigs: a['<tsconfig>'],
     }),
 )
 
@@ -108,9 +109,9 @@ const readTsconfig = flow(
     TE.map(trace(debug.cmd, 'tsconfig')),
 )
 
-const resolveIncludes = (includes: Includes) =>
+const resolveIncludes = (tsconfig: string) => (includes: Includes) =>
     TE.tryCatch(
-        async () => glob(includes),
+        async () => glob(includes, { cwd: path.dirname(tsconfig) }),
         flow(E.toError, (error) =>
             err({ type: 'unable to resolve globs', globs: includes, error }),
         ),
@@ -120,9 +121,15 @@ const exit = (code: 0 | 1) => () => process.exit(code)
 
 const main: T.Task<void> = pipe(
     decodeDocopt(CommandLineOptions, docstring),
-    TE.chain(({ tsconfig }) => readTsconfig(tsconfig)),
-    TE.chain(({ include }) => resolveIncludes(include)),
-    TE.chain(flow(A.map(Console.log), IO.sequenceArray, TE.fromIO)),
+    TE.chain(({ tsconfigs }) => pipe(
+        tsconfigs,
+        A.map(tsconfig => pipe(
+            readTsconfig(tsconfig),
+            TE.chain(({ include }) => resolveIncludes(tsconfig)(include)),
+            TE.chain(flow(A.map(Console.log), IO.sequenceArray, TE.fromIO)),
+        )),
+        TE.sequenceArray,
+    )),
     TE.map(constVoid),
     TE.getOrElseW(
         flow(
