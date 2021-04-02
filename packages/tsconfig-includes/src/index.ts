@@ -120,7 +120,13 @@ const resolveIncludes = (tsconfig: string) => (includes: Includes) =>
 const exit = (code: 0 | 1) => () => process.exit(code)
 
 const main: T.Task<void> = pipe(
-    decodeDocopt(CommandLineOptions, docstring),
+    decodeDocopt(CommandLineOptions, docstring, {
+        argv: [
+            ...process.argv.slice(2),
+            // file descriptor '0' is stdin
+            ...!process.stdin.isTTY ? fs.readFileSync(0, 'utf-8').trim().split(/\s/) : []
+        ]
+    }),
     TE.chain(({ tsconfigs }) => pipe(
         tsconfigs,
         A.map(tsconfig => pipe(
