@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](http://github.com-personal/typescript-tools/typescript-tools/compare/@typescript-tools/tsconfig-includes@1.2.0...@typescript-tools/tsconfig-includes@1.3.0) (2021-04-02)
+
+
+### Features
+
+* include cwd in output ([98dd804](http://github.com-personal/typescript-tools/typescript-tools/commit/98dd8046f4598cdef8ae8ae9db9edc3b01cad306))
+
+
+
+
+
 # [1.2.0](http://github.com-personal/typescript-tools/typescript-tools/compare/@typescript-tools/tsconfig-includes@1.1.0...@typescript-tools/tsconfig-includes@1.2.0) (2021-04-02)
 
 
