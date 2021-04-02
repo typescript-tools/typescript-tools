@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](http://github.com-personal/typescript-tools/typescript-tools/compare/@typescript-tools/tsconfig-includes@1.1.0...@typescript-tools/tsconfig-includes@1.2.0) (2021-04-02)
+
+
+### Features
+
+* accept input via stdin ([36246d0](http://github.com-personal/typescript-tools/typescript-tools/commit/36246d0f48e44b55be46eff81f89489554fb2c8e))
+
+
+
+
+
 # [1.1.0](http://github.com-personal/typescript-tools/typescript-tools/compare/@typescript-tools/tsconfig-includes@1.0.1...@typescript-tools/tsconfig-includes@1.1.0) (2021-04-02)
 
 
