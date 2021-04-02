@@ -109,13 +109,18 @@ const readTsconfig = flow(
     TE.map(trace(debug.cmd, 'tsconfig')),
 )
 
-const resolveIncludes = (tsconfig: string) => (includes: Includes) =>
-    TE.tryCatch(
-        async () => glob(includes, { cwd: path.dirname(tsconfig) }),
-        flow(E.toError, (error) =>
-            err({ type: 'unable to resolve globs', globs: includes, error }),
+const resolveIncludes = (tsconfig: string) => (includes: Includes) => {
+    const cwd = path.dirname(tsconfig)
+    return pipe(
+        TE.tryCatch(
+            async () => glob(includes, { cwd }),
+            flow(E.toError, (error) =>
+                err({ type: 'unable to resolve globs', globs: includes, error }),
+            ),
         ),
+        TE.map(A.map(a => path.join(cwd, a)))
     )
+}
 
 const exit = (code: 0 | 1) => () => process.exit(code)
 
