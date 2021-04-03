@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.1](http://github.com-personal/typescript-tools/typescript-tools/compare/@typescript-tools/tsconfig-includes@1.3.0...@typescript-tools/tsconfig-includes@1.3.1) (2021-04-03)
+
+
+### Bug Fixes
+
+* split on \s+ ([5ce0589](http://github.com-personal/typescript-tools/typescript-tools/commit/5ce058986dbffbfc513979efe6f270906d9cdcb3))
+
+
+
+
+
 # [1.3.0](http://github.com-personal/typescript-tools/typescript-tools/compare/@typescript-tools/tsconfig-includes@1.2.0...@typescript-tools/tsconfig-includes@1.3.0) (2021-04-02)
 
 
