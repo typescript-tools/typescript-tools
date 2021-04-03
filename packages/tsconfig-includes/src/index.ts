@@ -134,6 +134,7 @@ const main: T.Task<void> = pipe(
     }),
     TE.chain(({ tsconfigs }) => pipe(
         tsconfigs,
+        A.filter(s => s.length > 0 ),
         A.map(tsconfig => pipe(
             readTsconfig(tsconfig),
             TE.chain(({ include }) => resolveIncludes(tsconfig)(include)),
