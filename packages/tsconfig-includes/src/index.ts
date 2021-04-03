@@ -129,7 +129,7 @@ const main: T.Task<void> = pipe(
         argv: [
             ...process.argv.slice(2),
             // file descriptor '0' is stdin
-            ...!process.stdin.isTTY ? fs.readFileSync(0, 'utf-8').trim().split(/\s/) : []
+            ...!process.stdin.isTTY ? fs.readFileSync(0, 'utf-8').trim().split(/\s+/) : []
         ]
     }),
     TE.chain(({ tsconfigs }) => pipe(
