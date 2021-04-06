@@ -78,7 +78,7 @@ export function dependencyGraph(
                 {} as { [packageName: string]: PackageManifest }
             )
 
-            // map of a package name to its internal dependencies
+            // map of a package name to its (direct) internal dependencies
             const internalDependencies = manifests.reduce(
                 (acc, manifest) => Object.assign(
                     acc,
@@ -104,7 +104,7 @@ export function dependencyGraph(
             const allInternalDependencies = (pkg: string): PackageManifest[] => {
                 const processed = new Set<string>()
                 const deps: PackageManifest[] = []
-                let next = internalDependencies[pkg]
+                let next = internalDependencies[pkg] ?? []
 
                 do {
                     next.forEach(dependency => {
@@ -113,7 +113,7 @@ export function dependencyGraph(
                     })
                     next = pipe(
                         next,
-                        A.chain(dependency => options.recursive ? internalDependencies[dependency.name] : [] ?? []),
+                        A.chain(dependency => (options.recursive ? internalDependencies[dependency.name] : []) ?? []),
                         A.filter(dependency => !processed.has(dependency.name))
                     )
                 } while (!A.isEmpty(next))
