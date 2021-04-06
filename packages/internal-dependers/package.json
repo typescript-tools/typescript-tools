@@ -1,6 +1,6 @@
 {
     "name": "@typescript-tools/internal-dependers",
-    "version": "0.0.2",
+    "version": "1.0.0",
     "description": "Calculate dependents of a package in the same monorepo",
     "homepage": "https://github.com/typescript-tools/typescript-tools",
     "bugs": {
