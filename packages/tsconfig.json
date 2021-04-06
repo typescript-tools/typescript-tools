@@ -5,6 +5,9 @@
             "path": "dependency-graph"
         },
         {
+            "path": "depender-graph"
+        },
+        {
             "path": "find-package"
         },
         {
@@ -12,6 +15,9 @@
         },
         {
             "path": "internal-dependencies"
+        },
+        {
+            "path": "internal-dependers"
         },
         {
             "path": "io-ts"
@@ -39,6 +45,9 @@
         },
         {
             "path": "stringify-json"
+        },
+        {
+            "path": "tsconfig-includes"
         },
         {
             "path": "typescript-build-linker"

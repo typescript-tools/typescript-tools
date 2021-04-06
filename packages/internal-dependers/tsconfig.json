@@ -1,7 +1,8 @@
 {
     "extends": "../tsconfig.settings.json",
     "include": [
-        "src/**/*"
+        "src/**/*",
+        "test/**/test-*"
     ],
     "exclude": [
         "node_modules",
@@ -18,7 +19,19 @@
     },
     "references": [
         {
+            "path": "../depender-graph"
+        },
+        {
+            "path": "../find-package"
+        },
+        {
             "path": "../io-ts"
+        },
+        {
+            "path": "../lerna-packages"
+        },
+        {
+            "path": "../monorepo-root"
         }
     ]
 }
