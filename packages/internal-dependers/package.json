@@ -17,6 +17,9 @@
     "files": [
         "dist/src/"
     ],
+    "bin": {
+        "internal-dependers": "./dist/src/index.js"
+    },
     "scripts": {
         "prepublishOnly": "npm run compile",
         "ava": "echo 'No tests defined'",
@@ -104,8 +107,5 @@
     ],
     "publishConfig": {
         "access": "public"
-    },
-    "bin": {
-        "internal-dependers": "./dist/src/index.js"
     }
 }
