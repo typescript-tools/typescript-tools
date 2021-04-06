@@ -1,6 +1,6 @@
 {
     "name": "@typescript-tools/depender-graph",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Generate depender graph of internal packages",
     "homepage": "https://github.com/typescript-tools/typescript-tools",
     "bugs": {

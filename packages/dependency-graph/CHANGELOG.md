@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.1.3](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/dependency-graph@2.1.2...@typescript-tools/dependency-graph@2.1.3) (2021-04-06)
+
+
+### Bug Fixes
+
+* properly fallback on getOrElse values ([eb5cf2c](https://github.com/typescript-tools/typescript-tools/commit/eb5cf2c9ec6761e25820642267e6c2f472d8ae3c))
+
+
+
+
+
 ## [2.1.2](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/dependency-graph@2.1.1...@typescript-tools/dependency-graph@2.1.2) (2021-02-20)
 
 **Note:** Version bump only for package @typescript-tools/dependency-graph
