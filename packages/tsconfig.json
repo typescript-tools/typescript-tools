@@ -41,6 +41,12 @@
             "path": "package-manifests"
         },
         {
+            "path": "packages-to-rebuild-on-changes-cli"
+        },
+        {
+            "path": "packages-to-rebuild-on-changes"
+        },
+        {
             "path": "pin-lerna-package-versions"
         },
         {

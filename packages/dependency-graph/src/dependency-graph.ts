@@ -113,7 +113,11 @@ export function dependencyGraph(
                     })
                     next = pipe(
                         next,
-                        A.chain(dependency => (options.recursive ? internalDependencies[dependency.name] : []) ?? []),
+                        A.chain(dependency => (
+                            options.recursive
+                                ? internalDependencies[dependency.name]
+                                : []
+                        ) ?? []),
                         A.filter(dependency => !processed.has(dependency.name))
                     )
                 } while (!A.isEmpty(next))
