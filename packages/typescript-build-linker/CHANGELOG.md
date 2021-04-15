@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/typescript-build-linker@2.2.5...@typescript-tools/typescript-build-linker@3.0.0) (2021-04-15)
+
+
+* chore!: bump major version to demonstrate breaking changes ([297a56e](https://github.com/typescript-tools/typescript-tools/commit/297a56e8c61266b056e894d0cae34c78a6b3c524))
+
+
+### BREAKING CHANGES
+
+* json default indent width changed from 4 to 2
+
+
+
+
+
 ## [2.2.5](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/typescript-build-linker@2.2.4...@typescript-tools/typescript-build-linker@2.2.5) (2021-04-15)
 
 **Note:** Version bump only for package @typescript-tools/typescript-build-linker
