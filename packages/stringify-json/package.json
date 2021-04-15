@@ -1,6 +1,6 @@
 {
     "name": "@typescript-tools/stringify-json",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "description": "Stringify JSON for file writes",
     "main": "dist/src/stringify-json.js",
     "types": "dist/src/stringify-json.d.ts",
