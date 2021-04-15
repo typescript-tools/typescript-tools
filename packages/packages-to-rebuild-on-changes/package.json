@@ -1,6 +1,6 @@
 {
     "name": "@typescript-tools/packages-to-rebuild-on-changes",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "Calculate packages required to rebuild when a given package changes",
     "homepage": "https://github.com/typescript-tools/typescript-tools",
     "bugs": {
@@ -44,7 +44,7 @@
     },
     "dependencies": {
         "@typescript-tools/io-ts": "^2.2.0",
-        "@typescript-tools/lerna-packages": "^2.2.1",
+        "@typescript-tools/lerna-packages": "^2.2.2",
         "@typescript-tools/lerna-utils": "^2.1.1",
         "fp-ts": "^2.9.3",
         "io-ts": "~2.1.3"

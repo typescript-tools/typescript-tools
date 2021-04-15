@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.1.3](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/use-hoisted-version@2.1.2...@typescript-tools/use-hoisted-version@2.1.3) (2021-04-15)
+
+**Note:** Version bump only for package @typescript-tools/use-hoisted-version
+
+
+
+
+
 ## [2.1.2](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/use-hoisted-version@2.1.1...@typescript-tools/use-hoisted-version@2.1.2) (2021-02-20)
 
 

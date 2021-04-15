@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.4](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/link-local-dependencies@1.1.3...@typescript-tools/link-local-dependencies@1.1.4) (2021-04-15)
+
+**Note:** Version bump only for package @typescript-tools/link-local-dependencies
+
+
+
+
+
 ## [1.1.3](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/link-local-dependencies@1.1.2...@typescript-tools/link-local-dependencies@1.1.3) (2021-02-20)
 
 

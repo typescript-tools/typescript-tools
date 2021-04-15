@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.2.2](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/lerna-packages@2.2.1...@typescript-tools/lerna-packages@2.2.2) (2021-04-15)
+
+**Note:** Version bump only for package @typescript-tools/lerna-packages
+
+
+
+
+
 ## [2.2.1](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/lerna-packages@2.2.0...@typescript-tools/lerna-packages@2.2.1) (2021-02-20)
 
 

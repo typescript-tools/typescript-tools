@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/stringify-json@1.3.0...@typescript-tools/stringify-json@2.0.0) (2021-04-15)
+
+
+* fix!: change json indent to 2 spaces ([b4df6dd](https://github.com/typescript-tools/typescript-tools/commit/b4df6dd24f6a465831e7dbe9b33367475e9cda04))
+
+
+### BREAKING CHANGES
+
+* this may cause a monster diff on first application
+
+
+
+
+
 # [1.3.0](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/stringify-json@1.2.0...@typescript-tools/stringify-json@1.3.0) (2021-02-19)
 
 
