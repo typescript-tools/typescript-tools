@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/link-local-dependencies@1.1.4...@typescript-tools/link-local-dependencies@1.2.0) (2021-05-15)
+
+
+### Features
+
+* allow symlinking all internal packages together ([41aefc4](https://github.com/typescript-tools/typescript-tools/commit/41aefc4b9b09b408b7c0268afb80e446b9749e98))
+
+
+
+
+
 ## [1.1.4](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/link-local-dependencies@1.1.3...@typescript-tools/link-local-dependencies@1.1.4) (2021-04-15)
 
 **Note:** Version bump only for package @typescript-tools/link-local-dependencies
