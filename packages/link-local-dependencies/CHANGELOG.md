@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.2](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/link-local-dependencies@1.2.1...@typescript-tools/link-local-dependencies@1.2.2) (2021-05-15)
+
+
+### Bug Fixes
+
+* replace O(n) runtime with O(1) ([cf9940b](https://github.com/typescript-tools/typescript-tools/commit/cf9940b347fd066fd07845473c732a58113c68f5))
+
+
+
+
+
 ## [1.2.1](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/link-local-dependencies@1.2.0...@typescript-tools/link-local-dependencies@1.2.1) (2021-05-15)
 
 
