@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.1.4](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/hoisted-packages@2.1.3...@typescript-tools/hoisted-packages@2.1.4) (2021-05-15)
+
+
+### Bug Fixes
+
+* fix always-failing test ([b8e028b](https://github.com/typescript-tools/typescript-tools/commit/b8e028b46e025b00ba2ea2175cea586e1c0fd154))
+
+
+
+
+
 ## [2.1.3](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/hoisted-packages@2.1.2...@typescript-tools/hoisted-packages@2.1.3) (2021-04-15)
 
 **Note:** Version bump only for package @typescript-tools/hoisted-packages
