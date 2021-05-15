@@ -8,7 +8,6 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as A from 'fp-ts/ReadonlyArray'
 import * as E from 'fp-ts/Either'
-import * as M from 'fp-ts/Map'
 import * as O from 'fp-ts/Option'
 import * as TE from 'fp-ts/TaskEither'
 import * as PathReporter from 'io-ts/lib/PathReporter'
@@ -25,7 +24,6 @@ import {
 } from '@typescript-tools/io-ts/dist/lib/PackageJsonDependencies'
 import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
 import { Path } from '@typescript-tools/io-ts/dist/lib/Path'
-import { eqString } from 'fp-ts/lib/Eq'
 
 const debug = {
     cmd: Debug('link'),
@@ -49,7 +47,7 @@ const findPackageIn = (packages: Map<string, LernaPackage>) => (
     packagePathOrName: string
 ) =>
     pipe(
-        M.lookup(eqString)(packagePathOrName)(packages),
+        O.fromNullable(packages.get(packagePathOrName)),
         E.fromOption(
             (): LinkLocalDependenciesError => ({
                 type: 'unknown package',
@@ -85,7 +83,7 @@ const internalDependencies = (packages: Map<string, LernaPackage>) => (
         dependencies,
         A.chain(dependency =>
             pipe(
-                M.lookup(eqString)(dependency)(packages),
+                O.fromNullable(packages.get(dependency)),
                 O.map(A.of),
                 O.getOrElseW(() => A.empty)
             )
