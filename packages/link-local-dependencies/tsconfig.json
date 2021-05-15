@@ -19,9 +19,6 @@
     },
     "references": [
         {
-            "path": "../find-package"
-        },
-        {
             "path": "../io-ts"
         },
         {

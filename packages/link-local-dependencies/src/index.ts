@@ -24,12 +24,15 @@ import {
 } from '@typescript-tools/io-ts/dist/lib/PackageJsonDependencies'
 import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
 import { Path } from '@typescript-tools/io-ts/dist/lib/Path'
+import { PackageDiscoveryError } from '@typescript-tools/lerna-packages'
+import { lernaPackages as lernaPackages_ } from './lerna-packages'
 
 const debug = {
     cmd: Debug('link'),
 }
 
 export type LinkLocalDependenciesError =
+    | PackageDiscoveryError
     | PackageManifestsError
     | { type: 'unknown package'; package: string }
     | { type: 'unable to decode package manifest'; error: string }
@@ -183,7 +186,11 @@ const symlinkPackage = (targetPackage: Path) => (
     )
 }
 
-export const linkLocalDependencies = (packages: Map<string, LernaPackage>) => (
+const lernaPackages = flow(lernaPackages_, TE.mapLeft(err))
+
+export const linkLocalDependenciesIn = (
+    packages: Map<string, LernaPackage>
+) => (
     packagePathOrName: string
 ): TE.TaskEither<LinkLocalDependenciesError, void> =>
     pipe(
@@ -199,14 +206,29 @@ export const linkLocalDependencies = (packages: Map<string, LernaPackage>) => (
         TE.map(constVoid)
     )
 
+
+// REFACTOR: this is the result of a gnarly, time-constrained session
+// It's not pretty code, I think we should remove the ./lerna-packages
+// file entirely and consolidate our exposed api
+export const linkLocalDependencies = (
+    packagePathOrName: string
+): TE.TaskEither<LinkLocalDependenciesError, void> =>
+    pipe(
+        // FIXME: process.cwd should instead be exposed as a parameter
+        lernaPackages(process.cwd()),
+        TE.chain(packages =>
+            linkLocalDependenciesIn(packages.map)(packagePathOrName)
+        )
+    )
+
 export const linkAllLocalDependencies = (
-    packagesList: LernaPackage[],
-    packagesMap: Map<string, LernaPackage>
+    packagesMap: Map<string, LernaPackage>,
+    packagesList: LernaPackage[]
 ): TE.TaskEither<LinkLocalDependenciesError, void> =>
     pipe(
         packagesList,
         TE.traverseArray(
-            flow(pkg => pkg.location, linkLocalDependencies(packagesMap))
+            flow(pkg => pkg.location, linkLocalDependenciesIn(packagesMap))
         ),
         TE.map(constVoid)
     )

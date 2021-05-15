@@ -25,6 +25,9 @@
             "path": "../io-ts"
         },
         {
+            "path": "../lerna-packages"
+        },
+        {
             "path": "../monorepo-root"
         }
     ]
