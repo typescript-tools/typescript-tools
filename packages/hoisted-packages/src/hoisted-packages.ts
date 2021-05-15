@@ -88,7 +88,7 @@ export function hoistedPackages(
                             A.sort(contramap (({frequency}: {frequency: number}) => frequency) (getDualOrd(ordNumber)))
                         )
                         // Only a non-ambiguous mode can be hoisted
-                        if (frequencies[0].frequency > frequencies[1]?.frequency ?? 0) {
+                        if (frequencies[0].frequency > (frequencies[1]?.frequency ?? 0)) {
                             acc.set(dependencyName, frequencies[0].version)
                         }
                         return acc
