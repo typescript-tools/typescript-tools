@@ -24,6 +24,7 @@ export { PackageManifestsError } from '@typescript-tools/package-manifests'
  *       hoisted.
  */
 export function hoistedPackages(
+    // REFACTOR: have hoistedPackages determine the monorepo root
     root: string,
 ): TE.TaskEither<PackageManifestsError, Map<PackageName, PackageVersion>> {
 
