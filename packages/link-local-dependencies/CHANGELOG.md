@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.3](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/link-local-dependencies@1.2.2...@typescript-tools/link-local-dependencies@1.2.3) (2021-05-15)
+
+
+### Bug Fixes
+
+* restore expected api for linkLocalDependencies ([2b4cd8d](https://github.com/typescript-tools/typescript-tools/commit/2b4cd8da9a2daa579bdb165ea7f979ddda0bb761))
+
+
+
+
+
 ## [1.2.2](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/link-local-dependencies@1.2.1...@typescript-tools/link-local-dependencies@1.2.2) (2021-05-15)
 
 
