@@ -28,10 +28,10 @@
             "path": "../lerna-packages"
         },
         {
-            "path": "../packages-to-rebuild-on-changes"
+            "path": "../monorepo-root"
         },
         {
-            "path": "../monorepo-root"
+            "path": "../packages-to-rebuild-on-changes"
         }
     ]
 }

@@ -10,50 +10,75 @@ import * as PathReporter from 'io-ts/lib/PathReporter'
 import { pipe, flow, Endomorphism, identity } from 'fp-ts/lib/function'
 import { withEncode, decodeDocopt as decodeDocopt_ } from 'io-ts-docopt'
 import {
+    lernaPackages as lernaPackages_,
+    PackageDiscoveryError,
+} from '@typescript-tools/lerna-packages'
+import {
     linkLocalDependencies as linkLocalDependencies_,
+    linkAllLocalDependencies as linkAllLocalDependencies_,
     LinkLocalDependenciesError as LinkLocalDependenciesError_,
 } from './index'
+import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
 
 const docstring = `
 Usage:
-    link-local-dependencies <package>
+    link-local-dependencies [<package>]
 
 Options:
-    package    Path or name of package for which to install local dependencies
+    package    Path or name of single package for which to install local dependencies
 `
 
 const CommandLineOptions = withEncode(
     t.type({
-        '<package>': t.string,
+        '<package>': t.union([t.null, t.string]),
     }),
     a => ({
-        pkg: a['<package>']
+        pkg: a['<package>'],
     })
 )
 
 type LinkLocalDependenciesError =
     | LinkLocalDependenciesError_
-    | { type: 'docopt decode', error: string }
+    | PackageDiscoveryError
+    | { type: 'docopt decode'; error: string }
 
 const err: Endomorphism<LinkLocalDependenciesError> = identity
 
 const decodeDocopt = flow(
     decodeDocopt_,
-    E.mapLeft(flow(
-        errors => PathReporter.failure(errors).join('\n'),
-        error => err({ type: 'docopt decode', error })
-    )),
+    E.mapLeft(
+        flow(
+            errors => PathReporter.failure(errors).join('\n'),
+            error => err({ type: 'docopt decode', error })
+        )
+    ),
     TE.fromEither
 )
 
-const linkLocalDependencies = flow(linkLocalDependencies_, TE.mapLeft(err))
+const lernaPackages = flow(lernaPackages_, TE.mapLeft(err))
+
+const linkLocalDependencies = (packages: LernaPackage[]) =>
+    flow(linkLocalDependencies_(packages), TE.mapLeft(err))
+
+const linkAllLocalDependencies = flow(
+    linkAllLocalDependencies_,
+    TE.mapLeft(err)
+)
 
 const exit = (code: 0 | 1) => () => process.exit(code)
 
 const main: T.Task<void> = pipe(
-    decodeDocopt(CommandLineOptions, docstring),
-    TE.chain(({ pkg }) => linkLocalDependencies(pkg)),
-    TE.getOrElseW(flow(Console.error, IO.chain(() => exit(1)), T.fromIO))
+    TE.bindTo('options')(decodeDocopt(CommandLineOptions, docstring)),
+    // FIXME: process.cwd should instead be exposed as a parameter
+    TE.bind('packages', () => lernaPackages(process.cwd())),
+    TE.chain(({ options, packages }) =>
+        options.pkg
+            ? linkLocalDependencies(packages)(options.pkg)
+            : linkAllLocalDependencies(packages)
+    ),
+    TE.getOrElseW(
+        flow(Console.error, IO.chain(() => exit(1)), T.fromIO)
+    )
 )
 
 main()
