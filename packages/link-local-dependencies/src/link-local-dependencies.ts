@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 
 import * as t from 'io-ts'
+import * as A from 'fp-ts/ReadonlyArray'
 import * as E from 'fp-ts/Either'
+import * as M from 'fp-ts/Map'
 import * as T from 'fp-ts/Task'
 import * as TE from 'fp-ts/TaskEither'
 import * as IO from 'fp-ts/IO'
@@ -19,6 +21,10 @@ import {
     LinkLocalDependenciesError as LinkLocalDependenciesError_,
 } from './index'
 import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
+import { eqString } from 'fp-ts/Eq'
+import { getFirstSemigroup } from 'fp-ts/Semigroup'
+import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
+import { Path } from '@typescript-tools/io-ts/dist/lib/Path'
 
 const docstring = `
 Usage:
@@ -55,9 +61,30 @@ const decodeDocopt = flow(
     TE.fromEither
 )
 
-const lernaPackages = flow(lernaPackages_, TE.mapLeft(err))
+const lernaPackages = flow(
+    lernaPackages_,
+    TE.bimap(
+        err,
+        packages => pipe(
+            packages,
+            A.chain((pkg): [
+                [PackageName, LernaPackage],
+                [Path, LernaPackage]
+            ] => [
+                [pkg.name, pkg],
+                [pkg.location, pkg],
+            ]),
+            M.fromFoldable(
+                eqString,
+                getFirstSemigroup<LernaPackage>(),
+                A.readonlyArray
+            ),
+            packagesMap => ({list: packages, map: packagesMap})
+        )
+    )
+)
 
-const linkLocalDependencies = (packages: LernaPackage[]) =>
+const linkLocalDependencies = (packages: Map<string, LernaPackage>) =>
     flow(linkLocalDependencies_(packages), TE.mapLeft(err))
 
 const linkAllLocalDependencies = flow(
@@ -73,11 +100,15 @@ const main: T.Task<void> = pipe(
     TE.bind('packages', () => lernaPackages(process.cwd())),
     TE.chain(({ options, packages }) =>
         options.pkg
-            ? linkLocalDependencies(packages)(options.pkg)
-            : linkAllLocalDependencies(packages)
+            ? linkLocalDependencies(packages.map)(options.pkg)
+        : linkAllLocalDependencies(packages.list, packages.map)
     ),
     TE.getOrElseW(
-        flow(Console.error, IO.chain(() => exit(1)), T.fromIO)
+        flow(
+            Console.error,
+            IO.chain(() => exit(1)),
+            T.fromIO
+        )
     )
 )
 

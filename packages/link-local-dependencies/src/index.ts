@@ -15,10 +15,6 @@ import * as PathReporter from 'io-ts/lib/PathReporter'
 import { Endomorphism, identity, pipe, flow, constVoid } from 'fp-ts/function'
 import { trace } from '@strong-roots-capital/trace'
 import {
-    findPackageIn as findPackageIn_,
-    FindPackageError,
-} from '@typescript-tools/find-package'
-import {
     packageManifest as packageManifest_,
     PackageManifestsError,
 } from '@typescript-tools/package-manifests'
@@ -27,20 +23,17 @@ import {
     PackageJsonDependencies,
     dependencies,
 } from '@typescript-tools/io-ts/dist/lib/PackageJsonDependencies'
-import {
-    PackageName,
-    Eq as eqPackageName,
-} from '@typescript-tools/io-ts/dist/lib/PackageName'
-import { getFirstSemigroup } from 'fp-ts/Semigroup'
+import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
 import { Path } from '@typescript-tools/io-ts/dist/lib/Path'
+import { eqString } from 'fp-ts/lib/Eq'
 
 const debug = {
     cmd: Debug('link'),
 }
 
 export type LinkLocalDependenciesError =
-    | FindPackageError
     | PackageManifestsError
+    | { type: 'unknown package'; package: string }
     | { type: 'unable to decode package manifest'; error: string }
     | { type: 'unable to create directory'; path: string; error: Error }
     | {
@@ -52,12 +45,19 @@ export type LinkLocalDependenciesError =
 
 const err: Endomorphism<LinkLocalDependenciesError> = identity
 
-const findPackageIn = (packages: LernaPackage[]) =>
-    flow(
-        findPackageIn_(packages),
-        TE.mapLeft(
-            flow(err, trace(debug.cmd, 'Linking dependencies for package'))
-        )
+const findPackageIn = (packages: Map<string, LernaPackage>) => (
+    packagePathOrName: string
+) =>
+    pipe(
+        M.lookup(eqString)(packagePathOrName)(packages),
+        E.fromOption(
+            (): LinkLocalDependenciesError => ({
+                type: 'unknown package',
+                package: packagePathOrName,
+            })
+        ),
+        TE.fromEither,
+        TE.bimap(err, trace(debug.cmd, 'Linking dependencies for package'))
     )
 
 const packageManifest = flow(
@@ -78,24 +78,14 @@ const decodeManifest = (manifest: E.Json) =>
         TE.fromEither
     )
 
-const internalDependencies = (packages: LernaPackage[]) => (
+const internalDependencies = (packages: Map<string, LernaPackage>) => (
     dependencies: readonly PackageName[]
 ) => {
-    const packagesByName = pipe(
-        packages,
-        A.map((pkg): [PackageName, LernaPackage] => [pkg.name, pkg]),
-        M.fromFoldable(
-            eqPackageName,
-            getFirstSemigroup<LernaPackage>(),
-            A.readonlyArray
-        )
-    )
     return pipe(
         dependencies,
         A.chain(dependency =>
             pipe(
-                M.lookup(eqPackageName)(dependency)(packagesByName),
-                value => value,
+                M.lookup(eqString)(dependency)(packages),
                 O.map(A.of),
                 O.getOrElseW(() => A.empty)
             )
@@ -103,7 +93,7 @@ const internalDependencies = (packages: LernaPackage[]) => (
     )
 }
 
-const internalPackageDependencies = (packages: LernaPackage[]) =>
+const internalPackageDependencies = (packages: Map<string, LernaPackage>) =>
     flow(
         packageManifest,
         TE.chain(decodeManifest),
@@ -195,7 +185,7 @@ const symlinkPackage = (targetPackage: Path) => (
     )
 }
 
-export const linkLocalDependencies = (packages: LernaPackage[]) => (
+export const linkLocalDependencies = (packages: Map<string, LernaPackage>) => (
     packagePathOrName: string
 ): TE.TaskEither<LinkLocalDependenciesError, void> =>
     pipe(
@@ -212,12 +202,13 @@ export const linkLocalDependencies = (packages: LernaPackage[]) => (
     )
 
 export const linkAllLocalDependencies = (
-    packages: LernaPackage[]
+    packagesList: LernaPackage[],
+    packagesMap: Map<string, LernaPackage>
 ): TE.TaskEither<LinkLocalDependenciesError, void> =>
     pipe(
-        packages,
+        packagesList,
         TE.traverseArray(
-            flow(pkg => pkg.location, linkLocalDependencies(packages))
+            flow(pkg => pkg.location, linkLocalDependencies(packagesMap))
         ),
         TE.map(constVoid)
     )
