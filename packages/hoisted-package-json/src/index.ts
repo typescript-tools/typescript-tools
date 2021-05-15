@@ -20,6 +20,8 @@ import { PackageJsonDependencies } from '@typescript-tools/io-ts/dist/lib/Packag
 import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
 import { PackageVersion } from '@typescript-tools/io-ts/dist/lib/PackageVersion'
 import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
+import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
+import { lernaPackages as lernaPackages_ } from '@typescript-tools/lerna-packages'
 import {
     monorepoRoot as monorepoRoot_,
     MonorepoRootError,
@@ -75,6 +77,7 @@ const decodeDocopt = flow(
 
 const monorepoRoot = flow(monorepoRoot_, E.mapLeft(err), TE.fromEither)
 const hoistedPackages = flow(hoistedPackages_, TE.mapLeft(err))
+const lernaPackages = flow(lernaPackages_, TE.mapLeft(err))
 
 const readRootPackageJson = (
     root: string,
@@ -123,19 +126,32 @@ const stringifyJson = (
         TE.fromEither,
     )
 
+const removeInternalPackages = (
+    hoisted: Map<PackageName, PackageVersion>,
+    internalPackages: LernaPackage[],
+): Map<PackageName, PackageVersion> => {
+    for (const pkg of internalPackages) {
+        hoisted.delete(pkg.name)
+    }
+    return hoisted
+}
+
 const main: T.Task<void> = pipe(
     TE.bindTo('options')(decodeDocopt(CommandLineOptions, docstring)),
     TE.bind('root', () => monorepoRoot()),
     TE.chain(({ root }) =>
         pipe(
             {
+                // FIXME: remove internal packages
                 hoisted: hoistedPackages(root),
+                lernaPackages: lernaPackages(root),
                 rootPackageJson: readRootPackageJson(root),
             },
             sequenceS(TE.ApplicativePar),
-            TE.chain(({ hoisted, rootPackageJson }) =>
+            TE.chain(({ hoisted, lernaPackages, rootPackageJson }) =>
                 pipe(
-                    hoistedPackageJson(hoisted, rootPackageJson),
+                    removeInternalPackages(hoisted, lernaPackages),
+                    (hoisted) => hoistedPackageJson(hoisted, rootPackageJson),
                     stringifyJson,
                 ),
             ),
