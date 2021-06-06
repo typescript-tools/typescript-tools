@@ -90,6 +90,7 @@ const decodeDocopt = <C extends t.Mixed>(
 const packagesToRebuildOnChanges = flow(packagesToRebuildOnChanges_, TE.mapLeft(err))
 const lernaPackages = flow(lernaPackages_, TE.mapLeft(err))
 
+// REFACTOR: avoid O(n) runtime
 const findPackageIn = (packages: LernaPackage[]) =>
     flow(
         findPackageIn_(packages),
