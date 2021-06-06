@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.3](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/configure-lerna-manifest@1.0.2...@typescript-tools/configure-lerna-manifest@1.0.3) (2021-06-06)
+
+
+### Bug Fixes
+
+* search by absolute path ([277c044](https://github.com/typescript-tools/typescript-tools/commit/277c044804bbd39f8ca1fb5da3b0d4e12b78e998))
+
+
+
+
+
 ## [1.0.2](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/configure-lerna-manifest@1.0.1...@typescript-tools/configure-lerna-manifest@1.0.2) (2021-06-06)
 
 
