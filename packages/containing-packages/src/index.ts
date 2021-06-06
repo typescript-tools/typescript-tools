@@ -135,7 +135,7 @@ const main: T.Task<void> = pipe(
             ...process.argv.slice(2),
             // file descriptor '0' is stdin
             ...(!process.stdin.isTTY
-                ? fs.readFileSync(0, 'utf-8').trim().split('\n')
+                ? fs.readFileSync('/dev/stdin', 'utf-8').trim().split('\n')
                 : []),
         ],
     }),
