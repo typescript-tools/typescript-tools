@@ -166,18 +166,24 @@ const lernaPackages = flow(
     TE.mapLeft(err),
 )
 
-const packagePath = (packages: Map<string, LernaPackage>) => (packagePathOrName: string) =>
+const packagePath = (packages: Map<string, LernaPackage>) => (root: string) => (
+    packagePathOrName: string,
+) =>
     pipe(
         O.fromNullable(packages.get(packagePathOrName)),
+        // search by absolute path if no match found yet
+        O.alt(() =>
+            O.fromNullable(packages.get(path.join(root, packagePathOrName))),
+        ),
         // WISH: turn into a relative path (if necessary)
-        O.map(_ => _.location),
+        O.map((_) => _.location),
         E.fromOption(
             (): Err => ({
                 type: 'unknown package',
-                package: packagePathOrName
-            })
+                package: packagePathOrName,
+            }),
         ),
-        TE.fromEither
+        TE.fromEither,
     )
 
 const exit = (code: 0 | 1): IO.IO<void> => () => process.exit(code)
@@ -192,22 +198,26 @@ const main: T.Task<void> = pipe(
                 : []),
         ],
     }),
-    TE.chain(options => pipe(
-        {
-            manifest: pipe(
-                readFile(path.join(options.root, 'lerna.json')),
-                TE.chain(decodeLernaManifest),
-            ),
-            packages: lernaPackages(options.root)
-        },
-        sequenceS(TE.ApplicativePar),
-        TE.map(data => Object.assign(data, { options })),
-    )),
-    TE.chain(({ options, manifest, packages }) => pipe(
-        options.packages,
-        TE.traverseArray(packagePath(packages.map)),
-        TE.map(packagePaths => ({ options, manifest, packagePaths })),
-    )),
+    TE.chain((options) =>
+        pipe(
+            {
+                manifest: pipe(
+                    readFile(path.join(options.root, 'lerna.json')),
+                    TE.chain(decodeLernaManifest),
+                ),
+                packages: lernaPackages(options.root),
+            },
+            sequenceS(TE.ApplicativePar),
+            TE.map((data) => Object.assign(data, { options })),
+        ),
+    ),
+    TE.chain(({ options, manifest, packages }) =>
+        pipe(
+            options.packages,
+            TE.traverseArray(packagePath(packages.map)(options.root)),
+            TE.map((packagePaths) => ({ options, manifest, packagePaths })),
+        ),
+    ),
     TE.chain(({ options, manifest, packagePaths }) =>
         pipe(
             Object.assign(manifest, { packages: packagePaths }),
