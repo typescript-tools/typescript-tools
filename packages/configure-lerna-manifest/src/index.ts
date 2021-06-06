@@ -44,7 +44,7 @@ Usage:
     configure-lerna-manifest [--root <root>] --packages <package>...
 
 Options:
-    packages         Package names or paths to rebuild when listed packages change (also reads from stdin)
+    packages         Package names or paths to include in the lerna manifest (also reads from stdin)
     --root=<root>    Root of lerna mono-repository
 `
 
