@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.2](http://github.com-personal/typescript-tools/typescript-tools/compare/@typescript-tools/packages-to-rebuild-on-changes-cli@1.1.1...@typescript-tools/packages-to-rebuild-on-changes-cli@1.1.2) (2021-06-06)
+
+
+### Bug Fixes
+
+* use all of stdin ([26d58af](http://github.com-personal/typescript-tools/typescript-tools/commit/26d58af09ce2db259af95b1a93ef8c95b14f74fd))
+
+
+
+
+
 ## [1.1.1](http://github.com-personal/typescript-tools/typescript-tools/compare/@typescript-tools/packages-to-rebuild-on-changes-cli@1.1.0...@typescript-tools/packages-to-rebuild-on-changes-cli@1.1.1) (2021-06-06)
 
 **Note:** Version bump only for package @typescript-tools/packages-to-rebuild-on-changes-cli
