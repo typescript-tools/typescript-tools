@@ -51,10 +51,12 @@ const decode = <C extends t.Mixed>(codec: C) => (filename: string) => (
 ): TE.TaskEither<PackagesToRebuildOnChangesError, t.TypeOf<C>> =>
     pipe(
         codec.decode(value),
-        E.mapLeft((errors) => PathReporter.failure(errors).join('\n')),
-        E.mapLeft((error) =>
-            err({ type: 'unexpected file contents', filename, error }),
-        ),
+        E.mapLeft(
+            flow(
+                (errors) => PathReporter.failure(errors).join('\n'),
+                (error) =>
+                    err({ type: 'unexpected file contents', filename, error })
+            )),
         TE.fromEither,
     )
 
