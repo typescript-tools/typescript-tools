@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.4](http://github.com-personal/typescript-tools/typescript-tools/compare/@typescript-tools/tsconfig-includes@1.3.3...@typescript-tools/tsconfig-includes@1.3.4) (2021-06-06)
+
+
+### Bug Fixes
+
+* use all of stdin ([e8c1b3b](http://github.com-personal/typescript-tools/typescript-tools/commit/e8c1b3bc62cee5ee5bb84d4e02376d52ec3d5ff0))
+
+
+
+
+
 ## [1.3.3](http://github.com-personal/typescript-tools/typescript-tools/compare/@typescript-tools/tsconfig-includes@1.3.2...@typescript-tools/tsconfig-includes@1.3.3) (2021-04-06)
 
 **Note:** Version bump only for package @typescript-tools/tsconfig-includes

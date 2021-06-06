@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.2.4](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/internal-dependencies@2.2.3...@typescript-tools/internal-dependencies@2.2.4) (2021-06-06)
+
+
+### Bug Fixes
+
+* use all of stdin ([e8c1b3b](https://github.com/typescript-tools/typescript-tools/commit/e8c1b3bc62cee5ee5bb84d4e02376d52ec3d5ff0))
+
+
+
+
+
 ## [2.2.3](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/internal-dependencies@2.2.2...@typescript-tools/internal-dependencies@2.2.3) (2021-04-15)
 
 **Note:** Version bump only for package @typescript-tools/internal-dependencies
