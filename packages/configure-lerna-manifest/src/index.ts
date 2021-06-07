@@ -41,7 +41,7 @@ import {
 
 const docstring = `
 Usage:
-    configure-lerna-manifest [--root <root>] --packages <package>...
+    configure-lerna-manifest [--root <root>] --packages [<package>]...
 
 Options:
     packages         Package names or paths to include in the lerna manifest (also reads from stdin)
@@ -193,7 +193,7 @@ const main: T.Task<void> = pipe(
         argv: [
             ...process.argv.slice(2),
             ...(!process.stdin.isTTY
-                ? fs.readFileSync('/dev/stdin', 'utf-8').trim().split('\n')
+                ? fs.readFileSync('/dev/stdin', 'utf-8').trim().split('\n').filter(s => s.length > 0)
                 : []),
         ],
     }),
