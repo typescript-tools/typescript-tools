@@ -1,6 +1,6 @@
 {
     "name": "@typescript-tools/configure-lerna-manifest",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "description": "Configure lerna manifest properties",
     "homepage": "https://github.com/typescript-tools/typescript-tools",
     "bugs": {

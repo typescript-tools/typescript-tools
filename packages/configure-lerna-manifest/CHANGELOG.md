@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.6](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/configure-lerna-manifest@1.0.5...@typescript-tools/configure-lerna-manifest@1.0.6) (2021-06-07)
+
+
+### Bug Fixes
+
+* allow empty package list ([507c8c5](https://github.com/typescript-tools/typescript-tools/commit/507c8c51adabcbd47ee233a03349701ccbb332f7))
+
+
+
+
+
 ## [1.0.5](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/configure-lerna-manifest@1.0.4...@typescript-tools/configure-lerna-manifest@1.0.5) (2021-06-06)
 
 
