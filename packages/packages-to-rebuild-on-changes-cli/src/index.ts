@@ -107,7 +107,7 @@ const main: T.Task<void> =
             {
                 argv: [
                     ...process.argv.slice(2),
-                    ...!process.stdin.isTTY ? fs.readFileSync('/dev/stdin', 'utf-8').trim().split('\n') : []
+                    ...!process.stdin.isTTY ? fs.readFileSync('/dev/stdin', 'utf-8').trim().split('\n').filter(s => s.length > 0) : []
                 ]
             }
         )),
