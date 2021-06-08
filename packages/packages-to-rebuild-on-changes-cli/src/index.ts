@@ -42,7 +42,7 @@ import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
 
 const docstring = `
 Usage:
-    packages-to-rebuild-on-changes [--root <root>] [--path] <package>...
+    packages-to-rebuild-on-changes [--root <root>] [--path] [<package>]...
 
 Options:
     packages         Package names or paths to rebuild when listed packages change (also reads from stdin)
