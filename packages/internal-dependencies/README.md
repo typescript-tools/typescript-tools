@@ -15,7 +15,7 @@ npm install --save-dev @typescript-tools/internal-dependencies
 
 ## Use
 
-``` shell
+```
 Usage:
     internal-dependencies [--root <root>] [--path] <package>...
 
@@ -25,24 +25,63 @@ Options:
     --path           Print the relative path to each package from root
 ```
 
-## Example
+`internal-dependencies` reads one or more packages either as arguments
+or from `stdin`, and outputs the internal dependencies that the list
+of packages depends upon, either directly or transitively.
 
-`internal-dependencies` can read one or more package names (the `name`
-property in the package's `package.json`) either as arguments or stdin.
+Packages may be specified by path or by (scoped) name.
 
-It outputs the internal dependencies that the list of packages depends
-upon, either directly or transitively.
+## Examples
+
+> Note: all examples run from the root of this monorepo
+
+Given the following `package.json`
+
+```json
+{
+    "name": "@typescript-tools/lerna-utils",
+    "version": "2.1.1",
+    "dependencies": {
+        "@typescript-tools/io-ts": "^2.2.0"
+    },
+}
+```
+
+`internal-dependencies` prints the following
 
 ``` shell
-$ echo @typescript-tools/lerna-utils | node ./packages/internal-dependencies/dist/src/internal-dependencies.js
+$ echo @typescript-tools/lerna-utils | npx internal-dependencies
+@typescript-tools/io-ts
+
+$ echo @typescript-tools/lerna-utils | npx internal-dependencies
 @typescript-tools/io-ts
 ```
 
 Use `--path` to print the path to the dependencies rather than the
-package names.
+package names
+
+```json
+
+{
+    "name": "@typescript-tools/internal-dependencies",
+    "version": "2.2.4",
+    "dependencies": {
+        "@typescript-tools/dependency-graph": "^2.1.5",
+        "@typescript-tools/find-package": "^1.1.3",
+        "@typescript-tools/io-ts": "^2.2.0",
+        "@typescript-tools/lerna-packages": "^2.2.2",
+        "@typescript-tools/monorepo-root": "^1.3.2"
+    },
+    "devDependencies": {
+}
+```
 
 ``` shell
-$ internal-dependencies --path @typescript-tools/internal-dependencies
+$ npx internal-dependencies --path @typescript-tools/internal-dependencies
+packages/dependency-graph
+packages/find-package
 packages/io-ts
+packages/lerna-packages
+packages/monorepo-root
 packages/lerna-utils
 ```
