@@ -50,7 +50,7 @@ Given the following `package.json`
 `internal-dependencies` prints the following
 
 ``` shell
-$ echo @typescript-tools/lerna-utils | npx internal-dependencies
+$ npx internal-dependencies @typescript-tools/lerna-utils
 @typescript-tools/io-ts
 
 $ echo @typescript-tools/lerna-utils | npx internal-dependencies
