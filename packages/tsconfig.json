@@ -2,6 +2,12 @@
     "files": [],
     "references": [
         {
+            "path": "configure-lerna-manifest"
+        },
+        {
+            "path": "containing-packages"
+        },
+        {
             "path": "dependency-graph"
         },
         {
