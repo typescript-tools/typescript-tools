@@ -20,7 +20,7 @@ Usage:
     internal-dependencies [--root <root>] [--path] <package>...
 
 Options:
-    packages         Packages to print dependencies of (also reads from stdin)
+    packages         Package names or paths to print dependencies of (also reads from stdin)
     --root=<root>    Root of lerna mono-repository
     --path           Print the relative path to each package from root
 ```
