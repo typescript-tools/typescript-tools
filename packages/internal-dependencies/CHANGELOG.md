@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.2.5](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/internal-dependencies@2.2.4...@typescript-tools/internal-dependencies@2.2.5) (2021-06-14)
+
+**Note:** Version bump only for package @typescript-tools/internal-dependencies
+
+
+
+
+
 ## [2.2.4](https://github.com/typescript-tools/typescript-tools/compare/@typescript-tools/internal-dependencies@2.2.3...@typescript-tools/internal-dependencies@2.2.4) (2021-06-06)
 
 

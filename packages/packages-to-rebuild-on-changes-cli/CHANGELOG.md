@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.6](http://github.com-personal/typescript-tools/typescript-tools/compare/@typescript-tools/packages-to-rebuild-on-changes-cli@1.1.5...@typescript-tools/packages-to-rebuild-on-changes-cli@1.1.6) (2021-06-14)
+
+**Note:** Version bump only for package @typescript-tools/packages-to-rebuild-on-changes-cli
+
+
+
+
+
 ## [1.1.5](http://github.com-personal/typescript-tools/typescript-tools/compare/@typescript-tools/packages-to-rebuild-on-changes-cli@1.1.4...@typescript-tools/packages-to-rebuild-on-changes-cli@1.1.5) (2021-06-08)
 
 
