@@ -24,7 +24,7 @@ import findUp from 'find-up'
 import glob from 'fast-glob'
 import { ordString } from 'fp-ts/Ord'
 import { pipe, flow, constant } from 'fp-ts/function'
-import { withEncode} from 'io-ts-docopt'
+import { withEncode } from 'io-ts-docopt'
 import { match } from 'ts-pattern'
 import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
 import { trace } from '@strong-roots-capital/trace'
@@ -36,7 +36,7 @@ import {
 import { StringEndingWithTsconfigSettingsJson } from './string-ending-with-tsconfig-settings-json'
 
 const debug = {
-    manifest: Debug('manifest')
+    manifest: Debug('manifest'),
 }
 
 const docstring = `
@@ -52,144 +52,192 @@ const CommandLineOptions = withEncode(
         '<glob>': t.array(t.string),
     }),
     a => ({
-        globs: a['<glob>']
+        globs: a['<glob>'],
     })
 )
 
-type CommandLineOptions = (typeof CommandLineOptions)['_O'];
+type CommandLineOptions = typeof CommandLineOptions['_O']
 
 type Err =
-    | { type: 'docopt decode', error: string }
+    | { type: 'docopt decode'; error: string }
     | { type: 'found no matching packages' }
     | { type: 'package not in monorepo' }
-    | { type: 'unable to stringify json', json: unknown, error: Error }
-    | { type: 'unable to read file', error: NodeJS.ErrnoException }
-    | { type: 'unable to write file', error: NodeJS.ErrnoException }
-    | { type: 'json parse error', filename: string, error: string }
-    | { type: 'no-op' }  // not an error, was lazy of me to put here. I regret it already
+    | { type: 'unable to stringify json'; json: unknown; error: Error }
+    | { type: 'unable to read file'; error: NodeJS.ErrnoException }
+    | { type: 'unable to write file'; error: NodeJS.ErrnoException }
+    | { type: 'json parse error'; filename: string; error: string }
+    | { type: 'no-op' } // not an error, was lazy of me to put here. I regret it already
 
 // Widens the type of a particular Err into Err
 const err = (error: Err): Err => error
 
 const decodeDocopt = flow(
     D.decodeDocopt,
-    E.mapLeft(errors => PathReporter.failure(errors).join('\n')),
-    E.mapLeft(error => err({ type: 'docopt decode', error })),
+    E.mapLeft(
+        flow(
+            errors => PathReporter.failure(errors).join('\n'),
+            error => err({ type: 'docopt decode', error })
+        )
+    ),
     TE.fromEither
 )
 
-const decode = <C extends t.Mixed>(codec: C) => (filename: string) => (contents: unknown) => pipe(
-    codec.decode(contents),
-    E.mapLeft(errors => PathReporter.failure(errors).join('\n')),
-    E.mapLeft(error => err({ type: 'json parse error', filename, error })),
-)
+const decode = <C extends t.Mixed>(codec: C) => (filename: string) => (
+    contents: unknown
+) =>
+    pipe(
+        codec.decode(contents),
+        E.mapLeft(
+            flow(
+                errors => PathReporter.failure(errors).join('\n'),
+                error => err({ type: 'json parse error', filename, error })
+            )
+        )
+    )
 
 const findup = flow(
-    findUp.sync as (name: string | readonly string[], options?: findUp.Options) => string | undefined,
+    findUp.sync as (
+        name: string | readonly string[],
+        options?: findUp.Options
+    ) => string | undefined,
     O.fromNullable,
     O.map(path.dirname),
-    E.fromOption(() => err({ type: 'package not in monorepo' })),
+    E.fromOption(() => err({ type: 'package not in monorepo' }))
 )
 
-const readFile = (file: fs.PathLike) => pipe(
-    readFile_(file),
-    TE.mapLeft(error => err({ type: 'unable to read file', error }))
-)
-
-const writeFile = (file: fs.PathLike) => (contents: string) => pipe(
-    writeFile_ (file) (contents),
-    TE.mapLeft(error => err({ type: 'unable to write file', error }))
-)
-
-const main: T.Task<void> =
+const readFile = (file: fs.PathLike) =>
     pipe(
-        decodeDocopt(CommandLineOptions, docstring),
-        TE.map(({ globs }) => glob.sync(
+        readFile_(file),
+        TE.mapLeft(error => err({ type: 'unable to read file', error }))
+    )
+
+const writeFile = (file: fs.PathLike) => (contents: string) =>
+    pipe(
+        writeFile_(file)(contents),
+        TE.mapLeft(error => err({ type: 'unable to write file', error }))
+    )
+
+const main: T.Task<void> = pipe(
+    decodeDocopt(CommandLineOptions, docstring),
+    TE.map(({ globs }) =>
+        glob.sync(
             globs.map(glob => path.resolve(glob, '**', 'tsconfig.json')),
             {
                 followSymbolicLinks: false,
                 onlyFiles: true,
                 unique: true,
                 deep: 2,
-                ignore: ['node_modules/**']
+                ignore: ['node_modules/**'],
             }
-        )),
-        TE.chain(candidates => {
-            const isCandidate = (candidate: string) => pipe(
+        )
+    ),
+    TE.chain(candidates => {
+        const isCandidate = (candidate: string) =>
+            pipe(
                 readFile(candidate),
-                TE.chain((contents) => TE.of({
-                    file: candidate,
-                    isLernaPackage: StringifiedJSON(
-                        t.type({
-                            extends: StringEndingWithTsconfigSettingsJson
-                        })
-                    ).is(contents)
-                }))
+                TE.chain(contents =>
+                    TE.of({
+                        file: candidate,
+                        isLernaPackage: StringifiedJSON(
+                            t.type({
+                                extends: StringEndingWithTsconfigSettingsJson,
+                            })
+                        ).is(contents),
+                    })
+                )
             )
 
-            return TE.sequenceArray(candidates.map(isCandidate))
-        }),
-        TE.chain(flow(
-            RA.filter(({ isLernaPackage }: { file: string, isLernaPackage: boolean }) => isLernaPackage),
+        return TE.sequenceArray(candidates.map(isCandidate))
+    }),
+    TE.chain(
+        flow(
+            RA.filter(
+                ({
+                    isLernaPackage,
+                }: {
+                    file: string
+                    isLernaPackage: boolean
+                }) => isLernaPackage
+            ),
             RA.map(({ file }) => file),
             RNEA.fromReadonlyArray,
             E.fromOption(() => err({ type: 'found no matching packages' })),
-            E.chain(packages => pipe(
-                // TODO: use monorepo-root package
-                findup('lerna.json', { cwd: RNEA.head(packages) }),
-                E.map(root => ({
-                    root,
-                    packages: pipe(
-                        packages,
-                        RA.map(pkg => path.relative(root, pkg)),
-                        RA.map(path.dirname),
-                        RA.sort(ordString)
-                    )
-                }))
-            )),
+            E.chain(packages =>
+                pipe(
+                    // TODO: use monorepo-root package
+                    findup('lerna.json', { cwd: RNEA.head(packages) }),
+                    E.map(root => ({
+                        root,
+                        packages: pipe(
+                            packages,
+                            RA.map(pkg => path.relative(root, pkg)),
+                            RA.map(path.dirname),
+                            RA.sort(ordString)
+                        ),
+                    }))
+                )
+            ),
             TE.fromEither
-        )),
-        TE.chain(({root, packages}: {root: string, packages: readonly string[]}) =>
+        )
+    ),
+    TE.chain(
+        ({ root, packages }: { root: string; packages: readonly string[] }) =>
             pipe(
                 readFile(path.join(root, 'lerna.json')),
                 TE.chain(contents => {
                     const LernaManifest = StringifiedJSON(
                         t.type({
-                            packages: t.array(t.string)
+                            packages: t.array(t.string),
                         })
                     )
                     return pipe(
-                        decode (LernaManifest) ('lerna.json') (contents),
+                        decode(LernaManifest)('lerna.json')(contents),
                         E.chain(manifest =>
                             deepEqual(manifest.packages, packages)
-                            ? E.left({ type: 'no-op' } as Err)
-                            : E.right((manifest.packages = packages, manifest))),
-                        E.chain(json => pipe(
-                            stringifyJSON (E.toError) (json),
-                            E.map(trace(debug.manifest, 'Updating lerna manifest')),
-                            E.mapLeft(error => err({ type: 'unable to stringify json', json, error }))
-                        )),
+                                ? E.left({ type: 'no-op' } as Err)
+                                : E.right(
+                                      (manifest.packages = packages, manifest)
+                                  )
+                        ),
+                        E.chain(json =>
+                            pipe(
+                                stringifyJSON(E.toError)(json),
+                                E.map(
+                                    trace(
+                                        debug.manifest,
+                                        'Updating lerna manifest'
+                                    )
+                                ),
+                                E.mapLeft(error =>
+                                    err({
+                                        type: 'unable to stringify json',
+                                        json,
+                                        error,
+                                    })
+                                )
+                            )
+                        ),
                         TE.fromEither,
-                        TE.chain(writeFile(path.join(root, 'lerna.json'))),
+                        TE.chain(writeFile(path.join(root, 'lerna.json')))
                     )
                 }),
                 // do not report a no-op as an error
-                TE.orElse(
-                    err => match<Err, TE.TaskEither<Err, void>>(err)
+                TE.orElse(err =>
+                    match<Err, TE.TaskEither<Err, void>>(err)
                         .with({ type: 'no-op' }, () => TE.of(undefined))
                         .otherwise(() => TE.left(err))
                 )
             )
+    ),
+    TE.fold(
+        flow(
+            Console.error,
+            IO.chain(() => process.exit(1) as IO.IO<void>),
+            T.fromIO
         ),
-        TE.fold(
-            flow(
-                Console.error,
-                IO.chain(() => process.exit(1) as IO.IO<void>),
-                T.fromIO
-            ),
-            constant(T.of(undefined))
-        )
+        constant(T.of(undefined))
     )
+)
 
 main()
 
