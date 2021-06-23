@@ -41,18 +41,24 @@ const debug = {
 
 const docstring = `
 Usage:
-    update-lerna-manifest <glob>...
+    update-lerna-manifest [--root <root>] [--depth <depth>] <dirs>...
 
 Options:
-    <glob>    Glob of package directories to search for lerna packages
+    <dirs>             Directories to recursively search for lerna packages
+    --root=<root>      Root of lerna mono-repository
+    --depth=<depth>    Maximum directory depth in package search
 `
 
 const CommandLineOptions = withEncode(
     t.type({
-        '<glob>': t.array(t.string),
+        '<dirs>': t.array(t.string),
+        '--root': t.union([t.string, t.null]),
+        '--depth': t.union([t.number, t.null]),
     }),
     a => ({
-        globs: a['<glob>'],
+        dirs: a['<dirs>'],
+        root: a['--root'],
+        depth: a['--depth'],
     })
 )
 
@@ -118,116 +124,140 @@ const writeFile = (file: fs.PathLike) => (contents: string) =>
     )
 
 const main: T.Task<void> = pipe(
-    decodeDocopt(CommandLineOptions, docstring),
-    TE.map(({ globs }) =>
-        glob.sync(
-            globs.map(glob => path.resolve(glob, '**', 'tsconfig.json')),
-            {
-                followSymbolicLinks: false,
-                onlyFiles: true,
-                unique: true,
-                deep: 2,
-                ignore: ['node_modules/**'],
-            }
-        )
-    ),
-    TE.chain(candidates => {
-        const isCandidate = (candidate: string) =>
-            pipe(
-                readFile(candidate),
-                TE.chain(contents =>
-                    TE.of({
-                        file: candidate,
-                        isLernaPackage: StringifiedJSON(
-                            t.type({
-                                extends: StringEndingWithTsconfigSettingsJson,
-                            })
-                        ).is(contents),
-                    })
-                )
-            )
-
-        return TE.sequenceArray(candidates.map(isCandidate))
-    }),
-    TE.chain(
-        flow(
-            RA.filter(
-                ({
-                    isLernaPackage,
-                }: {
-                    file: string
-                    isLernaPackage: boolean
-                }) => isLernaPackage
-            ),
-            RA.map(({ file }) => file),
-            RNEA.fromReadonlyArray,
-            E.fromOption(() => err({ type: 'found no matching packages' })),
-            E.chain(packages =>
-                pipe(
-                    // TODO: use monorepo-root package
-                    findup('lerna.json', { cwd: RNEA.head(packages) }),
-                    E.map(root => ({
-                        root,
-                        packages: pipe(
-                            packages,
-                            RA.map(pkg => path.relative(root, pkg)),
-                            RA.map(path.dirname),
-                            RA.sort(ordString)
-                        ),
-                    }))
-                )
-            ),
-            TE.fromEither
-        )
-    ),
-    TE.chain(
-        ({ root, packages }: { root: string; packages: readonly string[] }) =>
-            pipe(
-                readFile(path.join(root, 'lerna.json')),
-                TE.chain(contents => {
-                    const LernaManifest = StringifiedJSON(
-                        t.type({
-                            packages: t.array(t.string),
-                        })
+    TE.Do,
+    TE.bind('options', () => decodeDocopt(CommandLineOptions, docstring)),
+    TE.chain(({ options }) =>
+        pipe(
+            glob.sync(
+                // TODO: use monorepo-root package
+                options.dirs.map(glob =>
+                    path.resolve(
+                        options.root ?? '',
+                        glob,
+                        '**',
+                        'tsconfig.json'
                     )
-                    return pipe(
-                        decode(LernaManifest)('lerna.json')(contents),
-                        E.chain(manifest =>
-                            deepEqual(manifest.packages, packages)
-                                ? E.left({ type: 'no-op' } as Err)
-                                : E.right(
-                                      (manifest.packages = packages, manifest)
-                                  )
-                        ),
-                        E.chain(json =>
-                            pipe(
-                                stringifyJSON(E.toError)(json),
-                                E.map(
-                                    trace(
-                                        debug.manifest,
-                                        'Updating lerna manifest'
+                ),
+                {
+                    followSymbolicLinks: false,
+                    onlyFiles: true,
+                    unique: true,
+                    deep: options.depth ?? 3,
+                    ignore: ['node_modules/**'],
+                }
+            ),
+            candidates => {
+                const isCandidate = (candidate: string) =>
+                    pipe(
+                        readFile(candidate),
+                        TE.chain(contents =>
+                            TE.of({
+                                file: candidate,
+                                isLernaPackage: StringifiedJSON(
+                                    t.type({
+                                        extends: StringEndingWithTsconfigSettingsJson,
+                                    })
+                                ).is(contents),
+                            })
+                        )
+                    )
+
+                return TE.sequenceArray(candidates.map(isCandidate))
+            },
+            TE.chain(
+                flow(
+                    RA.filter(
+                        ({
+                            isLernaPackage,
+                        }: {
+                            file: string
+                            isLernaPackage: boolean
+                        }) => isLernaPackage
+                    ),
+                    RA.map(({ file }) => file),
+                    RNEA.fromReadonlyArray,
+                    E.fromOption(() =>
+                        err({ type: 'found no matching packages' })
+                    ),
+                    E.chain(packages =>
+                        pipe(
+                            findup('lerna.json', {
+                                cwd: options.root ?? RNEA.head(packages),
+                            }),
+                            E.map(root => ({
+                                root,
+                                packages: pipe(
+                                    packages,
+                                    RA.map(pkg => path.relative(root, pkg)),
+                                    RA.map(path.dirname),
+                                    RA.sort(ordString)
+                                ),
+                            }))
+                        )
+                    ),
+                    TE.fromEither
+                )
+            ),
+            TE.chain(
+                ({
+                    root,
+                    packages,
+                }: {
+                    root: string
+                    packages: readonly string[]
+                }) =>
+                    pipe(
+                        readFile(path.join(root, 'lerna.json')),
+                        TE.chain(contents => {
+                            const LernaManifest = StringifiedJSON(
+                                t.type({
+                                    packages: t.array(t.string),
+                                })
+                            )
+                            return pipe(
+                                decode(LernaManifest)('lerna.json')(contents),
+                                E.chain(manifest =>
+                                    deepEqual(manifest.packages, packages)
+                                        ? E.left({ type: 'no-op' } as Err)
+                                        : E.right(
+                                              (manifest.packages = packages,
+                                              manifest)
+                                          )
+                                ),
+                                E.chain(json =>
+                                    pipe(
+                                        stringifyJSON(E.toError)(json),
+                                        E.map(
+                                            trace(
+                                                debug.manifest,
+                                                'Updating lerna manifest'
+                                            )
+                                        ),
+                                        E.mapLeft(error =>
+                                            err({
+                                                type:
+                                                    'unable to stringify json',
+                                                json,
+                                                error,
+                                            })
+                                        )
                                     )
                                 ),
-                                E.mapLeft(error =>
-                                    err({
-                                        type: 'unable to stringify json',
-                                        json,
-                                        error,
-                                    })
+                                TE.fromEither,
+                                TE.chain(
+                                    writeFile(path.join(root, 'lerna.json'))
                                 )
                             )
-                        ),
-                        TE.fromEither,
-                        TE.chain(writeFile(path.join(root, 'lerna.json')))
+                        }),
+                        // do not report a no-op as an error
+                        TE.orElse(err =>
+                            match<Err, TE.TaskEither<Err, void>>(err)
+                                .with({ type: 'no-op' }, () => TE.of(undefined))
+                                .otherwise(() => TE.left(err))
+                        )
                     )
-                }),
-                // do not report a no-op as an error
-                TE.orElse(err =>
-                    match<Err, TE.TaskEither<Err, void>>(err)
-                        .with({ type: 'no-op' }, () => TE.of(undefined))
-                        .otherwise(() => TE.left(err))
-                )
             )
+        )
     ),
     TE.fold(
         flow(
