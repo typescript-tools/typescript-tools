@@ -2,13 +2,13 @@
     "name": "@typescript-tools/packages-to-rebuild-on-changes-cli",
     "version": "1.1.6",
     "description": "CLI for packages-to-rebuild-on-changes",
-    "homepage": "https://github.com-personal/typescript-tools/typescript-tools",
+    "homepage": "https://github.com/typescript-tools/typescript-tools",
     "bugs": {
-        "url": "https://github.com-personal/typescript-tools/typescript-tools/issues"
+        "url": "https://github.com/typescript-tools/typescript-tools/issues"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com-personal/typescript-tools/typescript-tools.git"
+        "url": "git+https://github.com/typescript-tools/typescript-tools.git"
     },
     "license": "ISC",
     "author": "Eric Crosson <eric.s.crosson@utexas.edu> (https://github.com/ericcrosson)",
