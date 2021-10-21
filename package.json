@@ -12,11 +12,13 @@
     "test": "lerna run test",
     "lint": "lerna run lint",
     "lint:fix": "eslint --ext ts --fix . package.json",
+    "lint-staged-packages": "lerna run --concurrency 1 --stream lint-staged --since HEAD --exclude-dependents",
     "prettier": "lerna run prettier",
     "prettier:fix": "lerna run prettier:fix",
     "lerna:version": "lerna version --conventional-commits --include-merged-tags",
     "lerna:publish": "lerna publish from-package"
   },
+  "pre-commit": "lint-staged-packages",
   "repository": {
     "type": "git",
     "url": "https://github.com/typescript-tools/typescript-tools"
@@ -39,6 +41,7 @@
     "cz-conventional-changelog": "^3.3.0",
     "lerna": "^4.0.0",
     "multi-semantic-release": "^2.9.1",
+    "pre-commit": "^1.2.2",
     "typescript": "^4.4.4"
   }
 }
