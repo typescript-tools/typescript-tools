@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/typescript-tools/typescript-tools.git"
+    "url": "https://github.com/typescript-tools/typescript-tools.git"
   },
   "license": "ISC",
   "author": "Eric Crosson <eric.s.crosson@utexas.edu> (https://github.com/ericcrosson)",
@@ -69,7 +69,7 @@
     "prettier": "2.1.2",
     "rimraf": "^3.0.2",
     "ts-node": "^9.0.0",
-    "typescript": "^4.0.5"
+    "typescript": "^4.4.4"
   },
   "ava": {
     "extensions": [
