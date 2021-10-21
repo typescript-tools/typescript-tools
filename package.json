@@ -7,7 +7,7 @@
     "distclean": "find . -name 'node_modules' -type d -prune -exec rm -r '{}' +",
     "bootstrap": "lerna bootstrap --hoist --strict --force-local",
     "prebuild": "DEBUG=link typescript-build-linker .",
-    "build": "tsc -b --incremental --verbose packages",
+    "build": "tsc --build --incremental --verbose packages",
     "ava": "lerna run ava",
     "test": "lerna run test",
     "lint": "lerna run lint",

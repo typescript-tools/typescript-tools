@@ -6,7 +6,7 @@
   "types": "dist/src/package-manifests.d.ts",
   "scripts": {
     "prepublishOnly": "npm run clean && npm run compile",
-    "build": "tsc -b .",
+    "build": "tsc --build .",
     "clean": "rimraf --no-glob dist",
     "lint-staged": "lint-staged",
     "ava": "echo 'No tests defined'",
