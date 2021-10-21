@@ -19,8 +19,10 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 'lts/*'
+          registry-url: https://registry.npmjs.org
       - name: Configure npm
         run: |
+          touch ~/.npmrc
           npm config set //registry.npmjs.org/:_authToken '${NPM_TOKEN}'
           npm config set @typescript-tools://registry.npmjs.org/:_authToken '${NPM_TOKEN}'
           cat ~/.npmrc
