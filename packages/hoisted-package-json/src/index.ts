@@ -23,12 +23,12 @@ import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSO
 import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
 import { lernaPackages as lernaPackages_ } from '@typescript-tools/lerna-packages'
 import {
-    monorepoRoot as monorepoRoot_,
-    MonorepoRootError,
+  monorepoRoot as monorepoRoot_,
+  MonorepoRootError,
 } from '@typescript-tools/monorepo-root'
 import {
-    hoistedPackages as hoistedPackages_,
-    PackageManifestsError,
+  hoistedPackages as hoistedPackages_,
+  PackageManifestsError,
 } from '@typescript-tools/hoisted-packages'
 
 const docstring = `
@@ -41,38 +41,34 @@ Options:
 const CommandLineOptions = t.type({})
 
 type Err =
-    | PackageManifestsError
-    | MonorepoRootError
-    | { type: 'docopt decode'; error: string }
-    | { type: 'unexpected contents in top-level package.json'; error: string }
-    | { type: 'unable to stringify package.json'; error: Error }
+  | PackageManifestsError
+  | MonorepoRootError
+  | { type: 'docopt decode'; error: string }
+  | { type: 'unexpected contents in top-level package.json'; error: string }
+  | { type: 'unable to stringify package.json'; error: Error }
 
 const err: Endomorphism<Err> = identity
 
 const readFile = (filename: string) =>
-    TE.tryCatch(
-        async () =>
-            new Promise<string>((resolve, reject) =>
-                fs.readFile(filename, 'utf8', (error, data) =>
-                    error !== null && error !== undefined
-                        ? reject(error)
-                        : resolve(data),
-                ),
-            ),
-        flow(E.toError, (error) =>
-            err({ type: 'unable to read file', filename, error }),
+  TE.tryCatch(
+    async () =>
+      new Promise<string>((resolve, reject) =>
+        fs.readFile(filename, 'utf8', (error, data) =>
+          error !== null && error !== undefined ? reject(error) : resolve(data),
         ),
-    )
+      ),
+    flow(E.toError, (error) => err({ type: 'unable to read file', filename, error })),
+  )
 
 const decodeDocopt = flow(
-    decodeDocopt_,
-    E.mapLeft(
-        flow(
-            (errors) => PathReporter.failure(errors).join('\n'),
-            (error) => err({ type: 'docopt decode', error }),
-        ),
+  decodeDocopt_,
+  E.mapLeft(
+    flow(
+      (errors) => PathReporter.failure(errors).join('\n'),
+      (error) => err({ type: 'docopt decode', error }),
     ),
-    TE.fromEither,
+  ),
+  TE.fromEither,
 )
 
 const monorepoRoot = flow(monorepoRoot_, E.mapLeft(err), TE.fromEither)
@@ -80,84 +76,79 @@ const hoistedPackages = flow(hoistedPackages_, TE.mapLeft(err))
 const lernaPackages = flow(lernaPackages_, TE.mapLeft(err))
 
 const readRootPackageJson = (
-    root: string,
+  root: string,
 ): TE.TaskEither<Err, PackageJsonDependencies> =>
-    pipe(
-        path.resolve(root, 'package.json'),
-        readFile,
-        TE.chain(
-            flow(
-                StringifiedJSON(PackageJsonDependencies).decode.bind(null),
-                E.mapLeft(
-                    flow(
-                        (errors) => PathReporter.failure(errors).join('\n'),
-                        (error) =>
-                            err({
-                                type:
-                                    'unexpected contents in top-level package.json',
-                                error,
-                            }),
-                    ),
-                ),
-                TE.fromEither,
-            ),
-        ),
-    )
-
-const hoistedPackageJson = (
-    hoisted: Map<PackageName, PackageVersion>,
-    manifest: PackageJsonDependencies,
-): PackageJsonDependencies =>
-    Object.assign({}, manifest, {
-        devDependencies: undefined,
-        peerDependencies: undefined,
-        optionalDependencies: undefined,
-        dependencies: Object.fromEntries(hoisted),
-    })
-
-const stringifyJson = (
-    json: Record<string, unknown>,
-): TE.TaskEither<Err, string> =>
-    pipe(
-        E.tryCatch(() => JSON.stringify(json, null, 2), E.toError),
-        E.mapLeft((error) =>
-            err({ type: 'unable to stringify package.json', error }),
+  pipe(
+    path.resolve(root, 'package.json'),
+    readFile,
+    TE.chain(
+      flow(
+        StringifiedJSON(PackageJsonDependencies).decode.bind(null),
+        E.mapLeft(
+          flow(
+            (errors) => PathReporter.failure(errors).join('\n'),
+            (error) =>
+              err({
+                type: 'unexpected contents in top-level package.json',
+                error,
+              }),
+          ),
         ),
         TE.fromEither,
-    )
+      ),
+    ),
+  )
+
+const hoistedPackageJson = (
+  hoisted: Map<PackageName, PackageVersion>,
+  manifest: PackageJsonDependencies,
+): PackageJsonDependencies =>
+  Object.assign({}, manifest, {
+    devDependencies: undefined,
+    peerDependencies: undefined,
+    optionalDependencies: undefined,
+    dependencies: Object.fromEntries(hoisted),
+  })
+
+const stringifyJson = (json: Record<string, unknown>): TE.TaskEither<Err, string> =>
+  pipe(
+    E.tryCatch(() => JSON.stringify(json, null, 2), E.toError),
+    E.mapLeft((error) => err({ type: 'unable to stringify package.json', error })),
+    TE.fromEither,
+  )
 
 const removeInternalPackages = (
-    hoisted: Map<PackageName, PackageVersion>,
-    internalPackages: LernaPackage[],
+  hoisted: Map<PackageName, PackageVersion>,
+  internalPackages: LernaPackage[],
 ): Map<PackageName, PackageVersion> => {
-    for (const pkg of internalPackages) {
-        hoisted.delete(pkg.name)
-    }
-    return hoisted
+  for (const pkg of internalPackages) {
+    hoisted.delete(pkg.name)
+  }
+  return hoisted
 }
 
 const main: T.Task<void> = pipe(
-    TE.bindTo('options')(decodeDocopt(CommandLineOptions, docstring)),
-    TE.bind('root', () => monorepoRoot()),
-    TE.chain(({ root }) =>
+  TE.bindTo('options')(decodeDocopt(CommandLineOptions, docstring)),
+  TE.bind('root', () => monorepoRoot()),
+  TE.chain(({ root }) =>
+    pipe(
+      {
+        // FIXME: remove internal packages
+        hoisted: hoistedPackages(root),
+        lernaPackages: lernaPackages(root),
+        rootPackageJson: readRootPackageJson(root),
+      },
+      sequenceS(TE.ApplicativePar),
+      TE.chain(({ hoisted, lernaPackages, rootPackageJson }) =>
         pipe(
-            {
-                // FIXME: remove internal packages
-                hoisted: hoistedPackages(root),
-                lernaPackages: lernaPackages(root),
-                rootPackageJson: readRootPackageJson(root),
-            },
-            sequenceS(TE.ApplicativePar),
-            TE.chain(({ hoisted, lernaPackages, rootPackageJson }) =>
-                pipe(
-                    removeInternalPackages(hoisted, lernaPackages),
-                    (hoisted) => hoistedPackageJson(hoisted, rootPackageJson),
-                    stringifyJson,
-                ),
-            ),
+          removeInternalPackages(hoisted, lernaPackages),
+          (hoisted) => hoistedPackageJson(hoisted, rootPackageJson),
+          stringifyJson,
         ),
+      ),
     ),
-    TE.fold(flow(Console.error, T.fromIO), flow(Console.log, T.fromIO)),
+  ),
+  TE.fold(flow(Console.error, T.fromIO), flow(Console.log, T.fromIO)),
 )
 
 main()

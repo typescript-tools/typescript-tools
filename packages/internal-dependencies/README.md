@@ -1,15 +1,16 @@
 # internal-dependencies
+
 [![License][]](https://opensource.org/licenses/ISC)
 [![NPM Package][]](https://npmjs.org/package/@typescript-tools/internal-dependencies)
 
-[License]: https://img.shields.io/badge/License-ISC-blue.svg
-[NPM Package]: https://img.shields.io/npm/v/@typescript-tools/internal-dependencies.svg
+[license]: https://img.shields.io/badge/License-ISC-blue.svg
+[npm package]: https://img.shields.io/npm/v/@typescript-tools/internal-dependencies.svg
 
 > Calculate package dependencies living in the same monorepo
 
 ## Install
 
-``` shell
+```shell
 npm install --save-dev @typescript-tools/internal-dependencies
 ```
 
@@ -39,17 +40,17 @@ Given the following `package.json`
 
 ```json
 {
-    "name": "@typescript-tools/lerna-utils",
-    "version": "2.1.1",
-    "dependencies": {
-        "@typescript-tools/io-ts": "^2.2.0"
-    },
+  "name": "@typescript-tools/lerna-utils",
+  "version": "2.1.1",
+  "dependencies": {
+    "@typescript-tools/io-ts": "^2.2.0"
+  }
 }
 ```
 
 `internal-dependencies` prints the following
 
-``` shell
+```shell
 $ npx internal-dependencies @typescript-tools/lerna-utils
 @typescript-tools/io-ts
 
@@ -76,7 +77,7 @@ package names
 }
 ```
 
-``` shell
+```shell
 $ npx internal-dependencies --path @typescript-tools/internal-dependencies
 packages/dependency-graph
 packages/find-package

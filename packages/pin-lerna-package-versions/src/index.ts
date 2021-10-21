@@ -30,10 +30,13 @@ import { PackageJsonDependencies } from '@typescript-tools/io-ts/dist/lib/Packag
 import { stringifyJSON } from '@typescript-tools/stringify-json'
 import { trace } from '@strong-roots-capital/trace'
 import { lernaPackages, PackageDiscoveryError } from '@typescript-tools/lerna-packages'
-import { readFile as readFile_, writeFile as writeFile_ } from '@typescript-tools/lerna-utils'
+import {
+  readFile as readFile_,
+  writeFile as writeFile_,
+} from '@typescript-tools/lerna-utils'
 
 const debug = {
-    cmd: Debug('pin')
+  cmd: Debug('pin'),
 }
 
 const docstring = `
@@ -46,159 +49,175 @@ Options:
 `
 
 const CommandLineOptions = withEncode(
-    t.type({
-        '<root>': t.union([t.null, t.string]),
-        '--dist-tag': t.union([t.null, PackageVersion]),
-    }),
-    a => pipe(
-        {
-            root: a['<root>'] !== null ? a['<root>'] : undefined,
-            distTag: a['--dist-tag'] !== null ? a['--dist-tag'] : undefined,
-        },
-        value => {
-            // FIXME: interested in a better pattern around this
-            if (a['--dist-tag'] === null) {
-                delete value.distTag
-            }
-            return value
+  t.type({
+    '<root>': t.union([t.null, t.string]),
+    '--dist-tag': t.union([t.null, PackageVersion]),
+  }),
+  (a) =>
+    pipe(
+      {
+        root: a['<root>'] !== null ? a['<root>'] : undefined,
+        distTag: a['--dist-tag'] !== null ? a['--dist-tag'] : undefined,
+      },
+      (value) => {
+        // FIXME: interested in a better pattern around this
+        if (a['--dist-tag'] === null) {
+          delete value.distTag
         }
-    )
+        return value
+      },
+    ),
 )
 
-type CommandLineOptions = t.TypeOf<typeof CommandLineOptions>;
+type CommandLineOptions = t.TypeOf<typeof CommandLineOptions>
 
 type Err =
-    | PackageDiscoveryError
-    | { type: 'docopt decode', error: string }
-    | { type: 'unexpected file contents',  filename: string, error: string }
-    | { type: 'unable to read file', filename: string, error: NodeJS.ErrnoException }
-    | { type: 'unable to write file', filename: string, error: NodeJS.ErrnoException }
+  | PackageDiscoveryError
+  | { type: 'docopt decode'; error: string }
+  | { type: 'unexpected file contents'; filename: string; error: string }
+  | { type: 'unable to read file'; filename: string; error: NodeJS.ErrnoException }
+  | { type: 'unable to write file'; filename: string; error: NodeJS.ErrnoException }
 
 // Widens the type of a particular Err into Err
 const err = (error: Err): Err => error
 
 const decodeDocopt = flow(
-    decodeDocopt_,
-    E.mapLeft(errors => PathReporter.failure(errors).join('\n')),
-    E.mapLeft(error => err({ type: 'docopt decode', error })),
-    TE.fromEither
+  decodeDocopt_,
+  E.mapLeft((errors) => PathReporter.failure(errors).join('\n')),
+  E.mapLeft((error) => err({ type: 'docopt decode', error })),
+  TE.fromEither,
 )
 
-const readFile = (filename: string): TE.TaskEither<Err, string> => pipe(
+const readFile = (filename: string): TE.TaskEither<Err, string> =>
+  pipe(
     readFile_(filename),
-    TE.mapLeft(error => err({ type: 'unable to read file', filename, error }))
-)
+    TE.mapLeft((error) => err({ type: 'unable to read file', filename, error })),
+  )
 
-const writeFile = (filename: string) => (contents: string) => pipe(
+const writeFile = (filename: string) => (contents: string) =>
+  pipe(
     contents,
     trace(debug.cmd, `Writing file ${filename}`),
     writeFile_(filename),
-    TE.mapLeft(error => err({ type: 'unable to write file', filename, error }))
-)
+    TE.mapLeft((error) => err({ type: 'unable to write file', filename, error })),
+  )
 
 function packageDictionary(
-    packages: LernaPackage[]
+  packages: LernaPackage[],
 ): Record<PackageName, PackageVersion> {
-    return packages.reduce(
-        (acc, {name, version}) => Object.assign(acc, {[name]: `^${version}`}),
-        {} as Record<PackageName, PackageVersion>
-    )
+  return packages.reduce(
+    (acc, { name, version }) => Object.assign(acc, { [name]: `^${version}` }),
+    {} as Record<PackageName, PackageVersion>,
+  )
 }
 
 function updateDependencies(
-    dependencies: Record<PackageName, PackageVersion>,
-    distTag?: PackageVersion,
+  dependencies: Record<PackageName, PackageVersion>,
+  distTag?: PackageVersion,
 ) {
-    return function updateDependenciesFor(packageJson: string) {
+  return function updateDependenciesFor(packageJson: string) {
+    type NoChanges = { type: 'no-op' } | { type: 'error'; error: Error }
 
-        type NoChanges =
-            | { type: 'no-op' }
-            | { type: 'error', error: Error }
-
-        const withLatestDependencies = (
-            deps: Record<PackageName, PackageVersion> | undefined
-        ): Record<PackageName, PackageVersion> | undefined => pipe(
-            O.fromNullable(deps),
-            O.map(deps => Object.entries(deps).reduce(
-                (acc, [pkg, version]) => Object.assign(
-                    acc,
-                    {
-                        [pkg]: pipe(
-                            R.lookup (pkg) (dependencies),
-                            O.map(internalVersion => O.getOrElse (constant(internalVersion)) (O.fromNullable(distTag))),
-                            O.getOrElse (constant(version))
-                        )
-                    }
+    const withLatestDependencies = (
+      deps: Record<PackageName, PackageVersion> | undefined,
+    ): Record<PackageName, PackageVersion> | undefined =>
+      pipe(
+        O.fromNullable(deps),
+        O.map((deps) =>
+          Object.entries(deps).reduce(
+            (acc, [pkg, version]) =>
+              Object.assign(acc, {
+                [pkg]: pipe(
+                  R.lookup(pkg)(dependencies),
+                  O.map((internalVersion) =>
+                    O.getOrElse(constant(internalVersion))(O.fromNullable(distTag)),
+                  ),
+                  O.getOrElse(constant(version)),
                 ),
-                {} as Record<PackageName, PackageVersion>
-            )),
-            O.toUndefined
-        )
+              }),
+            {} as Record<PackageName, PackageVersion>,
+          ),
+        ),
+        O.toUndefined,
+      )
 
-        return pipe(
-            readFile(packageJson),
-            TE.chain(
-                (string): TE.TaskEither<Err, O.Option<PackageJsonDependencies>> => pipe(
-                    StringifiedJSON(PackageJsonDependencies).decode(string),
-                    E.map(originalJson => pipe(
-                        originalJson,
-                        mod ('dependencies') (withLatestDependencies),
-                        mod ('devDependencies') (withLatestDependencies),
-                        mod ('optionalDependencies') (withLatestDependencies),
-                        mod ('peerDependencies') (withLatestDependencies),
-                        R.filter(value => value !== undefined),
-                        updatedJson => deepEqual(originalJson, updatedJson)
-                            ? O.none
-                            : O.some(updatedJson)
-                    )),
-                    E.mapLeft(errors => PathReporter.failure(errors).join('\n')),
-                    E.mapLeft(error => err({ type: 'unexpected file contents', filename: packageJson, error })),
-                    TE.fromEither
-                )
+    return pipe(
+      readFile(packageJson),
+      TE.chain(
+        (string): TE.TaskEither<Err, O.Option<PackageJsonDependencies>> =>
+          pipe(
+            StringifiedJSON(PackageJsonDependencies).decode(string),
+            E.map((originalJson) =>
+              pipe(
+                originalJson,
+                mod('dependencies')(withLatestDependencies),
+                mod('devDependencies')(withLatestDependencies),
+                mod('optionalDependencies')(withLatestDependencies),
+                mod('peerDependencies')(withLatestDependencies),
+                R.filter((value) => value !== undefined),
+                (updatedJson) =>
+                  deepEqual(originalJson, updatedJson) ? O.none : O.some(updatedJson),
+              ),
             ),
-            TE.chain(updates => pipe(
-                updates,
-                E.fromOption((): NoChanges => ({ type: 'no-op' })),
-                E.chain(flow(
-                    stringifyJSON(E.toError),
-                    E.mapLeft((error): NoChanges => ({ type: 'error', error }))
-                )),
-                E.map(writeFile(packageJson)),
-                E.getOrElseW(
-                    error => match<NoChanges, TE.TaskEither<Err, void>>(error)
-                        .with({ type: 'no-op' }, () => TE.right(undefined))
-                        .with({ type: 'error' }, ({ error }) => TE.left(error) as TE.TaskEither<Err, void>)
-                        .run()
-                )
-            ))
-        )
-    }
+            E.mapLeft((errors) => PathReporter.failure(errors).join('\n')),
+            E.mapLeft((error) =>
+              err({ type: 'unexpected file contents', filename: packageJson, error }),
+            ),
+            TE.fromEither,
+          ),
+      ),
+      TE.chain((updates) =>
+        pipe(
+          updates,
+          E.fromOption((): NoChanges => ({ type: 'no-op' })),
+          E.chain(
+            flow(
+              stringifyJSON(E.toError),
+              E.mapLeft((error): NoChanges => ({ type: 'error', error })),
+            ),
+          ),
+          E.map(writeFile(packageJson)),
+          E.getOrElseW((error) =>
+            match<NoChanges, TE.TaskEither<Err, void>>(error)
+              .with({ type: 'no-op' }, () => TE.right(undefined))
+              .with(
+                { type: 'error' },
+                ({ error }) => TE.left(error) as TE.TaskEither<Err, void>,
+              )
+              .run(),
+          ),
+        ),
+      ),
+    )
+  }
 }
 
 const main: T.Task<void> = pipe(
-    decodeDocopt(CommandLineOptions, docstring),
-    TE.chain(options => pipe(
-        lernaPackages(options.root),
-        TE.chain(
-            packages => {
-                const dictionary = packageDictionary(packages)
+  decodeDocopt(CommandLineOptions, docstring),
+  TE.chain((options) =>
+    pipe(
+      lernaPackages(options.root),
+      TE.chain((packages) => {
+        const dictionary = packageDictionary(packages)
 
-                const packageJsons = packages
-                    .map(pkg => pkg.location)
-                    .map(dir => path.resolve(dir, 'package.json'))
+        const packageJsons = packages
+          .map((pkg) => pkg.location)
+          .map((dir) => path.resolve(dir, 'package.json'))
 
-                return TE.sequenceArray(packageJsons.map(updateDependencies(dictionary, options.distTag)))
-            }
+        return TE.sequenceArray(
+          packageJsons.map(updateDependencies(dictionary, options.distTag)),
         )
-    )),
-    TE.fold(
-        flow(
-            Console.error,
-            IO.chain(() => process.exit(1) as IO.IO<void>),
-            T.fromIO
-        ),
-        constant(T.of(undefined))
-    )
+      }),
+    ),
+  ),
+  TE.fold(
+    flow(
+      Console.error,
+      IO.chain(() => process.exit(1) as IO.IO<void>),
+      T.fromIO,
+    ),
+    constant(T.of(undefined)),
+  ),
 )
 
 main()

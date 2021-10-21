@@ -1,44 +1,46 @@
 {
-    "name": "typescript-tools",
-    "version": "0.0.1",
-    "description": "A monorepo of TypeScript tools",
-    "scripts": {
-        "make": "npm run bootstrap && npm run link && npm run build",
-        "clean": "lerna run --concurrency 50 clean",
-        "distclean": "find . -name 'node_modules' -type d -prune -exec rm -r '{}' +",
-        "pin": "DEBUG=pin pin-lerna-package-versions .",
-        "bootstrap": "npm run pin && lerna bootstrap --hoist --strict --force-local",
-        "link": "DEBUG=link typescript-build-linker .",
-        "debug:link": "DEBUG=link npm run link",
-        "build": "tsc -b --incremental --verbose packages",
-        "ava": "lerna run ava",
-        "test": "lerna run test",
-        "lint": "lerna run lint",
-        "lerna:version": "lerna version --conventional-commits --include-merged-tags",
-        "lerna:publish": "lerna publish from-package"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/typescript-tools/typescript-tools"
-    },
-    "keywords": [
-        "typescript",
-        "tools"
-    ],
-    "author": "Eric Crosson",
-    "license": "ISC",
-    "bugs": {
-        "url": "https://github.com/typescript-tools/typescript-tools/issues"
-    },
-    "homepage": "https://github.com/typescript-tools/typescript-tools",
-    "devDependencies": {
-        "@typescript-tools/pin-lerna-package-versions": "^3.1.0",
-        "@typescript-tools/typescript-build-linker": "^2.1.3",
-        "@typescript-tools/use-hoisted-version": "^2.0.1",
-        "commitizen": "^4.2.2",
-        "cz-conventional-changelog": "^3.3.0",
-        "lerna": "^3.22.1",
-        "nodemon": "^2.0.7",
-        "typescript": "^4.0.5"
-    }
+  "name": "typescript-tools",
+  "version": "0.0.1",
+  "description": "A monorepo of TypeScript tools",
+  "scripts": {
+    "clean": "lerna run --concurrency 50 clean",
+    "distclean": "find . -name 'node_modules' -type d -prune -exec rm -r '{}' +",
+    "prebootstrap": "DEBUG=pin pin-lerna-package-versions .",
+    "bootstrap": "lerna bootstrap --hoist --strict --force-local",
+    "prebuild": "DEBUG=link typescript-build-linker .",
+    "build": "tsc -b --incremental --verbose packages",
+    "ava": "lerna run ava",
+    "test": "lerna run test",
+    "lint": "lerna run lint",
+    "lint:fix": "eslint --ext ts --fix . package.json",
+    "prettier": "lerna run prettier",
+    "prettier:fix": "lerna run prettier:fix",
+    "lerna:version": "lerna version --conventional-commits --include-merged-tags",
+    "lerna:publish": "lerna publish from-package"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/typescript-tools/typescript-tools"
+  },
+  "keywords": [
+    "typescript",
+    "tools"
+  ],
+  "author": "Eric Crosson",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/typescript-tools/typescript-tools/issues"
+  },
+  "homepage": "https://github.com/typescript-tools/typescript-tools",
+  "devDependencies": {
+    "@ericcrosson/prettier-config": "^1.0.0",
+    "@typescript-tools/pin-lerna-package-versions": "^3.1.0",
+    "@typescript-tools/typescript-build-linker": "^2.1.3",
+    "@typescript-tools/use-hoisted-version": "^2.0.1",
+    "commitizen": "^4.2.2",
+    "cz-conventional-changelog": "^3.3.0",
+    "lerna": "^3.22.1",
+    "nodemon": "^2.0.7",
+    "typescript": "^4.0.5"
+  }
 }

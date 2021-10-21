@@ -4,10 +4,10 @@ import { PackageName } from './PackageName'
 import { PackageVersion } from './PackageVersion'
 
 export const LernaPackage = t.type({
-    name: PackageName,
-    version: PackageVersion,
-    location: Path,
-    private: t.boolean
+  name: PackageName,
+  version: PackageVersion,
+  location: Path,
+  private: t.boolean,
 })
 
-export type LernaPackage = t.TypeOf<typeof LernaPackage>;
+export type LernaPackage = t.TypeOf<typeof LernaPackage>

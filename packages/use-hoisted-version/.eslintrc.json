@@ -7,21 +7,12 @@
     "@typescript-eslint/prefer-includes": "warn",
     "@typescript-eslint/prefer-for-of": "warn",
     "@typescript-eslint/no-useless-constructor": "warn",
-    "@typescript-eslint/no-unnecessary-type-assertion": [
-      "warn"
-    ],
+    "@typescript-eslint/no-unnecessary-type-assertion": ["warn"],
     "@typescript-eslint/adjacent-overload-signatures": "warn",
     "@typescript-eslint/require-array-sort-compare": "error",
-    "@typescript-eslint/promise-function-async": [
-      "error"
-    ],
-    "@typescript-eslint/no-use-before-define": [
-      "error",
-      "nofunc"
-    ],
-    "@typescript-eslint/no-extra-parens": [
-      "error"
-    ],
+    "@typescript-eslint/promise-function-async": ["error"],
+    "@typescript-eslint/no-use-before-define": ["error", "nofunc"],
+    "@typescript-eslint/no-extra-parens": ["error"],
     "@typescript-eslint/no-explicit-any": "error",
     "@typescript-eslint/await-thenable": "error",
     "no-extra-parens": "off",
@@ -47,9 +38,7 @@
     "@typescript-eslint/no-this-alias": [
       "error",
       {
-        "allowedNames": [
-          "self"
-        ],
+        "allowedNames": ["self"],
         "allowDestructuring": false
       }
     ],
@@ -60,12 +49,8 @@
       }
     ]
   },
-  "extends": [
-    "plugin:@typescript-eslint/recommended"
-  ],
-  "plugins": [
-    "@typescript-eslint"
-  ],
+  "extends": ["plugin:@typescript-eslint/recommended"],
+  "plugins": ["@typescript-eslint"],
   "parserOptions": {
     "sourceType": "module",
     "ecmaVersion": 2018,

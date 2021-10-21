@@ -20,23 +20,20 @@ import { ordString } from 'fp-ts/Ord'
 import { match } from 'ts-pattern'
 import { pipe, flow, identity, constant, Endomorphism } from 'fp-ts/function'
 import {
-    packagesToRebuildOnChanges as packagesToRebuildOnChanges_,
-    PackagesToRebuildOnChangesError,
+  packagesToRebuildOnChanges as packagesToRebuildOnChanges_,
+  PackagesToRebuildOnChangesError,
 } from '@typescript-tools/packages-to-rebuild-on-changes'
 import { withEncode, decodeDocopt as decodeDocopt_ } from 'io-ts-docopt'
 import { DocoptOption } from 'docopt'
 import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
+import { monorepoRoot, MonorepoRootError } from '@typescript-tools/monorepo-root'
 import {
-    monorepoRoot,
-    MonorepoRootError,
-} from '@typescript-tools/monorepo-root'
-import {
-    FindPackageError,
-    findPackageIn as findPackageIn_,
+  FindPackageError,
+  findPackageIn as findPackageIn_,
 } from '@typescript-tools/find-package'
 import {
-    lernaPackages as lernaPackages_,
-    PackageDiscoveryError,
+  lernaPackages as lernaPackages_,
+  PackageDiscoveryError,
 } from '@typescript-tools/lerna-packages'
 import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
 
@@ -51,16 +48,16 @@ Options:
 `
 
 const CommandLineOptions = withEncode(
-    t.type({
-        '<package>': t.array(PackageName),
-        '--path': t.boolean,
-        '--root': t.union([t.null, t.string]),
-    }),
-    (a) => ({
-        root: a['--root'] !== null ? a['--root'] : undefined,
-        packages: a['<package>'],
-        mode: a['--path'] ? 'path' : 'name',
-    }),
+  t.type({
+    '<package>': t.array(PackageName),
+    '--path': t.boolean,
+    '--root': t.union([t.null, t.string]),
+  }),
+  (a) => ({
+    root: a['--root'] !== null ? a['--root'] : undefined,
+    packages: a['<package>'],
+    mode: a['--path'] ? 'path' : 'name',
+  }),
 )
 
 type CommandLineOptions = t.OutputOf<typeof CommandLineOptions>
@@ -68,108 +65,103 @@ type CommandLineOptions = t.OutputOf<typeof CommandLineOptions>
 const unary = <A, B>(f: (a: A) => B) => (a: A): B => f(a)
 
 type Err =
-    | PackagesToRebuildOnChangesError
-    | MonorepoRootError
-    | FindPackageError
-    | PackageDiscoveryError
-    | { type: 'docopt decode'; error: string }
+  | PackagesToRebuildOnChangesError
+  | MonorepoRootError
+  | FindPackageError
+  | PackageDiscoveryError
+  | { type: 'docopt decode'; error: string }
 
 // Widens the type of a particular Err into an Err
 const err: Endomorphism<Err> = identity
 
 const findMonorepoRoot = (a: CommandLineOptions) =>
-    pipe(
-        O.fromNullable(a.root),
-        O.fold(flow(monorepoRoot, E.mapLeft(err)), E.right),
-        E.map((root) => Object.assign(a, { root })),
-        TE.fromEither,
-    )
+  pipe(
+    O.fromNullable(a.root),
+    O.fold(flow(monorepoRoot, E.mapLeft(err)), E.right),
+    E.map((root) => Object.assign(a, { root })),
+    TE.fromEither,
+  )
 
 const decodeDocopt = <C extends t.Mixed>(
-    codec: C,
-    docstring: string,
-    options: DocoptOption,
+  codec: C,
+  docstring: string,
+  options: DocoptOption,
 ) =>
-    pipe(
-        decodeDocopt_(codec, docstring, options),
-        E.mapLeft((error) =>
-            err({
-                type: 'docopt decode',
-                error: PathReporter.failure(error).join('\n'),
-            }),
-        ),
-        TE.fromEither,
-        TE.chain(findMonorepoRoot),
-    )
+  pipe(
+    decodeDocopt_(codec, docstring, options),
+    E.mapLeft((error) =>
+      err({
+        type: 'docopt decode',
+        error: PathReporter.failure(error).join('\n'),
+      }),
+    ),
+    TE.fromEither,
+    TE.chain(findMonorepoRoot),
+  )
 
-const packagesToRebuildOnChanges = flow(
-    packagesToRebuildOnChanges_,
-    TE.mapLeft(err),
-)
+const packagesToRebuildOnChanges = flow(packagesToRebuildOnChanges_, TE.mapLeft(err))
 const lernaPackages = flow(lernaPackages_, TE.mapLeft(err))
 
 // REFACTOR: avoid O(n) runtime
 const findPackageIn = (packages: LernaPackage[]) =>
-    flow(findPackageIn_(packages), TE.mapLeft(err))
+  flow(findPackageIn_(packages), TE.mapLeft(err))
 
 const exit = (code: 0 | 1): IO.IO<void> => () => process.exit(code)
 
 const main: T.Task<void> = pipe(
-    TE.bindTo('options')(
-        decodeDocopt(CommandLineOptions, docstring, {
-            argv: [
-                ...process.argv.slice(2),
-                ...(!process.stdin.isTTY
-                    ? fs
-                          .readFileSync('/dev/stdin', 'utf-8')
-                          .trim()
-                          .split('\n')
-                          .filter((s) => s.length > 0)
-                    : []),
-            ],
-        }),
-    ),
-    TE.bind('packages', ({ options }) => lernaPackages(options.root)),
-    TE.bind('dependencies', ({ options, packages }) =>
+  TE.bindTo('options')(
+    decodeDocopt(CommandLineOptions, docstring, {
+      argv: [
+        ...process.argv.slice(2),
+        ...(!process.stdin.isTTY
+          ? fs
+              .readFileSync('/dev/stdin', 'utf-8')
+              .trim()
+              .split('\n')
+              .filter((s) => s.length > 0)
+          : []),
+      ],
+    }),
+  ),
+  TE.bind('packages', ({ options }) => lernaPackages(options.root)),
+  TE.bind('dependencies', ({ options, packages }) =>
+    pipe(
+      packagesToRebuildOnChanges(options.root),
+      TE.chain((graph) =>
         pipe(
-            packagesToRebuildOnChanges(options.root),
-            TE.chain((graph) =>
-                pipe(
-                    options.packages,
-                    TE.traverseArray((pkg) => findPackageIn(packages)(pkg)),
-                    TE.map(
-                        A.chain((pkg) =>
-                            pipe(
-                                O.fromNullable(graph.get(pkg.name)),
-                                O.getOrElseW(constant(A.empty)),
-                            ),
-                        ),
-                    ),
-                ),
+          options.packages,
+          TE.traverseArray((pkg) => findPackageIn(packages)(pkg)),
+          TE.map(
+            A.chain((pkg) =>
+              pipe(
+                O.fromNullable(graph.get(pkg.name)),
+                O.getOrElseW(constant(A.empty)),
+              ),
             ),
+          ),
         ),
+      ),
     ),
-    TE.map(({ options, dependencies }) =>
-        match(options.mode)
-            .with('path', () =>
-                dependencies
-                    .map((_) => _.location)
-                    .map((location) => path.relative(options.root, location)),
-            )
-            .otherwise(() => dependencies.map((_) => _.name)),
+  ),
+  TE.map(({ options, dependencies }) =>
+    match(options.mode)
+      .with('path', () =>
+        dependencies
+          .map((_) => _.location)
+          .map((location) => path.relative(options.root, location)),
+      )
+      .otherwise(() => dependencies.map((_) => _.name)),
+  ),
+  TE.map(A.uniq(ordString)),
+  TE.map((dependencies: readonly string[]) => dependencies.forEach(unary(console.log))),
+  TE.fold(
+    flow(
+      Console.error,
+      IO.chain(() => exit(1)),
+      T.fromIO,
     ),
-    TE.map(A.uniq(ordString)),
-    TE.map((dependencies: readonly string[]) =>
-        dependencies.forEach(unary(console.log)),
-    ),
-    TE.fold(
-        flow(
-            Console.error,
-            IO.chain(() => exit(1)),
-            T.fromIO,
-        ),
-        constant(T.of(undefined)),
-    ),
+    constant(T.of(undefined)),
+  ),
 )
 
 main()
