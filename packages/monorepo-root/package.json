@@ -6,7 +6,7 @@
   "types": "dist/src/monorepo-root.d.ts",
   "scripts": {
     "prepublishOnly": "npm run clean && npm run compile",
-    "compile": "tsc -b .",
+    "build": "tsc -b .",
     "clean": "rimraf --no-glob dist",
     "lint-staged": "lint-staged",
     "ava": "echo 'No tests defined'",

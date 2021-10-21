@@ -24,7 +24,7 @@
     "prepublishOnly": "npm run compile",
     "ava": "echo 'No tests defined'",
     "clean": "rimraf --no-glob dist",
-    "compile": "tsc --build --incremental --verbose .",
+    "build": "tsc --build --incremental --verbose .",
     "coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "docs": "docs-ts",
     "lint": "eslint --ext ts .",
