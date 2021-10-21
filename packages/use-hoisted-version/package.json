@@ -1,6 +1,6 @@
 {
   "name": "@typescript-tools/use-hoisted-version",
-  "version": "3.0.1",
+  "version": "0.0.0-development",
   "description": "Update lerna package to use hoisted version of npm dependency",
   "main": "dist/src/use-hoisted-version.js",
   "types": "dist/src/use-hoisted-version.d.ts",

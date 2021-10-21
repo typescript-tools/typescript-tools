@@ -1,6 +1,6 @@
 {
   "name": "@typescript-tools/tsconfig-includes",
-  "version": "1.3.4",
+  "version": "0.0.0-development",
   "description": "Enumerate files included by tsconfig.json",
   "homepage": "https://github.com/typescript-tools/typescript-tools",
   "bugs": {

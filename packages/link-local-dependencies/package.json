@@ -1,6 +1,6 @@
 {
   "name": "@typescript-tools/link-local-dependencies",
-  "version": "1.2.3",
+  "version": "0.0.0-development",
   "description": "Install local lerna dependencies",
   "homepage": "https://github.com/typescript-tools/typescript-tools",
   "bugs": {

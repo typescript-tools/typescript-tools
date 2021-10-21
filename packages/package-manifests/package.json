@@ -1,6 +1,6 @@
 {
   "name": "@typescript-tools/package-manifests",
-  "version": "2.2.3",
+  "version": "0.0.0-development",
   "description": "Read every package's package.json",
   "main": "dist/src/package-manifests.js",
   "types": "dist/src/package-manifests.d.ts",
