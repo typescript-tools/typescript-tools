@@ -10,12 +10,8 @@ dep: node_modules
 bootstrap: node_modules
 	npm run bootstrap
 
-.PHONY: lint
-link: node_modules
-	npm run link
-
-.PHONY: link
-build: link
+.PHONY: build
+build:
 	npm run build
 
 .PHONY: test
@@ -31,10 +27,6 @@ distclean: clean
 	-npm run distclean
 	@rm -f node_modules.sentinel
 	@rm -f aws/tools/generator-strategy-gate/npm_link.sentinel
-
-.PHONY: lint
-lint: node_modules
-	npm run lint
 
 node_modules.sentinel:
 	npm install

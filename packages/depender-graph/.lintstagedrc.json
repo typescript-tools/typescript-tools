@@ -1,0 +1,4 @@
+{
+  "*.{md,y(a)?ml}": ["prettier --write"],
+  "*.{json,ts(x)?}": ["prettier --write", "eslint --fix"]
+}

@@ -1,25 +1,26 @@
 # dependency-graph
+
 [![License][]](https://opensource.org/licenses/ISC)
 [![NPM Package][]](https://npmjs.org/package/@typescript-tools/dependency-graph)
 [![Build status][]](https://travis-ci.org/typescript-tools/dependency-graph)
 [![Code Coverage][]](https://codecov.io/gh/typescript-tools/dependency-graph)
 
-[License]: https://img.shields.io/badge/License-ISC-blue.svg
-[NPM Package]: https://img.shields.io/npm/v/@typescript-tools/dependency-graph.svg
-[Build status]: https://travis-ci.org/typescript-tools/dependency-graph.svg?branch=master
-[Code Coverage]: https://codecov.io/gh/typescript-tools/dependency-graph/branch/master/graph/badge.svg
+[license]: https://img.shields.io/badge/License-ISC-blue.svg
+[npm package]: https://img.shields.io/npm/v/@typescript-tools/dependency-graph.svg
+[build status]: https://travis-ci.org/typescript-tools/dependency-graph.svg?branch=master
+[code coverage]: https://codecov.io/gh/typescript-tools/dependency-graph/branch/master/graph/badge.svg
 
 > Generate dependency graph of internal packages
 
 ## Install
 
-``` shell
+```shell
 npm install @typescript-tools/dependency-graph
 ```
 
 ## Use
 
-``` typescript
+```typescript
 import { dependencyGraph } from '@typescript-tools/dependency-graph'
 // TODO: describe usage
 ```

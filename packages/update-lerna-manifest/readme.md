@@ -1,13 +1,14 @@
 # update-lerna-manifest
+
 [![License][]](https://opensource.org/licenses/ISC)
 [![NPM Package][]](https://npmjs.org/package/@typescript-tools/update-lerna-manifest)
 [![Build status][]](https://travis-ci.org/typescript-tools/update-lerna-manifest)
 [![Code Coverage][]](https://codecov.io/gh/typescript-tools/update-lerna-manifest)
 
-[License]: https://img.shields.io/badge/License-ISC-blue.svg
-[NPM Package]: https://img.shields.io/npm/v/@typescript-tools/update-lerna-manifest.svg
-[Build status]: https://travis-ci.org/typescript-tools/update-lerna-manifest.svg?branch=master
-[Code Coverage]: https://codecov.io/gh/typescript-tools/update-lerna-manifest/branch/master/graph/badge.svg
+[license]: https://img.shields.io/badge/License-ISC-blue.svg
+[npm package]: https://img.shields.io/npm/v/@typescript-tools/update-lerna-manifest.svg
+[build status]: https://travis-ci.org/typescript-tools/update-lerna-manifest.svg?branch=master
+[code coverage]: https://codecov.io/gh/typescript-tools/update-lerna-manifest/branch/master/graph/badge.svg
 
 > Keep the lerna manifest up to date
 
@@ -28,7 +29,7 @@ process somehow, before running `lerna bootstrap`.
 
 ## Install
 
-``` shell
+```shell
 npm install --save-dev @typescript-tools/update-lerna-manifest
 ```
 
@@ -44,7 +45,7 @@ Options:
 
 Example:
 
-``` shell
+```shell
 npx update-lerna-manifest packages
 ```
 
@@ -56,18 +57,12 @@ extending a parent's tsconfig.json file, like the following:
 
 ```json
 {
-    "extends": "../tsconfig.settings.json",
-    "include": [
-        "src/**/*",
-        "test/**/test-*"
-    ],
-    "exclude": [
-        "node_modules",
-        "dist"
-    ],
-    "compilerOptions": {
-        "outDir": "./dist",
-    }
+  "extends": "../tsconfig.settings.json",
+  "include": ["src/**/*", "test/**/test-*"],
+  "exclude": ["node_modules", "dist"],
+  "compilerOptions": {
+    "outDir": "./dist"
+  }
 }
 ```
 

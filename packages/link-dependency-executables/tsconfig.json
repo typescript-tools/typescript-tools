@@ -1,31 +1,23 @@
 {
-    "extends": "../tsconfig.settings.json",
-    "include": [
-        "src/**/*",
-        "test/**/test-*"
-    ],
-    "exclude": [
-        "node_modules",
-        "dist"
-    ],
-    "compilerOptions": {
-        "outDir": "./dist",
-        "baseUrl": "./",
-        "paths": {
-            "*": [
-                "src/@types/*"
-            ]
-        }
+  "extends": "../tsconfig.settings.json",
+  "include": ["src/**/*", "test/**/test-*"],
+  "exclude": ["node_modules", "dist"],
+  "compilerOptions": {
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "paths": {
+      "*": ["src/@types/*"]
+    }
+  },
+  "references": [
+    {
+      "path": "../find-package"
     },
-    "references": [
-        {
-            "path": "../find-package"
-        },
-        {
-            "path": "../io-ts"
-        },
-        {
-            "path": "../monorepo-root"
-        }
-    ]
+    {
+      "path": "../io-ts"
+    },
+    {
+      "path": "../monorepo-root"
+    }
+  ]
 }

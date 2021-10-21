@@ -4,13 +4,13 @@
 
 ## Install
 
-``` shell
+```shell
 npm install @typescript-tools/lerna-packages
 ```
 
 ## Use
 
-``` typescript
+```typescript
 import { lernaPackages } from '@typescript-tools/lerna-packages'
 // TODO: describe usage
 ```
