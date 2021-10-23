@@ -20,6 +20,8 @@ jobs:
         with:
           node-version: 'lts/*'
           always-auth: true
+      - name: Print npm version
+        run: npm --version
       # - name: Configure npm
       #   run: |
       #     echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' > .npmrc
