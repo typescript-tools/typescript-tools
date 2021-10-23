@@ -19,7 +19,7 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 'lts/*'
-          always-auth: true
+          scope: typescript-tools
       - name: Print npm version
         run: npm --version
       - name: Install dependencies
