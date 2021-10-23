@@ -28,6 +28,7 @@ jobs:
         run: |
           pwd
           echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' > .npmrc
+          echo '@typescript-tools:registry=https://registry.npmjs.org/' >> .npmrc
           cp .npmrc ~/.npmrc
       - name: Release
         run: |
