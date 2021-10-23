@@ -20,7 +20,6 @@ jobs:
         with:
           node-version: 'lts/*'
           scope: typescript-tools
-          registry-url: https://registry.npmjs.org
       - name: Print npm version
         run: npm --version
       - name: Install dependencies
