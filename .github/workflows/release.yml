@@ -33,7 +33,7 @@ jobs:
       - name: Release
         run: |
           npm whoami
-          npx multi-semantic-release
+          DEBUG=semantic-release* npx multi-semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
