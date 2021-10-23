@@ -22,6 +22,10 @@ jobs:
           always-auth: true
       - name: Print npm version
         run: npm --version
+      - name: Check npm authorization
+        run: npm whoami
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       # - name: Configure npm
       #   run: |
       #     echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' > .npmrc
