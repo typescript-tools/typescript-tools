@@ -20,6 +20,7 @@ jobs:
         with:
           node-version: 'lts/*'
           scope: typescript-tools
+          registry: https://registry.npmjs.org
       - name: Print npm version
         run: npm --version
       - name: Install dependencies
@@ -28,12 +29,12 @@ jobs:
           # npm run bootstrap
       # - name: Build TypeScript
       #   run: npm run build
-      - name: Configure npm
-        run: |
-          pwd
-          echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' > .npmrc
-          echo '@typescript-tools:registry=https://registry.npmjs.org/' >> .npmrc
-          cp .npmrc ~/.npmrc
+      # - name: Configure npm
+        # run: |
+        #   pwd
+        #   echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' > .npmrc
+        #   echo '@typescript-tools:registry=https://registry.npmjs.org/' >> .npmrc
+        #   cp .npmrc ~/.npmrc
       - name: Release
         run: |
           npm whoami
