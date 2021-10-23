@@ -21,7 +21,7 @@ jobs:
           node-version: 'lts/*'
           always-auth: true
       - name: Print npm version
-        run: npm --version
+        run: npm i -g npm
       # - name: Configure npm
       #   run: |
       #     echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' > .npmrc
@@ -29,8 +29,8 @@ jobs:
       #     cp .npmrc ~/.npmrc
       - name: Install dependencies
         run: npm ci
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        # env:
+        #   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Release
         run: npx multi-semantic-release
         env:
