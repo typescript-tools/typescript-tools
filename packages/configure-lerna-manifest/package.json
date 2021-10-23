@@ -2,6 +2,10 @@
   "name": "@typescript-tools/configure-lerna-manifest",
   "version": "0.0.0-development",
   "description": "Configure lerna manifest properties",
+  "keywords": [
+    "lerna",
+    "manifest"
+  ],
   "homepage": "https://github.com/typescript-tools/typescript-tools",
   "bugs": {
     "url": "https://github.com/typescript-tools/typescript-tools/issues"
@@ -14,19 +18,22 @@
   "author": "Eric Crosson <eric.s.crosson@utexas.edu> (https://github.com/eric.s.crosson@utexas.edu)",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
+  "bin": {
+    "configure-lerna-manifest": "./dist/src/index.js"
+  },
   "files": [
     "dist/src/"
   ],
   "scripts": {
-    "prepublishOnly": "npm run compile",
     "ava": "echo 'No tests defined'",
-    "clean": "rimraf --no-glob dist",
     "build": "tsc --build --incremental --verbose .",
+    "clean": "rimraf --no-glob dist",
     "coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "docs": "docs-ts",
     "lint": "eslint --ext ts . package.json",
-    "lint:fix": "eslint --ext ts --fix . package.json",
     "lint-staged": "lint-staged",
+    "lint:fix": "eslint --ext ts --fix . package.json",
+    "prepublishOnly": "npm run clean && npm run build",
     "prettier": "prettier --list-different .",
     "prettier:fix": "prettier --write .",
     "test": "echo 'No tests defined'"
@@ -97,14 +104,7 @@
       "ts-node/register"
     ]
   },
-  "keywords": [
-    "lerna",
-    "manifest"
-  ],
   "publishConfig": {
     "access": "public"
-  },
-  "bin": {
-    "configure-lerna-manifest": "./dist/src/index.js"
   }
 }

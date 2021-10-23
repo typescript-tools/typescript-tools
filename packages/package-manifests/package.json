@@ -5,7 +5,7 @@
   "main": "dist/src/package-manifests.js",
   "types": "dist/src/package-manifests.d.ts",
   "scripts": {
-    "prepublishOnly": "npm run clean && npm run compile",
+    "prepublishOnly": "npm run clean && npm run build",
     "build": "tsc --build .",
     "clean": "rimraf --no-glob dist",
     "lint-staged": "lint-staged",

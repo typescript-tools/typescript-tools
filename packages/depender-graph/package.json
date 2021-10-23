@@ -18,7 +18,7 @@
     "dist/src/"
   ],
   "scripts": {
-    "prepublishOnly": "npm run compile",
+    "prepublishOnly": "npm run clean && npm run build",
     "ava": "echo 'No tests defined'",
     "clean": "rimraf --no-glob dist",
     "build": "tsc --build --incremental --verbose .",

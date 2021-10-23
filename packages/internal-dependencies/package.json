@@ -8,7 +8,7 @@
     "internal-dependencies": "./dist/src/index.js"
   },
   "scripts": {
-    "prepublishOnly": "npm run clean && npm run compile",
+    "prepublishOnly": "npm run clean && npm run build",
     "build": "tsc --build .",
     "clean": "rimraf --no-glob dist",
     "lint-staged": "lint-staged",

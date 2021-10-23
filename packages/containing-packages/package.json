@@ -14,19 +14,22 @@
   "author": "Eric Crosson <eric.s.crosson@utexas.edu> (https://github.com/eric.s.crosson@utexas.edu)",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
+  "bin": {
+    "containing-packages": "./dist/src/index.js"
+  },
   "files": [
     "dist/src/"
   ],
   "scripts": {
-    "prepublishOnly": "npm run compile",
     "ava": "echo 'No tests defined'",
-    "clean": "rimraf --no-glob dist",
     "build": "tsc --build --incremental --verbose .",
+    "clean": "rimraf --no-glob dist",
     "coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "docs": "docs-ts",
     "lint": "eslint --ext ts . package.json",
-    "lint:fix": "eslint --ext ts --fix . package.json",
     "lint-staged": "lint-staged",
+    "lint:fix": "eslint --ext ts --fix . package.json",
+    "prepublishOnly": "npm run clean && npm run build",
     "prettier": "prettier --list-different .",
     "prettier:fix": "prettier --write .",
     "test": "echo 'No tests defined'"
@@ -97,8 +100,5 @@
   },
   "publishConfig": {
     "access": "public"
-  },
-  "bin": {
-    "containing-packages": "./dist/src/index.js"
   }
 }

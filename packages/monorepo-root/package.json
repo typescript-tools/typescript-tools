@@ -5,7 +5,7 @@
   "main": "dist/src/monorepo-root.js",
   "types": "dist/src/monorepo-root.d.ts",
   "scripts": {
-    "prepublishOnly": "npm run clean && npm run compile",
+    "prepublishOnly": "npm run clean && npm run build",
     "build": "tsc --build .",
     "clean": "rimraf --no-glob dist",
     "lint-staged": "lint-staged",
