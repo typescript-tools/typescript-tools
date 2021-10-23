@@ -20,7 +20,10 @@ jobs:
         with:
           node-version: 'lts/*'
           scope: typescript-tools
-          registry: https://registry.npmjs.org
+          registry-url: https://registry.npmjs.org
+          token: ${NPM_TOKEN}
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Print npm version
         run: npm --version
       - name: Install dependencies
