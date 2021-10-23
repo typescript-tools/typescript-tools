@@ -31,6 +31,9 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Release
         run: |
+          cat ~/.npmrc
+          rm ~/.npmrc
+          cat .npmrc
           npm whoami
           npx multi-semantic-release
         env:
