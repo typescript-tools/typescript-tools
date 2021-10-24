@@ -18,8 +18,7 @@ import * as IO from 'fp-ts/IO'
 import * as A from 'fp-ts/ReadonlyArray'
 import * as T from 'fp-ts/Task'
 import * as TE from 'fp-ts/TaskEither'
-import { identity, pipe, flow, constVoid } from 'fp-ts/function'
-import type { Endomorphism } from 'fp-ts/function'
+import { pipe, flow, constVoid } from 'fp-ts/function'
 import * as t from 'io-ts'
 import { withEncode, decodeDocopt as decodeDocopt_ } from 'io-ts-docopt'
 import { nonEmptyArray, withFallback } from 'io-ts-types'
@@ -56,24 +55,12 @@ const CommandLineOptions = withEncode(
   }),
 )
 
-type Err =
-  | { type: 'docopt decode'; error: string }
-  | {
-      type: 'unable to read file'
-      filename: string
-      error: NodeJS.ErrnoException
-    }
-  | { type: 'unable to parse tsconfig'; error: string }
-  | { type: 'unable to resolve globs'; globs: Includes; error: Error }
-
-const err: Endomorphism<Err> = identity
-
 const decodeDocopt = flow(
   decodeDocopt_,
   E.mapLeft(
     flow(
       (errors) => PathReporter.failure(errors).join('\n'),
-      (error) => err({ type: 'docopt decode', error }),
+      (error) => ({ type: 'docopt decode', error } as const),
     ),
   ),
   TE.fromEither,
@@ -91,18 +78,21 @@ const readFile = (filename: string) =>
           }
         })
       }),
-    flow(E.toError, (error) => err({ type: 'unable to read file', filename, error })),
+    flow(
+      E.toError,
+      (error) => ({ type: 'unable to read file', filename, error } as const),
+    ),
   )
 
 const readTsconfig = flow(
   readFile,
-  TE.chain(
+  TE.chainW(
     flow(
       StringifiedJSON(TSConfig).decode.bind(null),
       E.mapLeft(
         flow(
           (errors) => PathReporter.failure(errors).join('\n'),
-          (error) => err({ type: 'unable to parse tsconfig', error }),
+          (error) => ({ type: 'unable to parse tsconfig', error } as const),
         ),
       ),
       TE.fromEither,
@@ -116,9 +106,11 @@ const resolveIncludes = (tsconfig: string) => (includes: Includes) => {
   return pipe(
     TE.tryCatch(
       async () => glob(includes, { cwd }),
-      flow(E.toError, (error) =>
-        err({ type: 'unable to resolve globs', globs: includes, error }),
-      ),
+      flow(E.toError, (error) => ({
+        type: 'unable to resolve globs',
+        globs: includes,
+        error,
+      })),
     ),
     TE.map(A.map((a) => path.join(cwd, a))),
   )
@@ -143,7 +135,7 @@ const main: T.Task<void> = pipe(
       A.map((tsconfig) =>
         pipe(
           readTsconfig(tsconfig),
-          TE.chain(({ include }) => resolveIncludes(tsconfig)(include)),
+          TE.chainW(({ include }) => resolveIncludes(tsconfig)(include)),
           TE.chain(flow(A.map(Console.log), IO.sequenceArray, TE.fromIO)),
         ),
       ),
