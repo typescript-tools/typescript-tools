@@ -1,6 +1,6 @@
 {
   "name": "@typescript-tools/dependency-graph",
-  "version": "0.0.0-development",
+  "version": "0.0.0-semantically-released",
   "description": "Generate dependency graph of internal packages",
   "main": "dist/src/dependency-graph.js",
   "types": "dist/src/dependency-graph.d.ts",

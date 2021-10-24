@@ -1,6 +1,6 @@
 {
   "name": "@typescript-tools/hoisted-package-json",
-  "version": "0.0.0-development",
+  "version": "0.0.0-semantically-released",
   "description": "Generate the package.json used during a hoisted bootstrap",
   "keywords": [
     "lerna",

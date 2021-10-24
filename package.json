@@ -1,6 +1,6 @@
 {
   "name": "typescript-tools",
-  "version": "0.0.0-development",
+  "version": "0.0.0-semantically-released",
   "description": "A monorepo of TypeScript tools",
   "scripts": {
     "clean": "lerna run --concurrency 50 clean",

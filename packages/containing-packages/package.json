@@ -1,6 +1,6 @@
 {
   "name": "@typescript-tools/containing-packages",
-  "version": "0.0.0-development",
+  "version": "0.0.0-semantically-released",
   "description": "Map a list of files into the list of packages containing those files",
   "homepage": "https://github.com/typescript-tools/typescript-tools",
   "bugs": {

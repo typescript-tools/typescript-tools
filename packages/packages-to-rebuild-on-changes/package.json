@@ -1,6 +1,6 @@
 {
   "name": "@typescript-tools/packages-to-rebuild-on-changes",
-  "version": "0.0.0-development",
+  "version": "0.0.0-semantically-released",
   "description": "Calculate packages required to rebuild when a given package changes",
   "homepage": "https://github.com/typescript-tools/typescript-tools",
   "bugs": {

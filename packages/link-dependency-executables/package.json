@@ -1,6 +1,6 @@
 {
   "name": "@typescript-tools/link-dependency-executables",
-  "version": "0.0.0-development",
+  "version": "0.0.0-semantically-released",
   "description": "Link a package's executables into node_modules",
   "homepage": "https://github.com/typescript-tools/typescript-tools",
   "bugs": {

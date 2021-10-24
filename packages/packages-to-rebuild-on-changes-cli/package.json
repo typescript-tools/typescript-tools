@@ -1,6 +1,6 @@
 {
   "name": "@typescript-tools/packages-to-rebuild-on-changes-cli",
-  "version": "0.0.0-development",
+  "version": "0.0.0-semantically-released",
   "description": "CLI for packages-to-rebuild-on-changes",
   "homepage": "https://github.com/typescript-tools/typescript-tools",
   "bugs": {

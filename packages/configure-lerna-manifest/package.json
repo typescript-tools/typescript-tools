@@ -1,6 +1,6 @@
 {
   "name": "@typescript-tools/configure-lerna-manifest",
-  "version": "0.0.0-development",
+  "version": "0.0.0-semantically-released",
   "description": "Configure lerna manifest properties",
   "keywords": [
     "lerna",
