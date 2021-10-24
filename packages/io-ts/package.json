@@ -12,6 +12,8 @@
   },
   "license": "ISC",
   "author": "Eric Crosson <eric.s.crosson@utexas.edu> (https://github.com/ericcrosson)",
+  "main": "dist/lib/index.js",
+  "types": "dist/lib/index.d.ts",
   "files": [
     "dist/lib/"
   ],

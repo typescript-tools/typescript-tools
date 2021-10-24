@@ -3,8 +3,7 @@
  * Discover internal packages
  */
 
-import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
-import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
+import { LernaPackage, StringifiedJSON } from '@typescript-tools/io-ts'
 import {
   monorepoRoot as monorepoRoot_,
   MonorepoRootError,

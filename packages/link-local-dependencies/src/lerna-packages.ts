@@ -1,6 +1,4 @@
-import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
-import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
-import { Path } from '@typescript-tools/io-ts/dist/lib/Path'
+import { LernaPackage, PackageName, Path } from '@typescript-tools/io-ts'
 import { lernaPackages as lernaPackages_ } from '@typescript-tools/lerna-packages'
 import { eqString } from 'fp-ts/Eq'
 import * as M from 'fp-ts/Map'

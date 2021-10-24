@@ -5,7 +5,7 @@
 
 import * as path from 'path'
 
-import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
+import { LernaPackage } from '@typescript-tools/io-ts'
 import {
   lernaPackages as lernaPackages_,
   PackageDiscoveryError,

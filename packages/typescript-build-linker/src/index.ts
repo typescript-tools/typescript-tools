@@ -12,10 +12,7 @@ import {
   dependencyGraph,
   DependencyGraphError,
 } from '@typescript-tools/dependency-graph'
-import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
-import { Path } from '@typescript-tools/io-ts/dist/lib/Path'
-import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
-import { TsConfig } from '@typescript-tools/io-ts/dist/lib/TsConfig'
+import { LernaPackage, Path, StringifiedJSON, TsConfig } from '@typescript-tools/io-ts'
 import { lernaPackages, PackageDiscoveryError } from '@typescript-tools/lerna-packages'
 import {
   readFile as readFile_,

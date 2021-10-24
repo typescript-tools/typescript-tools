@@ -10,10 +10,12 @@ import {
   FindPackageError,
   findPackage as findPackage_,
 } from '@typescript-tools/find-package'
-import { ExecutableName } from '@typescript-tools/io-ts/dist/lib/ExecutableName'
-import { PackageJsonBin } from '@typescript-tools/io-ts/dist/lib/PackageJsonBin'
-import { Path } from '@typescript-tools/io-ts/dist/lib/Path'
-import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
+import {
+  ExecutableName,
+  PackageJsonBin,
+  Path,
+  StringifiedJSON,
+} from '@typescript-tools/io-ts'
 import {
   MonorepoRootError,
   monorepoRoot as monorepoRoot_,

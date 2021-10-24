@@ -10,7 +10,7 @@ import * as path from 'path'
 
 import { dependerGraph } from '@typescript-tools/depender-graph'
 import { findPackageIn } from '@typescript-tools/find-package'
-import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
+import { PackageName } from '@typescript-tools/io-ts'
 import { lernaPackages } from '@typescript-tools/lerna-packages'
 import { monorepoRoot } from '@typescript-tools/monorepo-root'
 import { DocoptOption } from 'docopt'

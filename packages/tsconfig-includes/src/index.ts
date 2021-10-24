@@ -9,7 +9,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 
 import { trace } from '@strong-roots-capital/trace'
-import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
+import { StringifiedJSON } from '@typescript-tools/io-ts'
 import Debug from 'debug'
 import glob from 'fast-glob'
 import * as Console from 'fp-ts/Console'

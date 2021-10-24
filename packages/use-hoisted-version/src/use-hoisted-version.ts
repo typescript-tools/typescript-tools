@@ -12,10 +12,12 @@ import {
   hoistedPackages,
   PackageManifestsError,
 } from '@typescript-tools/hoisted-packages'
-import { PackageJsonDependencies } from '@typescript-tools/io-ts/dist/lib/PackageJsonDependencies'
-import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
-import { PackageVersion } from '@typescript-tools/io-ts/dist/lib/PackageVersion'
-import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
+import {
+  PackageJsonDependencies,
+  PackageName,
+  PackageVersion,
+  StringifiedJSON,
+} from '@typescript-tools/io-ts'
 import {
   readFile as readFile_,
   writeFile as writeFile_,

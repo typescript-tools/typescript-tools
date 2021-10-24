@@ -8,9 +8,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 
-import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
-import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
-import { Path } from '@typescript-tools/io-ts/dist/lib/Path'
+import { LernaPackage, PackageName, Path } from '@typescript-tools/io-ts'
 import { lernaPackages as lernaPackages_ } from '@typescript-tools/lerna-packages'
 import { monorepoRoot } from '@typescript-tools/monorepo-root'
 import { DocoptOption } from 'docopt'

@@ -12,11 +12,13 @@ import {
   hoistedPackages,
   PackageManifestsError,
 } from '@typescript-tools/hoisted-packages'
-import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
-import { PackageJsonDependencies } from '@typescript-tools/io-ts/dist/lib/PackageJsonDependencies'
-import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
-import { PackageVersion } from '@typescript-tools/io-ts/dist/lib/PackageVersion'
-import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
+import {
+  LernaPackage,
+  PackageJsonDependencies,
+  PackageName,
+  PackageVersion,
+  StringifiedJSON,
+} from '@typescript-tools/io-ts'
 import { lernaPackages } from '@typescript-tools/lerna-packages'
 import { monorepoRoot, MonorepoRootError } from '@typescript-tools/monorepo-root'
 import { sequenceS } from 'fp-ts/Apply'

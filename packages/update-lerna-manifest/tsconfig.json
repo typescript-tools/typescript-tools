@@ -1,12 +1,20 @@
 {
   "extends": "../tsconfig.settings.json",
-  "include": ["src/**/*", "test/**/test-*"],
-  "exclude": ["node_modules", "dist"],
+  "include": [
+    "src/**/*",
+    "test/**/test-*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
   "compilerOptions": {
     "outDir": "./dist",
     "baseUrl": "./",
     "paths": {
-      "*": ["src/@types/*"]
+      "*": [
+        "src/@types/*"
+      ]
     }
   },
   "references": [
@@ -15,6 +23,9 @@
     },
     {
       "path": "../stringify-json"
+    },
+    {
+      "path": "../io-ts"
     }
   ]
 }

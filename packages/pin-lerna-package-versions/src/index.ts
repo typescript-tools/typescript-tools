@@ -8,11 +8,13 @@
 import * as path from 'path'
 
 import { trace } from '@strong-roots-capital/trace'
-import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
-import { PackageJsonDependencies } from '@typescript-tools/io-ts/dist/lib/PackageJsonDependencies'
-import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
-import { PackageVersion } from '@typescript-tools/io-ts/dist/lib/PackageVersion'
-import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
+import {
+  LernaPackage,
+  PackageJsonDependencies,
+  PackageName,
+  PackageVersion,
+  StringifiedJSON,
+} from '@typescript-tools/io-ts'
 import { lernaPackages, PackageDiscoveryError } from '@typescript-tools/lerna-packages'
 import {
   readFile as readFile_,

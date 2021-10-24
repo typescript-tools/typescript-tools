@@ -1,6 +1,8 @@
-import { PackageJsonDependencies } from '@typescript-tools/io-ts/dist/lib/PackageJsonDependencies'
-import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
-import { PackageVersion } from '@typescript-tools/io-ts/dist/lib/PackageVersion'
+import {
+  PackageJsonDependencies,
+  PackageName,
+  PackageVersion,
+} from '@typescript-tools/io-ts'
 import {
   packageManifests,
   PackageManifestsError,

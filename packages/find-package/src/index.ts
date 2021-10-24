@@ -5,7 +5,7 @@
 
 import * as path from 'path'
 
-import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
+import { LernaPackage } from '@typescript-tools/io-ts'
 import { lernaPackages, PackageDiscoveryError } from '@typescript-tools/lerna-packages'
 import * as O from 'fp-ts/Option'
 import * as A from 'fp-ts/ReadonlyArray'

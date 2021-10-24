@@ -8,10 +8,12 @@
 import * as fs from 'fs'
 import * as path from 'path'
 
-import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
-import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
-import { Path } from '@typescript-tools/io-ts/dist/lib/Path'
-import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
+import {
+  LernaPackage,
+  PackageName,
+  Path,
+  StringifiedJSON,
+} from '@typescript-tools/io-ts'
 import {
   PackageDiscoveryError,
   lernaPackages as lernaPackages_,

@@ -7,13 +7,13 @@ import * as fs from 'fs'
 import * as path from 'path'
 
 import { trace } from '@strong-roots-capital/trace'
-import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
 import {
+  LernaPackage,
   PackageJsonDependencies,
   dependencies,
-} from '@typescript-tools/io-ts/dist/lib/PackageJsonDependencies'
-import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
-import { Path } from '@typescript-tools/io-ts/dist/lib/Path'
+  PackageName,
+  Path,
+} from '@typescript-tools/io-ts'
 import { PackageDiscoveryError } from '@typescript-tools/lerna-packages'
 import {
   packageManifest as packageManifest_,

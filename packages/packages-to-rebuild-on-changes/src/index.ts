@@ -5,10 +5,12 @@
 
 import * as path from 'path'
 
-import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
-import { PackageJsonDependencies } from '@typescript-tools/io-ts/dist/lib/PackageJsonDependencies'
-import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
-import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
+import {
+  LernaPackage,
+  PackageJsonDependencies,
+  PackageName,
+  StringifiedJSON,
+} from '@typescript-tools/io-ts'
 import { lernaPackages, PackageDiscoveryError } from '@typescript-tools/lerna-packages'
 import { readFile as readFile_ } from '@typescript-tools/lerna-utils'
 import * as A from 'fp-ts/Array'
