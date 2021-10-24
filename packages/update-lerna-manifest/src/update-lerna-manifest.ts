@@ -125,6 +125,8 @@ const writeFile = (file: fs.PathLike) => (contents: string) =>
     TE.mapLeft((error) => err({ type: 'unable to write file', error })),
   )
 
+const exit = (code: 0 | 1): IO.IO<void> => () => process.exit(code)
+
 const main: T.Task<void> = pipe(
   TE.Do,
   TE.bind('options', () => decodeDocopt(CommandLineOptions, docstring)),
@@ -235,9 +237,8 @@ const main: T.Task<void> = pipe(
   ),
   TE.fold(
     flow(
-      Console.error,
-      IO.chain(() => process.exit(1) as IO.IO<void>),
-      T.fromIO,
+      T.fromIOK(Console.error),
+      T.chainIOK(() => exit(1)),
     ),
     constant(T.of(undefined)),
   ),
