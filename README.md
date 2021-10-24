@@ -5,7 +5,7 @@
 [![semantic-release]](https://github.com/semantic-release/semantic-release)
 
 [license]: https://img.shields.io/badge/License-ISC-blue.svg
-[Build Status]: https://github.com/typescript-tools/typescript-tools/actions/workflows/ci.yml/badge.svg
+[build status]: https://github.com/typescript-tools/typescript-tools/actions/workflows/ci.yml/badge.svg
 [semantic-release]: https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg
 
 The `typescript-tools` are an opinionated collection of utilities for working with TypeScript
@@ -37,3 +37,4 @@ none) but is implemented in TypeScript, which helps avoid some bugs.
 
 - [fp-ts](https://github.com/gcanti/fp-ts)
 - [io-ts](https://github.com/gcanti/io-ts)
+- [lerna]
