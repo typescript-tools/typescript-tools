@@ -9,7 +9,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 
 import {
-  hoistedPackages as hoistedPackages_,
+  hoistedPackages,
   PackageManifestsError,
 } from '@typescript-tools/hoisted-packages'
 import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
@@ -17,18 +17,14 @@ import { PackageJsonDependencies } from '@typescript-tools/io-ts/dist/lib/Packag
 import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
 import { PackageVersion } from '@typescript-tools/io-ts/dist/lib/PackageVersion'
 import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
-import { lernaPackages as lernaPackages_ } from '@typescript-tools/lerna-packages'
-import {
-  monorepoRoot as monorepoRoot_,
-  MonorepoRootError,
-} from '@typescript-tools/monorepo-root'
+import { lernaPackages } from '@typescript-tools/lerna-packages'
+import { monorepoRoot, MonorepoRootError } from '@typescript-tools/monorepo-root'
 import { sequenceS } from 'fp-ts/Apply'
 import * as Console from 'fp-ts/Console'
 import * as E from 'fp-ts/Either'
 import * as T from 'fp-ts/Task'
 import * as TE from 'fp-ts/TaskEither'
-import { pipe, flow, identity } from 'fp-ts/function'
-import type { Endomorphism } from 'fp-ts/function'
+import { pipe, flow } from 'fp-ts/function'
 import * as t from 'io-ts'
 import { decodeDocopt as decodeDocopt_ } from 'io-ts-docopt'
 import * as PathReporter from 'io-ts/lib/PathReporter'
@@ -49,8 +45,6 @@ type Err =
   | { type: 'unexpected contents in top-level package.json'; error: string }
   | { type: 'unable to stringify package.json'; error: Error }
 
-const err: Endomorphism<Err> = identity
-
 const readFile = (filename: string) =>
   TE.tryCatch(
     async () =>
@@ -63,7 +57,10 @@ const readFile = (filename: string) =>
           }
         })
       }),
-    flow(E.toError, (error) => err({ type: 'unable to read file', filename, error })),
+    flow(
+      E.toError,
+      (error) => ({ type: 'unable to read file', filename, error } as const),
+    ),
   )
 
 const decodeDocopt = flow(
@@ -71,15 +68,11 @@ const decodeDocopt = flow(
   E.mapLeft(
     flow(
       (errors) => PathReporter.failure(errors).join('\n'),
-      (error) => err({ type: 'docopt decode', error }),
+      (error) => ({ type: 'docopt decode', error } as const),
     ),
   ),
   TE.fromEither,
 )
-
-const monorepoRoot = flow(monorepoRoot_, E.mapLeft(err), TE.fromEither)
-const hoistedPackages = flow(hoistedPackages_, TE.mapLeft(err))
-const lernaPackages = flow(lernaPackages_, TE.mapLeft(err))
 
 const readRootPackageJson = (
   root: string,
@@ -87,17 +80,17 @@ const readRootPackageJson = (
   pipe(
     path.resolve(root, 'package.json'),
     readFile,
-    TE.chain(
+    TE.chainW(
       flow(
         StringifiedJSON(PackageJsonDependencies).decode.bind(null),
         E.mapLeft(
           flow(
             (errors) => PathReporter.failure(errors).join('\n'),
             (error) =>
-              err({
+              ({
                 type: 'unexpected contents in top-level package.json',
                 error,
-              }),
+              } as const),
           ),
         ),
         TE.fromEither,
@@ -119,7 +112,9 @@ const hoistedPackageJson = (
 const stringifyJson = (json: Record<string, unknown>): TE.TaskEither<Err, string> =>
   pipe(
     E.tryCatch(() => JSON.stringify(json, null, 2), E.toError),
-    E.mapLeft((error) => err({ type: 'unable to stringify package.json', error })),
+    E.mapLeft(
+      (error) => ({ type: 'unable to stringify package.json', error } as const),
+    ),
     TE.fromEither,
   )
 
@@ -135,8 +130,8 @@ const removeInternalPackages = (
 
 const main: T.Task<void> = pipe(
   TE.bindTo('options')(decodeDocopt(CommandLineOptions, docstring)),
-  TE.bind('root', () => monorepoRoot()),
-  TE.chain(({ root }) =>
+  TE.bindW('root', () => TE.fromEither(monorepoRoot())),
+  TE.chainW(({ root }) =>
     pipe(
       {
         // FIXME: remove internal packages
