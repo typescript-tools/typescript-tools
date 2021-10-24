@@ -8,21 +8,11 @@
 import * as fs from 'fs'
 import * as path from 'path'
 
-import {
-  dependencyGraph as dependencyGraph_,
-  DependencyGraphError,
-} from '@typescript-tools/dependency-graph'
-import {
-  FindPackageError,
-  findPackageIn as findPackageIn_,
-} from '@typescript-tools/find-package'
-import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
+import { dependencyGraph } from '@typescript-tools/dependency-graph'
+import { findPackageIn } from '@typescript-tools/find-package'
 import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
-import {
-  lernaPackages as lernaPackages_,
-  PackageDiscoveryError,
-} from '@typescript-tools/lerna-packages'
-import { monorepoRoot, MonorepoRootError } from '@typescript-tools/monorepo-root'
+import { lernaPackages } from '@typescript-tools/lerna-packages'
+import { monorepoRoot } from '@typescript-tools/monorepo-root'
 import { DocoptOption } from 'docopt'
 import * as Console from 'fp-ts/Console'
 import * as E from 'fp-ts/Either'
@@ -32,8 +22,7 @@ import { ordString } from 'fp-ts/Ord'
 import * as A from 'fp-ts/ReadonlyArray'
 import * as T from 'fp-ts/Task'
 import * as TE from 'fp-ts/TaskEither'
-import { pipe, flow, identity, constant } from 'fp-ts/function'
-import type { Endomorphism } from 'fp-ts/function'
+import { pipe, flow, constant } from 'fp-ts/function'
 import * as t from 'io-ts'
 import { withEncode, decodeDocopt as decodeDocopt_ } from 'io-ts-docopt'
 import * as PathReporter from 'io-ts/lib/PathReporter'
@@ -67,20 +56,10 @@ type CommandLineOptions = t.OutputOf<typeof CommandLineOptions>
 
 const unary = <A, B>(f: (a: A) => B) => (a: A): B => f(a)
 
-type Err =
-  | DependencyGraphError
-  | MonorepoRootError
-  | FindPackageError
-  | PackageDiscoveryError
-  | { type: 'docopt decode'; error: string }
-
-// Widens the type of a particular Err into an Err
-const err: Endomorphism<Err> = identity
-
 const findMonorepoRoot = (a: CommandLineOptions) =>
   pipe(
     O.fromNullable(a.root),
-    O.fold(flow(monorepoRoot, E.mapLeft(err)), E.right),
+    O.fold(monorepoRoot, E.right),
     E.map((root) => Object.assign(a, { root })),
     TE.fromEither,
   )
@@ -92,18 +71,16 @@ const decodeDocopt = <C extends t.Mixed>(
 ) =>
   pipe(
     decodeDocopt_(codec, docstring, options),
-    E.mapLeft((error) =>
-      err({ type: 'docopt decode', error: PathReporter.failure(error).join('\n') }),
+    E.mapLeft(
+      (error) =>
+        ({
+          type: 'docopt decode',
+          error: PathReporter.failure(error).join('\n'),
+        } as const),
     ),
     TE.fromEither,
-    TE.chain(findMonorepoRoot),
+    TE.chainW(findMonorepoRoot),
   )
-
-const dependencyGraph = flow(dependencyGraph_, TE.mapLeft(err))
-const lernaPackages = flow(lernaPackages_, TE.mapLeft(err))
-
-const findPackageIn = (packages: LernaPackage[]) =>
-  flow(findPackageIn_(packages), TE.mapLeft(err))
 
 const exit = (code: 0 | 1): IO.IO<void> => () => process.exit(code)
 
@@ -119,11 +96,11 @@ const main: T.Task<void> = pipe(
       ],
     }),
   ),
-  TE.bind('packages', ({ options }) => lernaPackages(options.root)),
-  TE.bind('dependencies', ({ options, packages }) =>
+  TE.bindW('packages', ({ options }) => lernaPackages(options.root)),
+  TE.bindW('dependencies', ({ options, packages }) =>
     pipe(
       dependencyGraph(options.root),
-      TE.chain((graph) =>
+      TE.chainW((graph) =>
         pipe(
           options.packages,
           TE.traverseArray((pkg) => findPackageIn(packages)(pkg)),
