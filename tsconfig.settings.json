@@ -1,17 +1,22 @@
 {
-    "compilerOptions": {
-        "target": "es6",
-        "module": "commonjs",
-        "moduleResolution": "node",
-        "lib": ["es6", "es2019", "es2019.array", "dom"],
-        "declaration": true,
-        "declarationMap": true,
-        "sourceMap": true,
-        "composite": true,
-        "downlevelIteration": true,
-        "strict": true,
-        "noImplicitReturns": true,
-        "noFallthroughCasesInSwitch": true,
-        "esModuleInterop": true
-    }
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "lib": [
+      "es6",
+      "es2019",
+      "es2019.array",
+      "dom"
+    ],
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "composite": true,
+    "downlevelIteration": true,
+    "strict": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "esModuleInterop": true
+  }
 }
