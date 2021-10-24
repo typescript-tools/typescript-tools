@@ -1,5 +1,5 @@
-import * as t from 'io-ts'
 import * as E from 'fp-ts/Eq'
+import * as t from 'io-ts'
 
 export interface PackageNameBrand {
   readonly PackageName: unique symbol

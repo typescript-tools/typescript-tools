@@ -26,15 +26,13 @@
     "lerna:publish": "lerna publish from-package",
     "lerna:version": "lerna version --conventional-commits --include-merged-tags",
     "lint": "lerna run lint",
-    "lint-staged": "lint-staged",
-    "lint-staged-all": "npm run lint-staged && npm run lint-staged-packages",
+    "lint:fix": "lerna run lint:fix",
     "lint-staged-packages": "lerna run --concurrency 1 --stream lint-staged --since HEAD --exclude-dependents",
-    "lint:fix": "eslint --ext ts --fix . package.json",
     "prettier": "lerna run prettier",
     "prettier:fix": "lerna run prettier:fix",
     "test": "lerna run test"
   },
-  "pre-commit": "lint-staged-all",
+  "pre-commit": "lint-staged-packages",
   "devDependencies": {
     "@ericcrosson/eslint-config": "^2.1.2",
     "@ericcrosson/prettier-config": "^1.0.0",

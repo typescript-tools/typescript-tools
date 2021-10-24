@@ -3,20 +3,10 @@
  * Install local lerna dependencies
  */
 
-import Debug from 'debug'
 import * as fs from 'fs'
 import * as path from 'path'
-import * as A from 'fp-ts/ReadonlyArray'
-import * as E from 'fp-ts/Either'
-import * as O from 'fp-ts/Option'
-import * as TE from 'fp-ts/TaskEither'
-import * as PathReporter from 'io-ts/lib/PathReporter'
-import { Endomorphism, identity, pipe, flow, constVoid } from 'fp-ts/function'
+
 import { trace } from '@strong-roots-capital/trace'
-import {
-  packageManifest as packageManifest_,
-  PackageManifestsError,
-} from '@typescript-tools/package-manifests'
 import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
 import {
   PackageJsonDependencies,
@@ -25,6 +15,19 @@ import {
 import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
 import { Path } from '@typescript-tools/io-ts/dist/lib/Path'
 import { PackageDiscoveryError } from '@typescript-tools/lerna-packages'
+import {
+  packageManifest as packageManifest_,
+  PackageManifestsError,
+} from '@typescript-tools/package-manifests'
+import Debug from 'debug'
+import * as E from 'fp-ts/Either'
+import * as O from 'fp-ts/Option'
+import * as A from 'fp-ts/ReadonlyArray'
+import * as TE from 'fp-ts/TaskEither'
+import { identity, pipe, flow, constVoid } from 'fp-ts/function'
+import type { Endomorphism } from 'fp-ts/function'
+import * as PathReporter from 'io-ts/lib/PathReporter'
+
 import { lernaPackages as lernaPackages_ } from './lerna-packages'
 
 const debug = {
@@ -110,13 +113,15 @@ const mkdir = (target: string) =>
   pipe(
     TE.tryCatch(
       async () =>
-        new Promise<void>((resolve, reject) =>
-          fs.mkdir(target, { recursive: true }, (error) =>
-            error !== null && error !== undefined
-              ? reject(error)
-              : resolve(constVoid()),
-          ),
-        ),
+        new Promise<void>((resolve, reject) => {
+          fs.mkdir(target, { recursive: true }, (error) => {
+            if (error !== null && error !== undefined) {
+              reject(error)
+            } else {
+              resolve(constVoid())
+            }
+          })
+        }),
       flow(E.toError, (error) =>
         err({ type: 'unable to create directory', path: target, error }),
       ),
@@ -134,13 +139,15 @@ const symlink = (target: string, link: string) =>
       pipe(
         TE.tryCatch(
           async () =>
-            new Promise<void>((resolve, reject) =>
-              fs.symlink(target, link, (error) =>
-                error !== null && error !== undefined
-                  ? reject(error)
-                  : resolve(constVoid()),
-              ),
-            ),
+            new Promise<void>((resolve, reject) => {
+              fs.symlink(target, link, (error) => {
+                if (error !== null && error !== undefined) {
+                  reject(error)
+                } else {
+                  resolve(constVoid())
+                }
+              })
+            }),
           E.toError,
         ),
         // recover from symlink-already-exists error

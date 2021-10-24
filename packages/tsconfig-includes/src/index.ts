@@ -5,23 +5,25 @@
  * Enumerate files included by tsconfig.json
  */
 
-import Debug from 'debug'
 import * as fs from 'fs'
 import * as path from 'path'
-import * as t from 'io-ts'
-import * as A from 'fp-ts/ReadonlyArray'
+
+import { trace } from '@strong-roots-capital/trace'
+import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
+import Debug from 'debug'
+import glob from 'fast-glob'
+import * as Console from 'fp-ts/Console'
 import * as E from 'fp-ts/Either'
+import * as IO from 'fp-ts/IO'
+import * as A from 'fp-ts/ReadonlyArray'
 import * as T from 'fp-ts/Task'
 import * as TE from 'fp-ts/TaskEither'
-import * as IO from 'fp-ts/IO'
-import * as Console from 'fp-ts/Console'
-import * as PathReporter from 'io-ts/lib/PathReporter'
+import { identity, pipe, flow, constVoid } from 'fp-ts/function'
+import type { Endomorphism } from 'fp-ts/function'
+import * as t from 'io-ts'
 import { withEncode, decodeDocopt as decodeDocopt_ } from 'io-ts-docopt'
-import { Endomorphism, identity, pipe, flow, constVoid } from 'fp-ts/function'
 import { nonEmptyArray, withFallback } from 'io-ts-types'
-import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
-import { trace } from '@strong-roots-capital/trace'
-import glob from 'fast-glob'
+import * as PathReporter from 'io-ts/lib/PathReporter'
 
 const debug = {
   cmd: Debug('tsconfig-includes'),
@@ -80,11 +82,15 @@ const decodeDocopt = flow(
 const readFile = (filename: string) =>
   TE.tryCatch(
     async () =>
-      new Promise<string>((resolve, reject) =>
-        fs.readFile(filename, 'utf8', (error, data) =>
-          error !== null && error !== undefined ? reject(error) : resolve(data),
-        ),
-      ),
+      new Promise<string>((resolve, reject) => {
+        fs.readFile(filename, 'utf8', (error, data) => {
+          if (error !== null && error !== undefined) {
+            reject(error)
+          } else {
+            resolve(data)
+          }
+        })
+      }),
     flow(E.toError, (error) => err({ type: 'unable to read file', filename, error })),
   )
 

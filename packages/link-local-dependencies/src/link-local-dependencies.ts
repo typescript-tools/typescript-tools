@@ -1,22 +1,25 @@
 #!/usr/bin/env node
 
-import * as t from 'io-ts'
+import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
+import { PackageDiscoveryError } from '@typescript-tools/lerna-packages'
+import * as Console from 'fp-ts/Console'
 import * as E from 'fp-ts/Either'
+import * as IO from 'fp-ts/IO'
 import * as T from 'fp-ts/Task'
 import * as TE from 'fp-ts/TaskEither'
-import * as IO from 'fp-ts/IO'
-import * as Console from 'fp-ts/Console'
-import * as PathReporter from 'io-ts/lib/PathReporter'
-import { pipe, flow, Endomorphism, identity } from 'fp-ts/lib/function'
+import { pipe, flow, identity } from 'fp-ts/function'
+import type { Endomorphism } from 'fp-ts/function'
+import * as t from 'io-ts'
 import { withEncode, decodeDocopt as decodeDocopt_ } from 'io-ts-docopt'
-import { PackageDiscoveryError } from '@typescript-tools/lerna-packages'
+import * as PathReporter from 'io-ts/lib/PathReporter'
+
+import { lernaPackages as lernaPackages_ } from './lerna-packages'
+
 import {
   linkLocalDependenciesIn as linkLocalDependenciesIn_,
   linkAllLocalDependencies as linkAllLocalDependencies_,
   LinkLocalDependenciesError as LinkLocalDependenciesError_,
 } from './index'
-import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
-import { lernaPackages as lernaPackages_ } from './lerna-packages'
 
 const docstring = `
 Usage:
@@ -40,6 +43,7 @@ type LinkLocalDependenciesError =
   | PackageDiscoveryError
   | { type: 'docopt decode'; error: string }
 
+// REFACTOR: do not use functions to widen types
 const err: Endomorphism<LinkLocalDependenciesError> = identity
 
 const decodeDocopt = flow(
@@ -67,7 +71,7 @@ const main: T.Task<void> = pipe(
   // FIXME: process.cwd should instead be exposed as a parameter
   TE.bind('packages', () => lernaPackages(process.cwd())),
   TE.chain(({ options, packages }) =>
-    options.pkg
+    options.pkg !== null
       ? linkLocalDependencies(packages.map)(options.pkg)
       : linkAllLocalDependencies(packages.map, packages.list),
   ),

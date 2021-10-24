@@ -1,14 +1,16 @@
 #!/usr/bin/env node
 
-import * as t from 'io-ts'
+import * as Console from 'fp-ts/Console'
 import * as E from 'fp-ts/Either'
+import * as IO from 'fp-ts/IO'
 import * as T from 'fp-ts/Task'
 import * as TE from 'fp-ts/TaskEither'
-import * as IO from 'fp-ts/IO'
-import * as Console from 'fp-ts/Console'
-import * as PathReporter from 'io-ts/lib/PathReporter'
-import { pipe, flow, Endomorphism, identity } from 'fp-ts/lib/function'
+import { pipe, flow, identity } from 'fp-ts/function'
+import type { Endomorphism } from 'fp-ts/function'
+import * as t from 'io-ts'
 import { withEncode, decodeDocopt as decodeDocopt_ } from 'io-ts-docopt'
+import * as PathReporter from 'io-ts/lib/PathReporter'
+
 import {
   linkDependencyExecutables as linkDependencyExecutables_,
   LinkDependencyExecutablesError as LinkDependencyExecutablesError_,
@@ -38,6 +40,7 @@ type LinkDependencyExecutablesError =
   | LinkDependencyExecutablesError_
   | { type: 'docopt decode'; error: string }
 
+// REFACTOR: avoid using functions to narrow types
 const err: Endomorphism<LinkDependencyExecutablesError> = identity
 
 const decodeDocopt = flow(

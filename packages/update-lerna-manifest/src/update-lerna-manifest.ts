@@ -7,32 +7,34 @@
 
 import * as fs from 'fs'
 import * as path from 'path'
-import * as t from 'io-ts'
-import * as RA from 'fp-ts/ReadonlyArray'
-import * as E from 'fp-ts/Either'
-import * as O from 'fp-ts/Option'
-import * as RNEA from 'fp-ts/ReadonlyNonEmptyArray'
-import * as D from 'io-ts-docopt'
-import * as T from 'fp-ts/Task'
-import * as TE from 'fp-ts/TaskEither'
-import * as IO from 'fp-ts/IO'
-import * as Console from 'fp-ts/Console'
-import * as PathReporter from 'io-ts/lib/PathReporter'
-import Debug from 'debug'
-import deepEqual from 'fast-deep-equal'
-import findUp from 'find-up'
-import glob from 'fast-glob'
-import { ordString } from 'fp-ts/Ord'
-import { pipe, flow, constant } from 'fp-ts/function'
-import { withEncode } from 'io-ts-docopt'
-import { match } from 'ts-pattern'
-import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
+
 import { trace } from '@strong-roots-capital/trace'
-import { stringifyJSON } from '@typescript-tools/stringify-json'
+import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
 import {
   readFile as readFile_,
   writeFile as writeFile_,
 } from '@typescript-tools/lerna-utils'
+import { stringifyJSON } from '@typescript-tools/stringify-json'
+import Debug from 'debug'
+import deepEqual from 'fast-deep-equal'
+import glob from 'fast-glob'
+import findUp from 'find-up'
+import * as Console from 'fp-ts/Console'
+import * as E from 'fp-ts/Either'
+import * as IO from 'fp-ts/IO'
+import * as O from 'fp-ts/Option'
+import { ordString } from 'fp-ts/Ord'
+import * as RA from 'fp-ts/ReadonlyArray'
+import * as RNEA from 'fp-ts/ReadonlyNonEmptyArray'
+import * as T from 'fp-ts/Task'
+import * as TE from 'fp-ts/TaskEither'
+import { pipe, flow, constant } from 'fp-ts/function'
+import * as t from 'io-ts'
+import * as D from 'io-ts-docopt'
+import { withEncode } from 'io-ts-docopt'
+import * as PathReporter from 'io-ts/lib/PathReporter'
+import { match } from 'ts-pattern'
+
 import { StringEndingWithTsconfigSettingsJson } from './string-ending-with-tsconfig-settings-json'
 
 const debug = {
@@ -201,7 +203,7 @@ const main: T.Task<void> = pipe(
               E.chain((manifest) =>
                 deepEqual(manifest.packages, packages)
                   ? E.left({ type: 'no-op' } as Err)
-                  : E.right(((manifest.packages = packages), manifest)),
+                  : E.right((manifest.packages = packages, manifest)),
               ),
               E.chain((json) =>
                 pipe(
@@ -210,6 +212,7 @@ const main: T.Task<void> = pipe(
                   E.mapLeft((error) =>
                     err({
                       type: 'unable to stringify json',
+                      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                       json,
                       error,
                     }),

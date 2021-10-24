@@ -4,6 +4,7 @@
  */
 
 import * as path from 'path'
+
 import findUp from 'find-up'
 import * as E from 'fp-ts/Either'
 import { pipe, constant } from 'fp-ts/function'

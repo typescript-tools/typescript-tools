@@ -4,12 +4,13 @@
  */
 
 import * as path from 'path'
-import * as A from 'fp-ts/ReadonlyArray'
+
+import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
+import { lernaPackages, PackageDiscoveryError } from '@typescript-tools/lerna-packages'
 import * as O from 'fp-ts/Option'
+import * as A from 'fp-ts/ReadonlyArray'
 import * as TE from 'fp-ts/TaskEither'
 import { pipe } from 'fp-ts/function'
-import { lernaPackages, PackageDiscoveryError } from '@typescript-tools/lerna-packages'
-import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
 
 export type FindPackageError =
   | PackageDiscoveryError

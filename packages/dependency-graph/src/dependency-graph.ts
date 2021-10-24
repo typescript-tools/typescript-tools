@@ -3,24 +3,25 @@
  * Generate dependency graph of internal packages
  */
 
-import * as t from 'io-ts'
 import * as path from 'path'
-import * as A from 'fp-ts/Array'
-import * as O from 'fp-ts/Option'
-import * as E from 'fp-ts/Either'
-import * as R from 'fp-ts/Record'
-import * as TE from 'fp-ts/TaskEither'
-import * as PathReporter from 'io-ts/lib/PathReporter'
-import { constant, pipe, flow } from 'fp-ts/lib/function'
-import { readFile as readFile_ } from '@typescript-tools/lerna-utils'
+
+import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
+import { PackageJsonDependencies } from '@typescript-tools/io-ts/dist/lib/PackageJsonDependencies'
+import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
+import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
 import {
   lernaPackages as lernaPackages_,
   PackageDiscoveryError,
 } from '@typescript-tools/lerna-packages'
-import { PackageJsonDependencies } from '@typescript-tools/io-ts/dist/lib/PackageJsonDependencies'
-import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
-import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
-import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
+import { readFile as readFile_ } from '@typescript-tools/lerna-utils'
+import * as A from 'fp-ts/Array'
+import * as E from 'fp-ts/Either'
+import * as O from 'fp-ts/Option'
+import * as R from 'fp-ts/Record'
+import * as TE from 'fp-ts/TaskEither'
+import { constant, pipe, flow } from 'fp-ts/function'
+import * as t from 'io-ts'
+import * as PathReporter from 'io-ts/lib/PathReporter'
 
 // REFACTOR: move this to our io-ts package
 export type PackageManifest = LernaPackage & PackageJsonDependencies
@@ -44,6 +45,7 @@ const readFile = (filename: string) =>
 const decode = <C extends t.Mixed>(codec: C) => (filename: string) => (
   value: unknown,
 ): TE.TaskEither<DependencyGraphError, t.TypeOf<C>> =>
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   pipe(
     codec.decode(value),
     E.mapLeft((errors) => PathReporter.failure(errors).join('\n')),

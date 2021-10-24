@@ -2,6 +2,13 @@
   "name": "@typescript-tools/typescript-build-linker",
   "version": "0.0.0-semantically-released",
   "description": "Link together TypeScript packages in a monorepo",
+  "keywords": [
+    "link",
+    "typescript",
+    "packages",
+    "monorepo",
+    "lerna"
+  ],
   "homepage": "https://github.com/typescript-tools/typescript-tools",
   "bugs": {
     "url": "https://github.com/typescript-tools/typescript-tools/issues"
@@ -14,32 +21,26 @@
   "author": "Eric Crosson <eric.s.crosson@utexas.edu> (https://github.com/EricCrosson)",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
-  "files": [
-    "dist/src/"
-  ],
   "bin": {
     "typescript-build-linker": "dist/src/index.js"
   },
+  "files": [
+    "dist/src/"
+  ],
   "scripts": {
-    "prepublishOnly": "npm run clean && npm run build",
     "ava": "echo 'No tests defined'",
-    "clean": "rimraf --no-glob dist",
     "build": "tsc --build --incremental .",
+    "clean": "rimraf --no-glob dist",
     "coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "lint": "eslint --ext ts .",
-    "lint:fix": "eslint --ext ts --fix . package.json",
     "lint-staged": "lint-staged",
-    "test": "echo 'No tests defined'",
+    "lint:fix": "eslint --ext ts --fix . package.json",
+    "prepublishOnly": "npm run clean && npm run build",
     "prettier": "prettier --list-different .",
-    "prettier:fix": "prettier --write ."
+    "prettier:fix": "prettier --write .",
+    "test": "echo 'No tests defined'"
   },
   "pre-commit": "lint-staged",
-  "lint-staged": {
-    "*.ts": [
-      "eslint --fix",
-      "prettier --write"
-    ]
-  },
   "dependencies": {
     "@typescript-tools/dependency-graph": "^2.1.5",
     "@typescript-tools/io-ts": "^2.2.0",
@@ -61,17 +62,17 @@
   "devDependencies": {
     "@types/debug": "^4.1.5",
     "@types/node": "^14.14.6",
-    "@typescript-eslint/eslint-plugin": "^4.6.1",
-    "@typescript-eslint/parser": "^4.6.1",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@typescript-eslint/parser": "^5.0.0",
     "ava": "^3.13.0",
     "ava-fast-check": "^3.0.0",
     "codecov": "^3.8.1",
-    "eslint": "^7.12.1",
+    "eslint": "^7.32.0",
     "fast-check": "^2.6.0",
-    "lint-staged": "^10.5.1",
+    "lint-staged": "^10.5.3",
     "nyc": "^15.1.0",
     "pre-commit": "^1.2.2",
-    "prettier": "2.1.2",
+    "prettier": "2.2.1",
     "rimraf": "^3.0.2",
     "ts-node": "^9.0.0",
     "typescript": "^4.4.4"
@@ -99,13 +100,6 @@
       "ts-node/register"
     ]
   },
-  "keywords": [
-    "link",
-    "typescript",
-    "packages",
-    "monorepo",
-    "lerna"
-  ],
   "publishConfig": {
     "access": "public"
   }

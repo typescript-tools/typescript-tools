@@ -3,18 +3,18 @@
  * Discover internal packages
  */
 
-import * as t from 'io-ts'
-import * as E from 'fp-ts/Either'
-import * as TE from 'fp-ts/TaskEither'
-import * as PathReporter from 'io-ts/lib/PathReporter'
-import { pipe } from 'fp-ts/function'
+import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
+import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
 import {
   monorepoRoot as monorepoRoot_,
   MonorepoRootError,
 } from '@typescript-tools/monorepo-root'
-import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
-import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
 import execa from 'execa'
+import * as E from 'fp-ts/Either'
+import * as TE from 'fp-ts/TaskEither'
+import { pipe } from 'fp-ts/function'
+import * as t from 'io-ts'
+import * as PathReporter from 'io-ts/lib/PathReporter'
 
 export type PackageDiscoveryError =
   | MonorepoRootError

@@ -3,27 +3,29 @@
  * Link a package's executables into node_modules
  */
 
-import Debug from 'debug'
 import * as fs from 'fs'
 import * as path from 'path'
-import * as E from 'fp-ts/Either'
-import * as R from 'fp-ts/Record'
-import * as TE from 'fp-ts/TaskEither'
-import * as Apply from 'fp-ts/Apply'
-import * as PathReporter from 'io-ts/lib/PathReporter'
-import { Endomorphism, identity, flow, pipe, constVoid } from 'fp-ts/function'
-import { PackageJsonBin } from '@typescript-tools/io-ts/dist/lib/PackageJsonBin'
-import {
-  MonorepoRootError,
-  monorepoRoot as monorepoRoot_,
-} from '@typescript-tools/monorepo-root'
+
 import {
   FindPackageError,
   findPackage as findPackage_,
 } from '@typescript-tools/find-package'
-import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
 import { ExecutableName } from '@typescript-tools/io-ts/dist/lib/ExecutableName'
+import { PackageJsonBin } from '@typescript-tools/io-ts/dist/lib/PackageJsonBin'
 import { Path } from '@typescript-tools/io-ts/dist/lib/Path'
+import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
+import {
+  MonorepoRootError,
+  monorepoRoot as monorepoRoot_,
+} from '@typescript-tools/monorepo-root'
+import Debug from 'debug'
+import * as Apply from 'fp-ts/Apply'
+import * as E from 'fp-ts/Either'
+import * as R from 'fp-ts/Record'
+import * as TE from 'fp-ts/TaskEither'
+import { identity, flow, pipe, constVoid } from 'fp-ts/function'
+import type { Endomorphism } from 'fp-ts/function'
+import * as PathReporter from 'io-ts/lib/PathReporter'
 
 const debug = {
   cmd: Debug('link'),
@@ -41,6 +43,7 @@ export type LinkDependencyExecutablesError =
   | { type: 'unable to create directory'; path: string; error: Error }
   | { type: 'unable to create symlink'; target: string; path: string; error: Error }
 
+// REFACTOR: avoid using functions to widen types
 const err: Endomorphism<LinkDependencyExecutablesError> = identity
 
 const findPackage = (packagePathOrName: string) =>
@@ -61,11 +64,15 @@ const topLevelDependency = (monorepoRoot: string) => (dependency: string) =>
 const readFile = (filename: string) =>
   TE.tryCatch(
     async () =>
-      new Promise<string>((resolve, reject) =>
-        fs.readFile(filename, 'utf8', (error, data) =>
-          error !== null && error !== undefined ? reject(error) : resolve(data),
-        ),
-      ),
+      new Promise<string>((resolve, reject) => {
+        fs.readFile(filename, 'utf8', (error, data) => {
+          if (error !== null && error !== undefined) {
+            reject(error)
+          } else {
+            resolve(data)
+          }
+        })
+      }),
     flow(E.toError, (error) => err({ type: 'unable to read file', filename, error })),
   )
 
@@ -93,13 +100,15 @@ const mkdir = (target: string) =>
   pipe(
     TE.tryCatch(
       async () =>
-        new Promise<void>((resolve, reject) =>
-          fs.mkdir(target, { recursive: true }, (error) =>
-            error !== null && error !== undefined
-              ? reject(error)
-              : resolve(constVoid()),
-          ),
-        ),
+        new Promise<void>((resolve, reject) => {
+          fs.mkdir(target, { recursive: true }, (error) => {
+            if (error !== null && error !== undefined) {
+              reject(error)
+            } else {
+              resolve(constVoid())
+            }
+          })
+        }),
       flow(E.toError, (error) =>
         err({ type: 'unable to create directory', path: target, error }),
       ),
@@ -117,13 +126,15 @@ const symlink = (target: string, link: string) =>
       pipe(
         TE.tryCatch(
           async () =>
-            new Promise<void>((resolve, reject) =>
-              fs.symlink(target, link, (error) =>
-                error !== null && error !== undefined
-                  ? reject(error)
-                  : resolve(constVoid()),
-              ),
-            ),
+            new Promise<void>((resolve, reject) => {
+              fs.symlink(target, link, (error) => {
+                if (error !== null && error !== undefined) {
+                  reject(error)
+                } else {
+                  resolve(constVoid())
+                }
+              })
+            }),
           E.toError,
         ),
         // recover from symlink-already-exists error

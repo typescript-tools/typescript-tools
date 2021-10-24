@@ -1,17 +1,17 @@
-import * as A from 'fp-ts/Array'
-import * as E from 'fp-ts/Either'
-import * as O from 'fp-ts/Option'
-import * as R from 'fp-ts/Record'
-import * as TE from 'fp-ts/TaskEither'
-import { contramap, ordNumber, getDualOrd } from 'fp-ts/Ord'
-import { pipe } from 'fp-ts/function'
+import { PackageJsonDependencies } from '@typescript-tools/io-ts/dist/lib/PackageJsonDependencies'
+import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
+import { PackageVersion } from '@typescript-tools/io-ts/dist/lib/PackageVersion'
 import {
   packageManifests,
   PackageManifestsError,
 } from '@typescript-tools/package-manifests'
-import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
-import { PackageVersion } from '@typescript-tools/io-ts/dist/lib/PackageVersion'
-import { PackageJsonDependencies } from '@typescript-tools/io-ts/dist/lib/PackageJsonDependencies'
+import * as A from 'fp-ts/Array'
+import * as E from 'fp-ts/Either'
+import * as O from 'fp-ts/Option'
+import { contramap, ordNumber, getDualOrd } from 'fp-ts/Ord'
+import * as R from 'fp-ts/Record'
+import * as TE from 'fp-ts/TaskEither'
+import { pipe } from 'fp-ts/function'
 
 export { PackageManifestsError } from '@typescript-tools/package-manifests'
 
@@ -54,8 +54,10 @@ export function hoistedPackages(
       const depsToInstall = packages.reduce((acc, manifest) => {
         pipe(
           PackageJsonDependencies.decode(manifest.contents),
-          // BUG(io-ts): why are these decoded records not typed?
+          // BUG(io-ts): why are these decoded records not typed?  Answer: we can only
+          // use string as domain in a record. This does not apply to Maps
           E.map((json) =>
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             Object.assign(
               {} as Record<PackageName, PackageVersion>,
               json.dependencies,

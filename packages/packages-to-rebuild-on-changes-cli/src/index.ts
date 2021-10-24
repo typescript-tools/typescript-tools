@@ -7,35 +7,37 @@
 
 import * as fs from 'fs'
 import * as path from 'path'
-import * as t from 'io-ts'
-import * as A from 'fp-ts/ReadonlyArray'
-import * as E from 'fp-ts/Either'
-import * as O from 'fp-ts/Option'
-import * as T from 'fp-ts/Task'
-import * as TE from 'fp-ts/TaskEither'
-import * as IO from 'fp-ts/IO'
-import * as Console from 'fp-ts/Console'
-import * as PathReporter from 'io-ts/lib/PathReporter'
-import { ordString } from 'fp-ts/Ord'
-import { match } from 'ts-pattern'
-import { pipe, flow, identity, constant, Endomorphism } from 'fp-ts/function'
-import {
-  packagesToRebuildOnChanges as packagesToRebuildOnChanges_,
-  PackagesToRebuildOnChangesError,
-} from '@typescript-tools/packages-to-rebuild-on-changes'
-import { withEncode, decodeDocopt as decodeDocopt_ } from 'io-ts-docopt'
-import { DocoptOption } from 'docopt'
-import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
-import { monorepoRoot, MonorepoRootError } from '@typescript-tools/monorepo-root'
+
 import {
   FindPackageError,
   findPackageIn as findPackageIn_,
 } from '@typescript-tools/find-package'
+import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
+import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
 import {
   lernaPackages as lernaPackages_,
   PackageDiscoveryError,
 } from '@typescript-tools/lerna-packages'
-import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
+import { monorepoRoot, MonorepoRootError } from '@typescript-tools/monorepo-root'
+import {
+  packagesToRebuildOnChanges as packagesToRebuildOnChanges_,
+  PackagesToRebuildOnChangesError,
+} from '@typescript-tools/packages-to-rebuild-on-changes'
+import { DocoptOption } from 'docopt'
+import * as Console from 'fp-ts/Console'
+import * as E from 'fp-ts/Either'
+import * as IO from 'fp-ts/IO'
+import * as O from 'fp-ts/Option'
+import { ordString } from 'fp-ts/Ord'
+import * as A from 'fp-ts/ReadonlyArray'
+import * as T from 'fp-ts/Task'
+import * as TE from 'fp-ts/TaskEither'
+import { pipe, flow, identity, constant } from 'fp-ts/function'
+import type { Endomorphism } from 'fp-ts/function'
+import * as t from 'io-ts'
+import { withEncode, decodeDocopt as decodeDocopt_ } from 'io-ts-docopt'
+import * as PathReporter from 'io-ts/lib/PathReporter'
+import { match } from 'ts-pattern'
 
 const docstring = `
 Usage:

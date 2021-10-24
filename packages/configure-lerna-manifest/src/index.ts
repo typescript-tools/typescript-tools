@@ -7,34 +7,38 @@
 
 import * as fs from 'fs'
 import * as path from 'path'
-import * as t from 'io-ts'
-import * as A from 'fp-ts/ReadonlyArray'
-import * as M from 'fp-ts/Map'
-import * as E from 'fp-ts/Either'
-import * as O from 'fp-ts/Option'
-import * as T from 'fp-ts/Task'
-import * as TE from 'fp-ts/TaskEither'
-import * as IO from 'fp-ts/IO'
-import * as Console from 'fp-ts/Console'
-import * as PathReporter from 'io-ts/lib/PathReporter'
-import { sequenceS } from 'fp-ts/Apply'
-import { DocoptOption } from 'docopt'
-import { pipe, flow, Endomorphism, identity } from 'fp-ts/function'
-import { withEncode, decodeDocopt as decodeDocopt_ } from 'io-ts-docopt'
-import { monorepoRoot, MonorepoRootError } from '@typescript-tools/monorepo-root'
-import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
-import { stringifyJSON as stringifyJSON_ } from '@typescript-tools/stringify-json'
-import { PackageDiscoveryError } from '@typescript-tools/lerna-packages'
-import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
-import { lernaPackages as lernaPackages_ } from '@typescript-tools/lerna-packages'
+
 import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
-import { eqString } from 'fp-ts/Eq'
+import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
 import { Path } from '@typescript-tools/io-ts/dist/lib/Path'
-import { getFirstSemigroup } from 'fp-ts/Semigroup'
+import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
+import {
+  PackageDiscoveryError,
+  lernaPackages as lernaPackages_,
+} from '@typescript-tools/lerna-packages'
 import {
   readFile as readFile_,
   writeFile as writeFile_,
 } from '@typescript-tools/lerna-utils'
+import { monorepoRoot, MonorepoRootError } from '@typescript-tools/monorepo-root'
+import { stringifyJSON as stringifyJSON_ } from '@typescript-tools/stringify-json'
+import { DocoptOption } from 'docopt'
+import { sequenceS } from 'fp-ts/Apply'
+import * as Console from 'fp-ts/Console'
+import * as E from 'fp-ts/Either'
+import { eqString } from 'fp-ts/Eq'
+import * as IO from 'fp-ts/IO'
+import * as M from 'fp-ts/Map'
+import * as O from 'fp-ts/Option'
+import * as A from 'fp-ts/ReadonlyArray'
+import { getFirstSemigroup } from 'fp-ts/Semigroup'
+import * as T from 'fp-ts/Task'
+import * as TE from 'fp-ts/TaskEither'
+import { pipe, flow, identity } from 'fp-ts/function'
+import type { Endomorphism } from 'fp-ts/function'
+import * as t from 'io-ts'
+import { withEncode, decodeDocopt as decodeDocopt_ } from 'io-ts-docopt'
+import * as PathReporter from 'io-ts/lib/PathReporter'
 
 const docstring = `
 Usage:

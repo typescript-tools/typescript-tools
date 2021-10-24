@@ -5,31 +5,33 @@
  * Generate the package.json used during a hoisted bootstrap
  */
 
-import * as path from 'path'
 import * as fs from 'fs'
-import * as t from 'io-ts'
-import * as E from 'fp-ts/Either'
-import * as T from 'fp-ts/Task'
-import * as TE from 'fp-ts/TaskEither'
-import * as Console from 'fp-ts/Console'
-import * as PathReporter from 'io-ts/lib/PathReporter'
-import { sequenceS } from 'fp-ts/Apply'
-import { pipe, flow, Endomorphism, identity } from 'fp-ts/function'
-import { decodeDocopt as decodeDocopt_ } from 'io-ts-docopt'
+import * as path from 'path'
+
+import {
+  hoistedPackages as hoistedPackages_,
+  PackageManifestsError,
+} from '@typescript-tools/hoisted-packages'
+import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
 import { PackageJsonDependencies } from '@typescript-tools/io-ts/dist/lib/PackageJsonDependencies'
 import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
 import { PackageVersion } from '@typescript-tools/io-ts/dist/lib/PackageVersion'
 import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
-import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
 import { lernaPackages as lernaPackages_ } from '@typescript-tools/lerna-packages'
 import {
   monorepoRoot as monorepoRoot_,
   MonorepoRootError,
 } from '@typescript-tools/monorepo-root'
-import {
-  hoistedPackages as hoistedPackages_,
-  PackageManifestsError,
-} from '@typescript-tools/hoisted-packages'
+import { sequenceS } from 'fp-ts/Apply'
+import * as Console from 'fp-ts/Console'
+import * as E from 'fp-ts/Either'
+import * as T from 'fp-ts/Task'
+import * as TE from 'fp-ts/TaskEither'
+import { pipe, flow, identity } from 'fp-ts/function'
+import type { Endomorphism } from 'fp-ts/function'
+import * as t from 'io-ts'
+import { decodeDocopt as decodeDocopt_ } from 'io-ts-docopt'
+import * as PathReporter from 'io-ts/lib/PathReporter'
 
 const docstring = `
 Usage:
@@ -52,11 +54,15 @@ const err: Endomorphism<Err> = identity
 const readFile = (filename: string) =>
   TE.tryCatch(
     async () =>
-      new Promise<string>((resolve, reject) =>
-        fs.readFile(filename, 'utf8', (error, data) =>
-          error !== null && error !== undefined ? reject(error) : resolve(data),
-        ),
-      ),
+      new Promise<string>((resolve, reject) => {
+        fs.readFile(filename, 'utf8', (error, data) => {
+          if (error !== null && error !== undefined) {
+            reject(error)
+          } else {
+            resolve(data)
+          }
+        })
+      }),
     flow(E.toError, (error) => err({ type: 'unable to read file', filename, error })),
   )
 
