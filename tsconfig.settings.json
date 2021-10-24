@@ -17,6 +17,7 @@
     "strict": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
     "esModuleInterop": true
   }
 }
