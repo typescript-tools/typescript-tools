@@ -9,10 +9,7 @@ import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
 import { PackageJsonDependencies } from '@typescript-tools/io-ts/dist/lib/PackageJsonDependencies'
 import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
 import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
-import {
-  lernaPackages as lernaPackages_,
-  PackageDiscoveryError,
-} from '@typescript-tools/lerna-packages'
+import { lernaPackages, PackageDiscoveryError } from '@typescript-tools/lerna-packages'
 import { readFile as readFile_ } from '@typescript-tools/lerna-utils'
 import * as A from 'fp-ts/Array'
 import * as E from 'fp-ts/Either'
@@ -26,43 +23,62 @@ import * as PathReporter from 'io-ts/lib/PathReporter'
 // REFACTOR: move this to our io-ts package
 export type PackageManifest = LernaPackage & PackageJsonDependencies
 
+type ReadFileError = {
+  type: 'unable to read file'
+  filename: string
+  error: NodeJS.ErrnoException
+}
+
+type UnexpectedFileContentsError = {
+  type: 'unexpected file contents'
+  filename: string
+  error: string
+}
+
 export type DependencyGraphError =
   | PackageDiscoveryError
-  | { type: 'unable to read file'; filename: string; error: NodeJS.ErrnoException }
-  | { type: 'unexpected file contents'; filename: string; error: string }
-
-// Widens the type of a particular DependencyGraphError into a DependencyGraphError
-const err = (error: DependencyGraphError): DependencyGraphError => error
-
-const lernaPackages = flow(lernaPackages_, TE.mapLeft(err))
+  | ReadFileError
+  | UnexpectedFileContentsError
 
 const readFile = (filename: string) =>
   pipe(
     readFile_(filename),
-    TE.mapLeft((error) => err({ type: 'unable to read file', filename, error })),
+    TE.mapLeft(
+      (error): ReadFileError => ({ type: 'unable to read file', filename, error }),
+    ),
   )
 
 const decode = <C extends t.Mixed>(codec: C) => (filename: string) => (
   value: unknown,
-): TE.TaskEither<DependencyGraphError, t.TypeOf<C>> =>
+): E.Either<UnexpectedFileContentsError, t.TypeOf<C>> =>
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   pipe(
     codec.decode(value),
-    E.mapLeft((errors) => PathReporter.failure(errors).join('\n')),
-    E.mapLeft((error) => err({ type: 'unexpected file contents', filename, error })),
-    TE.fromEither,
+    E.mapLeft(
+      flow(
+        (errors) => PathReporter.failure(errors).join('\n'),
+        (error) => ({ type: 'unexpected file contents', filename, error }),
+      ),
+    ),
   )
 
 /**
  * Generate a DAG of internal dependencies.
  */
 export function dependencyGraph(
-  root?: string,
-  options: { recursive: boolean } = { recursive: true },
+  {
+    root,
+    recursive,
+  }: {
+    root?: string
+    recursive: boolean
+  } = {
+    recursive: true,
+  },
 ): TE.TaskEither<DependencyGraphError, Map<PackageName, PackageManifest[]>> {
   return pipe(
     lernaPackages(root),
-    TE.chain((packages) =>
+    TE.chainW((packages) =>
       pipe(
         packages,
         // REFACTOR: use These to report all errors instead of just the first
@@ -70,7 +86,9 @@ export function dependencyGraph(
           pipe(
             path.resolve(pkg.location, 'package.json'),
             readFile,
-            TE.chain(decode(StringifiedJSON(PackageJsonDependencies))(pkg.location)),
+            TE.chainEitherKW(
+              decode(StringifiedJSON(PackageJsonDependencies))(pkg.location),
+            ),
             TE.map((manifest) => ({ ...pkg, ...manifest })),
           ),
         ),
@@ -121,7 +139,7 @@ export function dependencyGraph(
             next,
             A.chain(
               (dependency) =>
-                (options.recursive ? internalDependencies[dependency.name] : []) ?? [],
+                (recursive ? internalDependencies[dependency.name] : []) ?? [],
             ),
             A.filter((dependency) => !processed.has(dependency.name)),
           )

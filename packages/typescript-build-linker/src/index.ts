@@ -9,7 +9,7 @@ import * as path from 'path'
 
 import { trace } from '@strong-roots-capital/trace'
 import {
-  dependencyGraph as dependencyGraph_,
+  dependencyGraph,
   DependencyGraphError,
 } from '@typescript-tools/dependency-graph'
 import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
@@ -81,8 +81,6 @@ type Err =
   | { type: 'unable to write file'; filename: string; error: NodeJS.ErrnoException }
 
 const monorepoRoot = flow(monorepoRoot_, TE.fromEither)
-
-const dependencyGraph = (root?: string) => dependencyGraph_(root, { recursive: false })
 
 const decodeDocopt = flow(
   D.decodeDocopt,
@@ -249,10 +247,9 @@ const linkPackageDependencies = (root: string) =>
         pkg.location,
       ]),
     ),
-
     TE.chain((lernaPackages) =>
       pipe(
-        dependencyGraph(root),
+        dependencyGraph({ root, recursive: false }),
         TE.map(mapToRecord),
         TE.map(
           R.reduceWithIndex(

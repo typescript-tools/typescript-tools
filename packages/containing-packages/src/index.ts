@@ -77,6 +77,9 @@ const decodeDocopt = <C extends t.Mixed>(
     TE.chainW(findMonorepoRoot),
   )
 
+/**
+ * Create a Map<PackageName | PackagePath, LernaPackage> for easy look-ups.
+ */
 const lernaPackages = flow(
   lernaPackages_,
   TE.map((packages) =>
@@ -115,7 +118,6 @@ const main: T.Task<void> = pipe(
   decodeDocopt(CommandLineOptions, docstring, {
     argv: [
       ...process.argv.slice(2),
-      // file descriptor '0' is stdin
       ...(!process.stdin.isTTY
         ? fs.readFileSync('/dev/stdin', 'utf-8').trim().split('\n')
         : []),

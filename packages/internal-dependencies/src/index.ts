@@ -99,7 +99,7 @@ const main: T.Task<void> = pipe(
   TE.bindW('packages', ({ options }) => lernaPackages(options.root)),
   TE.bindW('dependencies', ({ options, packages }) =>
     pipe(
-      dependencyGraph(options.root),
+      dependencyGraph({ root: options.root, recursive: true }),
       TE.chainW((graph) =>
         pipe(
           options.packages,
