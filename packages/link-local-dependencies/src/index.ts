@@ -24,11 +24,10 @@ import * as E from 'fp-ts/Either'
 import * as O from 'fp-ts/Option'
 import * as A from 'fp-ts/ReadonlyArray'
 import * as TE from 'fp-ts/TaskEither'
-import { identity, pipe, flow, constVoid } from 'fp-ts/function'
-import type { Endomorphism } from 'fp-ts/function'
+import { pipe, flow, constVoid } from 'fp-ts/function'
 import * as PathReporter from 'io-ts/lib/PathReporter'
 
-import { lernaPackages as lernaPackages_ } from './lerna-packages'
+import { lernaPackages } from './lerna-packages'
 
 const debug = {
   cmd: Debug('link'),
@@ -47,8 +46,6 @@ export type LinkLocalDependenciesError =
       error: Error
     }
 
-const err: Endomorphism<LinkLocalDependenciesError> = identity
-
 const findPackageIn = (packages: Map<string, LernaPackage>) => (
   packagePathOrName: string,
 ) =>
@@ -61,12 +58,12 @@ const findPackageIn = (packages: Map<string, LernaPackage>) => (
       }),
     ),
     TE.fromEither,
-    TE.bimap(err, trace(debug.cmd, 'Linking dependencies for package')),
+    TE.map(trace(debug.cmd, 'Linking dependencies for package')),
   )
 
 const packageManifest = flow(
   packageManifest_,
-  TE.bimap(err, ({ contents }) => contents),
+  TE.map(({ contents }) => contents),
 )
 
 const decodeManifest = (manifest: E.Json) =>
@@ -75,7 +72,7 @@ const decodeManifest = (manifest: E.Json) =>
     E.mapLeft(
       flow(
         (errors) => PathReporter.failure(errors).join('\n'),
-        (error) => err({ type: 'unable to decode package manifest', error }),
+        (error) => ({ type: 'unable to decode package manifest', error } as const),
       ),
     ),
     TE.fromEither,
@@ -99,7 +96,7 @@ const internalDependencies = (packages: Map<string, LernaPackage>) => (
 const internalPackageDependencies = (packages: Map<string, LernaPackage>) =>
   flow(
     packageManifest,
-    TE.chain(decodeManifest),
+    TE.chainW(decodeManifest),
     TE.map(
       flow(
         dependencies,
@@ -122,8 +119,10 @@ const mkdir = (target: string) =>
             }
           })
         }),
-      flow(E.toError, (error) =>
-        err({ type: 'unable to create directory', path: target, error }),
+      flow(
+        E.toError,
+        (error) =>
+          ({ type: 'unable to create directory', path: target, error } as const),
       ),
     ),
   )
@@ -135,7 +134,7 @@ const mkdir = (target: string) =>
 const symlink = (target: string, link: string) =>
   pipe(
     mkdir(path.dirname(link)),
-    TE.chain(() =>
+    TE.chainW(() =>
       pipe(
         TE.tryCatch(
           async () =>
@@ -154,13 +153,14 @@ const symlink = (target: string, link: string) =>
         TE.orElse((error) =>
           error.message.startsWith('EEXIST:') ? TE.right(constVoid()) : TE.left(error),
         ),
-        TE.mapLeft((error) =>
-          err({
-            type: 'unable to create symlink',
-            target,
-            path: link,
-            error,
-          }),
+        TE.mapLeft(
+          (error) =>
+            ({
+              type: 'unable to create symlink',
+              target,
+              path: link,
+              error,
+            } as const),
         ),
       ),
     ),
@@ -185,17 +185,16 @@ const symlinkPackage = (targetPackage: Path) => (lernaPackage: LernaPackage) => 
   )
 }
 
-const lernaPackages = flow(lernaPackages_, TE.mapLeft(err))
-
 export const linkLocalDependenciesIn = (packages: Map<string, LernaPackage>) => (
   packagePathOrName: string,
 ): TE.TaskEither<LinkLocalDependenciesError, void> =>
   pipe(
-    TE.bindTo('lernaPackage')(findPackageIn(packages)(packagePathOrName)),
-    TE.bind('dependencies', ({ lernaPackage }) =>
+    TE.Do,
+    TE.bind('lernaPackage', () => findPackageIn(packages)(packagePathOrName)),
+    TE.bindW('dependencies', ({ lernaPackage }) =>
       internalPackageDependencies(packages)(lernaPackage),
     ),
-    TE.chain(({ lernaPackage, dependencies }) =>
+    TE.chainW(({ lernaPackage, dependencies }) =>
       TE.traverseArray(symlinkPackage(lernaPackage.location))(dependencies),
     ),
     TE.map(constVoid),
