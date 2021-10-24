@@ -5,16 +5,12 @@ import * as E from 'fp-ts/Either'
 import * as IO from 'fp-ts/IO'
 import * as T from 'fp-ts/Task'
 import * as TE from 'fp-ts/TaskEither'
-import { pipe, flow, identity } from 'fp-ts/function'
-import type { Endomorphism } from 'fp-ts/function'
+import { pipe, flow } from 'fp-ts/function'
 import * as t from 'io-ts'
 import { withEncode, decodeDocopt as decodeDocopt_ } from 'io-ts-docopt'
 import * as PathReporter from 'io-ts/lib/PathReporter'
 
-import {
-  linkDependencyExecutables as linkDependencyExecutables_,
-  LinkDependencyExecutablesError as LinkDependencyExecutablesError_,
-} from './index'
+import { linkDependencyExecutables } from './index'
 
 const docstring = `
 Usage:
@@ -36,32 +32,22 @@ const CommandLineOptions = withEncode(
   }),
 )
 
-type LinkDependencyExecutablesError =
-  | LinkDependencyExecutablesError_
-  | { type: 'docopt decode'; error: string }
-
-// REFACTOR: avoid using functions to narrow types
-const err: Endomorphism<LinkDependencyExecutablesError> = identity
-
 const decodeDocopt = flow(
   decodeDocopt_,
   E.mapLeft(
     flow(
       (errors) => PathReporter.failure(errors).join('\n'),
-      (error) => err({ type: 'docopt decode', error }),
+      (error) => ({ type: 'docopt decode', error } as const),
     ),
   ),
   TE.fromEither,
 )
 
-const linkDependencyExecutables = (internalPackagePathOrName: string) =>
-  flow(linkDependencyExecutables_(internalPackagePathOrName), TE.mapLeft(err))
-
 const exit = (code: 0 | 1) => () => process.exit(code)
 
 const main: T.Task<void> = pipe(
   decodeDocopt(CommandLineOptions, docstring),
-  TE.chain(({ internalPackage, dependency }) =>
+  TE.chainW(({ internalPackage, dependency }) =>
     linkDependencyExecutables(internalPackage)(dependency),
   ),
   TE.getOrElseW(
