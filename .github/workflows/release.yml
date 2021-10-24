@@ -20,25 +20,16 @@ jobs:
         with:
           node-version: 'lts/*'
           scope: typescript-tools
-      - name: Print npm version
-        run: npm --version
       - name: Install dependencies
         run: |
           npm ci
-          # npm run bootstrap
-      # - name: Build TypeScript
-      #   run: npm run build
-      # - name: Configure npm
-        # run: |
-        #   pwd
-        #   echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' > .npmrc
-        #   echo '@typescript-tools:registry=https://registry.npmjs.org/' >> .npmrc
-        #   cp .npmrc ~/.npmrc
+          npm run bootstrap
+      - name: Build TypeScript
+        run: npm run build
       - name: Release
         run: |
-          npm whoami
-          DEBUG=semantic-release*,msr* npx multi-semantic-release
+          find . -name 'index.js' | grep @semantic-release/npm/index.js | xargs -I {} npx patch-semantic-release-npm-for-msr --file {}
+          npx multi-semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

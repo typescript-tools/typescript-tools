@@ -41,6 +41,7 @@
     "cz-conventional-changelog": "^3.3.0",
     "lerna": "^4.0.0",
     "multi-semantic-release": "^2.9.1",
+    "patch-semantic-release-npm-for-msr": "^1.0.0",
     "pre-commit": "^1.2.2",
     "typescript": "^4.4.4"
   }
