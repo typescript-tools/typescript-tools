@@ -23,7 +23,6 @@ import {
 import { monorepoRoot, MonorepoRootError } from '@typescript-tools/monorepo-root'
 import { stringifyJSON as stringifyJSON_ } from '@typescript-tools/stringify-json'
 import { DocoptOption } from 'docopt'
-import { sequenceS } from 'fp-ts/Apply'
 import * as Console from 'fp-ts/Console'
 import * as E from 'fp-ts/Either'
 import { eqString } from 'fp-ts/Eq'
@@ -34,8 +33,7 @@ import * as A from 'fp-ts/ReadonlyArray'
 import { getFirstSemigroup } from 'fp-ts/Semigroup'
 import * as T from 'fp-ts/Task'
 import * as TE from 'fp-ts/TaskEither'
-import { pipe, flow, identity } from 'fp-ts/function'
-import type { Endomorphism } from 'fp-ts/function'
+import { pipe, flow } from 'fp-ts/function'
 import * as t from 'io-ts'
 import { withEncode, decodeDocopt as decodeDocopt_ } from 'io-ts-docopt'
 import * as PathReporter from 'io-ts/lib/PathReporter'
@@ -78,32 +76,31 @@ type Err =
   | { type: 'unable to write lerna manifest'; error: NodeJS.ErrnoException }
   | { type: 'unknown package'; package: string }
 
-// Widens the type of a particular Err into an Err
-const err: Endomorphism<Err> = identity
-
 const readFile = (file: fs.PathLike) =>
   pipe(
     readFile_(file),
-    TE.mapLeft((error) => err({ type: 'unable to read lerna manifest', error })),
+    TE.mapLeft((error) => ({ type: 'unable to read lerna manifest', error } as const)),
   )
 
 const writeFile = (file: fs.PathLike) => (contents: string) =>
   pipe(
     writeFile_(file)(contents),
-    TE.mapLeft((error) => err({ type: 'unable to write lerna manifest', error })),
+    TE.mapLeft((error) => ({ type: 'unable to write lerna manifest', error } as const)),
   )
 
 const writeJson = (file: fs.PathLike) =>
   flow(
-    stringifyJSON_((error): Err => ({ type: 'unable to stringify manifest', error })),
+    stringifyJSON_(
+      (error): Err => ({ type: 'unable to stringify manifest', error } as const),
+    ),
     TE.fromEither,
-    TE.chain(writeFile(file)),
+    TE.chainW(writeFile(file)),
   )
 
 const findMonorepoRoot = (a: CommandLineOptions) =>
   pipe(
     O.fromNullable(a.root),
-    O.fold(flow(monorepoRoot, E.mapLeft(err)), E.right),
+    O.fold(monorepoRoot, E.right),
     E.map((root) => Object.assign(a, { root })),
     TE.fromEither,
   )
@@ -115,14 +112,12 @@ const decodeDocopt = <C extends t.Mixed>(
 ) =>
   pipe(
     decodeDocopt_(codec, docstring, options),
-    E.mapLeft((error) =>
-      err({
-        type: 'docopt decode',
-        error: PathReporter.failure(error).join('\n'),
-      }),
-    ),
+    E.mapLeft((error) => ({
+      type: 'docopt decode',
+      error: PathReporter.failure(error).join('\n'),
+    })),
     TE.fromEither,
-    TE.chain(findMonorepoRoot),
+    TE.chainW(findMonorepoRoot),
   )
 
 const decodeLernaManifest = (manifest: string) =>
@@ -131,7 +126,7 @@ const decodeLernaManifest = (manifest: string) =>
     E.mapLeft(
       flow(
         (errors) => PathReporter.failure(errors).join('\n'),
-        (error) => err({ type: 'unable to decode lerna manifest', error }),
+        (error) => ({ type: 'unable to decode lerna manifest', error }),
       ),
     ),
     TE.fromEither,
@@ -150,7 +145,6 @@ const lernaPackages = flow(
       (packagesMap) => ({ list: packages, map: packagesMap }),
     ),
   ),
-  TE.mapLeft(err),
 )
 
 const packagePath = (packages: Map<string, LernaPackage>) => (root: string) => (
@@ -188,25 +182,25 @@ const main: T.Task<void> = pipe(
   }),
   TE.chain((options) =>
     pipe(
-      {
-        manifest: pipe(
+      TE.Do,
+      TE.bind('options', () => TE.right(options)),
+      TE.bind('manifest', () =>
+        pipe(
           readFile(path.join(options.root, 'lerna.json')),
-          TE.chain(decodeLernaManifest),
+          TE.chainW(decodeLernaManifest),
         ),
-        packages: lernaPackages(options.root),
-      },
-      sequenceS(TE.ApplicativePar),
-      TE.map((data) => Object.assign(data, { options })),
+      ),
+      TE.bindW('packages', () => lernaPackages(options.root)),
     ),
   ),
-  TE.chain(({ options, manifest, packages }) =>
+  TE.chainW(({ options, manifest, packages }) =>
     pipe(
       options.packages,
       TE.traverseArray(packagePath(packages.map)(options.root)),
       TE.map((packagePaths) => ({ options, manifest, packagePaths })),
     ),
   ),
-  TE.chain(({ options, manifest, packagePaths }) =>
+  TE.chainW(({ options, manifest, packagePaths }) =>
     pipe(
       Object.assign(manifest, { packages: packagePaths }),
       writeJson(path.join(options.root, 'lerna.json')),
