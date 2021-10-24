@@ -113,7 +113,6 @@ const findup = flow(
   E.fromOption(() => ({ type: 'package not in monorepo' } as const)),
 )
 
-// REFACTOR: use the library
 const readFile = (file: fs.PathLike) =>
   pipe(
     readFile_(file),
