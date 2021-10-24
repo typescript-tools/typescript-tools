@@ -23,8 +23,7 @@ import * as Apply from 'fp-ts/Apply'
 import * as E from 'fp-ts/Either'
 import * as R from 'fp-ts/Record'
 import * as TE from 'fp-ts/TaskEither'
-import { identity, flow, pipe, constVoid } from 'fp-ts/function'
-import type { Endomorphism } from 'fp-ts/function'
+import { flow, pipe, constVoid } from 'fp-ts/function'
 import * as PathReporter from 'io-ts/lib/PathReporter'
 
 const debug = {
@@ -43,17 +42,11 @@ export type LinkDependencyExecutablesError =
   | { type: 'unable to create directory'; path: string; error: Error }
   | { type: 'unable to create symlink'; target: string; path: string; error: Error }
 
-// REFACTOR: avoid using functions to widen types
-const err: Endomorphism<LinkDependencyExecutablesError> = identity
-
 const findPackage = (packagePathOrName: string) =>
-  pipe(
-    // FIXME: this should be exposed as a parameter
-    findPackage_(process.cwd(), packagePathOrName),
-    TE.mapLeft(err),
-  )
+  // FIXME: this should be exposed as a parameter
+  findPackage_(process.cwd(), packagePathOrName)
 
-const monorepoRoot = flow(monorepoRoot_, E.mapLeft(err), TE.fromEither)
+const monorepoRoot = flow(monorepoRoot_, TE.fromEither)
 
 const packageJson = (packageDirectory: string) =>
   path.resolve(packageDirectory, 'package.json')
@@ -73,7 +66,10 @@ const readFile = (filename: string) =>
           }
         })
       }),
-    flow(E.toError, (error) => err({ type: 'unable to read file', filename, error })),
+    flow(
+      E.toError,
+      (error) => ({ type: 'unable to read file', filename, error } as const),
+    ),
   )
 
 const decodePackageJsonBin = (dependency: string) =>
@@ -83,7 +79,11 @@ const decodePackageJsonBin = (dependency: string) =>
       flow(
         (errors) => PathReporter.failure(errors).join('\n'),
         (error) =>
-          err({ type: 'unable to decode dependency package.json', dependency, error }),
+          ({
+            type: 'unable to decode dependency package.json',
+            dependency,
+            error,
+          } as const),
       ),
     ),
     TE.fromEither,
@@ -93,7 +93,7 @@ const externalPackageManifest = (monorepoRoot: string) => (dependencyName: strin
   pipe(
     packageJson(topLevelDependency(monorepoRoot)(dependencyName)),
     readFile,
-    TE.chain(decodePackageJsonBin(dependencyName)),
+    TE.chainW(decodePackageJsonBin(dependencyName)),
   )
 
 const mkdir = (target: string) =>
@@ -109,8 +109,10 @@ const mkdir = (target: string) =>
             }
           })
         }),
-      flow(E.toError, (error) =>
-        err({ type: 'unable to create directory', path: target, error }),
+      flow(
+        E.toError,
+        (error) =>
+          ({ type: 'unable to create directory', path: target, error } as const),
       ),
     ),
   )
@@ -122,7 +124,7 @@ const mkdir = (target: string) =>
 const symlink = (target: string, link: string) =>
   pipe(
     mkdir(path.dirname(link)),
-    TE.chain(() =>
+    TE.chainW(() =>
       pipe(
         TE.tryCatch(
           async () =>
@@ -141,8 +143,9 @@ const symlink = (target: string, link: string) =>
         TE.orElse((error) =>
           error.message.startsWith('EEXIST:') ? TE.right(constVoid()) : TE.left(error),
         ),
-        TE.mapLeft((error) =>
-          err({ type: 'unable to create symlink', target, path: link, error }),
+        TE.mapLeft(
+          (error) =>
+            ({ type: 'unable to create symlink', target, path: link, error } as const),
         ),
       ),
     ),
@@ -175,11 +178,11 @@ export const linkDependencyExecutables = (internalPackagePathOrName: string) => 
 ): TE.TaskEither<LinkDependencyExecutablesError, void> =>
   pipe(
     TE.bindTo('monorepoRoot')(monorepoRoot()),
-    TE.bind('internalPackage', () => findPackage(internalPackagePathOrName)),
-    TE.bind('dependencyManifest', ({ monorepoRoot }) =>
+    TE.bindW('internalPackage', () => findPackage(internalPackagePathOrName)),
+    TE.bindW('dependencyManifest', ({ monorepoRoot }) =>
       externalPackageManifest(monorepoRoot)(dependencyName),
     ),
-    TE.chain(({ monorepoRoot, internalPackage, dependencyManifest }) =>
+    TE.chainW(({ monorepoRoot, internalPackage, dependencyManifest }) =>
       pipe(
         (dependencyManifest.bin ?? {}) as Record<ExecutableName, Path>,
         R.mapWithIndex(
