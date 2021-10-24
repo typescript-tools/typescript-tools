@@ -86,9 +86,12 @@ const dependencyGraph = (root?: string) => dependencyGraph_(root, { recursive: f
 
 const decodeDocopt = flow(
   D.decodeDocopt,
-  // REFACTOR: use flow
-  E.mapLeft((errors) => PathReporter.failure(errors).join('\n')),
-  E.mapLeft((error) => ({ type: 'docopt decode', error } as const)),
+  E.mapLeft(
+    flow(
+      (errors) => PathReporter.failure(errors).join('\n'),
+      (error) => ({ type: 'docopt decode', error } as const),
+    ),
+  ),
   TE.fromEither,
 )
 
@@ -103,10 +106,11 @@ const decodeFile = <C extends t.Mixed>(codec: C) => (filename: string) => (
 ): TE.TaskEither<Err, C['_A']> =>
   pipe(
     StringifiedJSON(codec).decode(contents),
-    // REFACTOR: use flow
-    E.mapLeft((errors) => PathReporter.failure(errors).join('\n')),
     E.mapLeft(
-      (error) => ({ type: 'unexpected file contents', filename, error } as const),
+      flow(
+        (errors) => PathReporter.failure(errors).join('\n'),
+        (error) => ({ type: 'unexpected file contents', filename, error } as const),
+      ),
     ),
     TE.fromEither,
   )
