@@ -28,7 +28,7 @@ import * as RA from 'fp-ts/ReadonlyArray'
 import * as RNEA from 'fp-ts/ReadonlyNonEmptyArray'
 import * as T from 'fp-ts/Task'
 import * as TE from 'fp-ts/TaskEither'
-import { pipe, flow, constant } from 'fp-ts/function'
+import { pipe, flow, constVoid } from 'fp-ts/function'
 import * as t from 'io-ts'
 import * as D from 'io-ts-docopt'
 import { withEncode } from 'io-ts-docopt'
@@ -66,7 +66,9 @@ const CommandLineOptions = withEncode(
 
 type CommandLineOptions = typeof CommandLineOptions['_O']
 
-type Err =
+type RecoverableErrors = { type: 'no-op' }
+
+type UnrecoverableErrors =
   | { type: 'docopt decode'; error: string }
   | { type: 'found no matching packages' }
   | { type: 'package not in monorepo' }
@@ -74,17 +76,15 @@ type Err =
   | { type: 'unable to read file'; error: NodeJS.ErrnoException }
   | { type: 'unable to write file'; error: NodeJS.ErrnoException }
   | { type: 'json parse error'; filename: string; error: string }
-  | { type: 'no-op' } // not an error, was lazy of me to put here. I regret it already
 
-// Widens the type of a particular Err into Err
-const err = (error: Err): Err => error
+type Err = RecoverableErrors | UnrecoverableErrors
 
 const decodeDocopt = flow(
   D.decodeDocopt,
   E.mapLeft(
     flow(
       (errors) => PathReporter.failure(errors).join('\n'),
-      (error) => err({ type: 'docopt decode', error }),
+      (error) => ({ type: 'docopt decode', error } as const),
     ),
   ),
   TE.fromEither,
@@ -98,7 +98,7 @@ const decode = <C extends t.Mixed>(codec: C) => (filename: string) => (
     E.mapLeft(
       flow(
         (errors) => PathReporter.failure(errors).join('\n'),
-        (error) => err({ type: 'json parse error', filename, error }),
+        (error) => ({ type: 'json parse error', filename, error } as const),
       ),
     ),
   )
@@ -110,19 +110,20 @@ const findup = flow(
   ) => string | undefined,
   O.fromNullable,
   O.map(path.dirname),
-  E.fromOption(() => err({ type: 'package not in monorepo' })),
+  E.fromOption(() => ({ type: 'package not in monorepo' } as const)),
 )
 
+// REFACTOR: use the library
 const readFile = (file: fs.PathLike) =>
   pipe(
     readFile_(file),
-    TE.mapLeft((error) => err({ type: 'unable to read file', error })),
+    TE.mapLeft((error) => ({ type: 'unable to read file', error } as const)),
   )
 
 const writeFile = (file: fs.PathLike) => (contents: string) =>
   pipe(
     writeFile_(file)(contents),
-    TE.mapLeft((error) => err({ type: 'unable to write file', error })),
+    TE.mapLeft((error) => ({ type: 'unable to write file', error } as const)),
   )
 
 const exit = (code: 0 | 1): IO.IO<void> => () => process.exit(code)
@@ -163,7 +164,7 @@ const main: T.Task<void> = pipe(
 
         return TE.sequenceArray(candidates.map(isCandidate))
       },
-      TE.chain(
+      TE.chainW(
         flow(
           RA.filter(
             ({ isLernaPackage }: { file: string; isLernaPackage: boolean }) =>
@@ -171,8 +172,8 @@ const main: T.Task<void> = pipe(
           ),
           RA.map(({ file }) => file),
           RNEA.fromReadonlyArray,
-          E.fromOption(() => err({ type: 'found no matching packages' })),
-          E.chain((packages) =>
+          E.fromOption(() => ({ type: 'found no matching packages' } as const)),
+          E.chainW((packages) =>
             pipe(
               findup('lerna.json', {
                 cwd: options.root ?? RNEA.head(packages),
@@ -191,10 +192,10 @@ const main: T.Task<void> = pipe(
           TE.fromEither,
         ),
       ),
-      TE.chain(({ root, packages }: { root: string; packages: readonly string[] }) =>
+      TE.chainW(({ root, packages }: { root: string; packages: readonly string[] }) =>
         pipe(
           readFile(path.join(root, 'lerna.json')),
-          TE.chain((contents) => {
+          TE.chainW((contents) => {
             const LernaManifest = StringifiedJSON(
               t.type({
                 packages: t.array(t.string),
@@ -202,33 +203,34 @@ const main: T.Task<void> = pipe(
             )
             return pipe(
               decode(LernaManifest)('lerna.json')(contents),
-              E.chain((manifest) =>
+              E.chainW((manifest) =>
                 deepEqual(manifest.packages, packages)
-                  ? E.left({ type: 'no-op' } as Err)
+                  ? E.left({ type: 'no-op' } as const)
                   : E.right((manifest.packages = packages, manifest)),
               ),
-              E.chain((json) =>
+              E.chainW((json) =>
                 pipe(
                   stringifyJSON(E.toError)(json),
                   E.map(trace(debug.manifest, 'Updating lerna manifest')),
-                  E.mapLeft((error) =>
-                    err({
-                      type: 'unable to stringify json',
-                      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                      json,
-                      error,
-                    }),
+                  E.mapLeft(
+                    (error) =>
+                      ({
+                        type: 'unable to stringify json',
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                        json,
+                        error,
+                      } as const),
                   ),
                 ),
               ),
               TE.fromEither,
-              TE.chain(writeFile(path.join(root, 'lerna.json'))),
+              TE.chainW(writeFile(path.join(root, 'lerna.json'))),
             )
           }),
           // do not report a no-op as an error
           TE.orElse((err) =>
             match<Err, TE.TaskEither<Err, void>>(err)
-              .with({ type: 'no-op' }, () => TE.of(undefined))
+              .with({ type: 'no-op' }, () => TE.of(constVoid()))
               .otherwise(() => TE.left(err)),
           ),
         ),
@@ -240,7 +242,7 @@ const main: T.Task<void> = pipe(
       T.fromIOK(Console.error),
       T.chainIOK(() => exit(1)),
     ),
-    constant(T.of(undefined)),
+    () => T.of(constVoid()),
   ),
 )
 
