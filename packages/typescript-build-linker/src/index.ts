@@ -93,7 +93,7 @@ const decodeDocopt = flow(
   TE.fromEither,
 )
 
-const readFile = (filename: string): TE.TaskEither<Err, string> =>
+const readFile = (filename: string) =>
   pipe(
     readFile_(filename),
     TE.mapLeft((error) => ({ type: 'unable to read file', filename, error } as const)),
