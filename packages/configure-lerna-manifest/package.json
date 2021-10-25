@@ -32,7 +32,6 @@
     "lint": "eslint --ext ts . package.json",
     "lint-staged": "lint-staged",
     "lint:fix": "eslint --ext ts --fix . package.json",
-    "prepublishOnly": "npm run clean && npm run build",
     "prettier": "prettier --list-different .",
     "prettier:fix": "prettier --write .",
     "test": "echo 'No tests defined'"
