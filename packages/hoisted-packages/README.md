@@ -2,13 +2,13 @@
 
 [![License][]](https://opensource.org/licenses/ISC)
 [![NPM Package][]](https://npmjs.org/package/@typescript-tools/hoisted-packages)
-[![Build status][]](https://travis-ci.org/typescript-tools/hoisted-packages)
-[![Code Coverage][]](https://codecov.io/gh/typescript-tools/hoisted-packages)
+[![Build Status]](https://github.com/typescript-tools/typescript-tools/actions/workflows/ci.yml)
+[![semantic-release]](https://github.com/semantic-release/semantic-release)
 
 [license]: https://img.shields.io/badge/License-ISC-blue.svg
 [npm package]: https://img.shields.io/npm/v/@typescript-tools/hoisted-packages.svg
-[build status]: https://travis-ci.org/typescript-tools/hoisted-packages.svg?branch=master
-[code coverage]: https://codecov.io/gh/typescript-tools/hoisted-packages/branch/master/graph/badge.svg
+[build status]: https://github.com/typescript-tools/typescript-tools/actions/workflows/ci.yml/badge.svg
+[semantic-release]: https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg
 
 > Determine packages `lerna bootstrap --hoist` will hoist
 
@@ -18,13 +18,10 @@
 npm install @typescript-tools/hoisted-packages
 ```
 
-## Use
+## API
 
 ```typescript
-import { hoistedPackages } from '@typescript-tools/hoisted-packages'
-// TODO: describe usage
+export function hoistedPackages(
+  root: string,
+): TE.TaskEither<PackageManifestsError, Map<PackageName, PackageVersion>>
 ```
-
-## Documentation
-
-See [generated documentation](doc/README.md).
