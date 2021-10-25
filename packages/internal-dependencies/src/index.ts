@@ -103,7 +103,7 @@ const main: T.Task<void> = pipe(
       TE.chainW((graph) =>
         pipe(
           options.packages,
-          TE.traverseArray((pkg) => findPackageIn(packages)(pkg)),
+          TE.traverseArray(findPackageIn(packages)),
           TE.map(
             A.chain((pkg) =>
               pipe(
