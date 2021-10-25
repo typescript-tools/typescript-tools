@@ -50,6 +50,9 @@ const debug = {
   cmd: Debug('link'),
 }
 
+// log to stdout instead of the default stderr
+debug.cmd.log = console.log.bind(console)
+
 const docstring = `
 Usage:
     typescript-build-linker [<repository>]
