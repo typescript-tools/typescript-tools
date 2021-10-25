@@ -297,9 +297,8 @@ const main: T.Task<void> = pipe(
   ),
   TE.fold(
     flow(
-      Console.error,
-      IO.chain(() => exit(1)),
-      T.fromIO,
+      T.fromIOK(Console.error),
+      T.chainIOK(() => exit(1)),
     ),
     constant(T.of(undefined)),
   ),
