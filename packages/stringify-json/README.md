@@ -14,27 +14,4 @@
 
 > Stringify JSON for file writes
 
-## Install
-
-```shell
-npm install @typescript-tools/stringify-json
-```
-
-## Use
-
-```typescript
-import { stringifyJson } from '@typescript-tools/stringify-json'
-// TODO: describe usage
-```
-
-## Documentation
-
-See [generated documentation](doc/README.md).
-
-## Related
-
-TODO
-
-## Acknowledgments
-
-TODO
+This package is not published, it is for internal use only.
