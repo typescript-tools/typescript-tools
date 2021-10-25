@@ -63,8 +63,15 @@ const decode = <C extends t.Mixed>(codec: C) => (filename: string) => (
  * Generate a DAG of internal dependers.
  */
 export function dependerGraph(
-  root?: string,
-  options: { recursive: boolean } = { recursive: true },
+  {
+    root,
+    recursive,
+  }: {
+    root?: string
+    recursive?: boolean
+  } = {
+    recursive: true,
+  },
 ): TE.TaskEither<DependerGraphError, Map<PackageName, PackageManifest[]>> {
   return pipe(
     lernaPackages(root),
@@ -139,7 +146,7 @@ export function dependerGraph(
             next,
             A.chain(
               (dependency) =>
-                (options.recursive ? internalDependers[dependency.name] : []) ?? [],
+                (recursive === true ? internalDependers[dependency.name] : []) ?? [],
             ),
             A.filter((dependency) => !processed.has(dependency.name)),
           )

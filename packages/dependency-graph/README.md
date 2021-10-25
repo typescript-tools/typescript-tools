@@ -33,3 +33,7 @@ export function dependencyGraph(
   },
 ): TE.TaskEither<DependencyGraphError, Map<PackageName, PackageManifest[]>>
 ```
+
+## Related
+
+- [@typescript-tools/depender-graph](https://github.com/typescript-tools/typescript-tools/tree/master/packages/depender-graph)

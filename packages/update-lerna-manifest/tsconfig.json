@@ -19,13 +19,13 @@
   },
   "references": [
     {
+      "path": "../io-ts"
+    },
+    {
       "path": "../lerna-utils"
     },
     {
       "path": "../stringify-json"
-    },
-    {
-      "path": "../io-ts"
     }
   ]
 }

@@ -98,7 +98,7 @@ const main: T.Task<void> = pipe(
   TE.bindW('packages', ({ options }) => lernaPackages(options.root)),
   TE.bindW('dependencies', ({ options, packages }) =>
     pipe(
-      dependerGraph(options.root),
+      dependerGraph({ root: options.root }),
       TE.chainW((graph) =>
         pipe(
           options.packages,
