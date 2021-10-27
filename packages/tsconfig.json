@@ -17,9 +17,6 @@
             "path": "find-package"
         },
         {
-            "path": "hoisted-package-json"
-        },
-        {
             "path": "hoisted-packages"
         },
         {

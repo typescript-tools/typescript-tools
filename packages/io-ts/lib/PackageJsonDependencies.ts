@@ -1,4 +1,5 @@
 import * as t from 'io-ts'
+
 import { PackageName } from './PackageName'
 import { PackageVersion } from './PackageVersion'
 
@@ -16,6 +17,7 @@ export type PackageJsonDependencies = t.TypeOf<typeof PackageJsonDependencies>
 export const dependencies = (
   manifest: PackageJsonDependencies,
 ): [PackageName, PackageVersion][] =>
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   [
     ...Object.entries(manifest.dependencies ?? {}),
     ...Object.entries(manifest.devDependencies ?? {}),

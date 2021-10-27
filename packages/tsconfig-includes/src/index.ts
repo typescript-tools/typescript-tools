@@ -5,23 +5,24 @@
  * Enumerate files included by tsconfig.json
  */
 
-import Debug from 'debug'
 import * as fs from 'fs'
 import * as path from 'path'
-import * as t from 'io-ts'
-import * as A from 'fp-ts/ReadonlyArray'
+
+import { trace } from '@strong-roots-capital/trace'
+import { StringifiedJSON } from '@typescript-tools/io-ts'
+import Debug from 'debug'
+import glob from 'fast-glob'
+import * as Console from 'fp-ts/Console'
 import * as E from 'fp-ts/Either'
+import * as IO from 'fp-ts/IO'
+import * as A from 'fp-ts/ReadonlyArray'
 import * as T from 'fp-ts/Task'
 import * as TE from 'fp-ts/TaskEither'
-import * as IO from 'fp-ts/IO'
-import * as Console from 'fp-ts/Console'
-import * as PathReporter from 'io-ts/lib/PathReporter'
+import { pipe, flow, constVoid } from 'fp-ts/function'
+import * as t from 'io-ts'
 import { withEncode, decodeDocopt as decodeDocopt_ } from 'io-ts-docopt'
-import { Endomorphism, identity, pipe, flow, constVoid } from 'fp-ts/function'
 import { nonEmptyArray, withFallback } from 'io-ts-types'
-import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
-import { trace } from '@strong-roots-capital/trace'
-import glob from 'fast-glob'
+import * as PathReporter from 'io-ts/lib/PathReporter'
 
 const debug = {
   cmd: Debug('tsconfig-includes'),
@@ -54,24 +55,12 @@ const CommandLineOptions = withEncode(
   }),
 )
 
-type Err =
-  | { type: 'docopt decode'; error: string }
-  | {
-      type: 'unable to read file'
-      filename: string
-      error: NodeJS.ErrnoException
-    }
-  | { type: 'unable to parse tsconfig'; error: string }
-  | { type: 'unable to resolve globs'; globs: Includes; error: Error }
-
-const err: Endomorphism<Err> = identity
-
 const decodeDocopt = flow(
   decodeDocopt_,
   E.mapLeft(
     flow(
       (errors) => PathReporter.failure(errors).join('\n'),
-      (error) => err({ type: 'docopt decode', error }),
+      (error) => ({ type: 'docopt decode', error } as const),
     ),
   ),
   TE.fromEither,
@@ -80,23 +69,30 @@ const decodeDocopt = flow(
 const readFile = (filename: string) =>
   TE.tryCatch(
     async () =>
-      new Promise<string>((resolve, reject) =>
-        fs.readFile(filename, 'utf8', (error, data) =>
-          error !== null && error !== undefined ? reject(error) : resolve(data),
-        ),
-      ),
-    flow(E.toError, (error) => err({ type: 'unable to read file', filename, error })),
+      new Promise<string>((resolve, reject) => {
+        fs.readFile(filename, 'utf8', (error, data) => {
+          if (error !== null && error !== undefined) {
+            reject(error)
+          } else {
+            resolve(data)
+          }
+        })
+      }),
+    flow(
+      E.toError,
+      (error) => ({ type: 'unable to read file', filename, error } as const),
+    ),
   )
 
 const readTsconfig = flow(
   readFile,
-  TE.chain(
+  TE.chainW(
     flow(
       StringifiedJSON(TSConfig).decode.bind(null),
       E.mapLeft(
         flow(
           (errors) => PathReporter.failure(errors).join('\n'),
-          (error) => err({ type: 'unable to parse tsconfig', error }),
+          (error) => ({ type: 'unable to parse tsconfig', error } as const),
         ),
       ),
       TE.fromEither,
@@ -110,9 +106,11 @@ const resolveIncludes = (tsconfig: string) => (includes: Includes) => {
   return pipe(
     TE.tryCatch(
       async () => glob(includes, { cwd }),
-      flow(E.toError, (error) =>
-        err({ type: 'unable to resolve globs', globs: includes, error }),
-      ),
+      flow(E.toError, (error) => ({
+        type: 'unable to resolve globs',
+        globs: includes,
+        error,
+      })),
     ),
     TE.map(A.map((a) => path.join(cwd, a))),
   )
@@ -137,7 +135,7 @@ const main: T.Task<void> = pipe(
       A.map((tsconfig) =>
         pipe(
           readTsconfig(tsconfig),
-          TE.chain(({ include }) => resolveIncludes(tsconfig)(include)),
+          TE.chainW(({ include }) => resolveIncludes(tsconfig)(include)),
           TE.chain(flow(A.map(Console.log), IO.sequenceArray, TE.fromIO)),
         ),
       ),

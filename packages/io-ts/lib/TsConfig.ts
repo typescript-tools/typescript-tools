@@ -1,4 +1,5 @@
 import * as t from 'io-ts'
+
 import { PackageName } from './PackageName'
 
 export const TsConfigReference = t.type({

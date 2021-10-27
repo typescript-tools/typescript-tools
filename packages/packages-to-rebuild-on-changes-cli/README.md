@@ -73,3 +73,7 @@ would yield this output
 | `A`   | `A` `B` `C` `D` |
 | `B`   | `A` `B` `C`     |
 | `D`   | `A` `D`         |
+
+## Related
+
+- [@typescript-tools/packages-to-rebuild-on-changes](https://github.com/typescript-tools/typescript-tools/tree/master/packages/packages-to-rebuild-on-changes)

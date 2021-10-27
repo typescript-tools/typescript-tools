@@ -5,35 +5,37 @@
  * Pin lerna dependencies to latest managed version
  */
 
-import Debug from 'debug'
-import deepEqual from 'fast-deep-equal'
 import * as path from 'path'
-import * as t from 'io-ts'
-import * as E from 'fp-ts/Either'
-import * as O from 'fp-ts/Option'
-import * as R from 'fp-ts/Record'
-import * as T from 'fp-ts/Task'
-import * as TE from 'fp-ts/TaskEither'
-import * as IO from 'fp-ts/IO'
-import * as Console from 'fp-ts/Console'
-import * as PathReporter from 'io-ts/lib/PathReporter'
-import { mod } from 'shades'
-import { pipe, flow } from 'fp-ts/function'
-import { constant } from 'fp-ts/function'
-import { match } from 'ts-pattern'
-import { withEncode, decodeDocopt as decodeDocopt_ } from 'io-ts-docopt'
-import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
-import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
-import { PackageVersion } from '@typescript-tools/io-ts/dist/lib/PackageVersion'
-import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
-import { PackageJsonDependencies } from '@typescript-tools/io-ts/dist/lib/PackageJsonDependencies'
-import { stringifyJSON } from '@typescript-tools/stringify-json'
+
 import { trace } from '@strong-roots-capital/trace'
+import {
+  LernaPackage,
+  PackageJsonDependencies,
+  PackageName,
+  PackageVersion,
+  StringifiedJSON,
+} from '@typescript-tools/io-ts'
 import { lernaPackages, PackageDiscoveryError } from '@typescript-tools/lerna-packages'
 import {
   readFile as readFile_,
   writeFile as writeFile_,
 } from '@typescript-tools/lerna-utils'
+import { stringifyJSON } from '@typescript-tools/stringify-json'
+import Debug from 'debug'
+import deepEqual from 'fast-deep-equal'
+import * as Console from 'fp-ts/Console'
+import * as E from 'fp-ts/Either'
+import * as IO from 'fp-ts/IO'
+import * as O from 'fp-ts/Option'
+import * as R from 'fp-ts/Record'
+import * as T from 'fp-ts/Task'
+import * as TE from 'fp-ts/TaskEither'
+import { pipe, flow, constant } from 'fp-ts/function'
+import * as t from 'io-ts'
+import { withEncode, decodeDocopt as decodeDocopt_ } from 'io-ts-docopt'
+import * as PathReporter from 'io-ts/lib/PathReporter'
+import { mod } from 'shades'
+import { match } from 'ts-pattern'
 
 const debug = {
   cmd: Debug('pin'),

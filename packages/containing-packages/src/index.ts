@@ -7,27 +7,25 @@
 
 import * as fs from 'fs'
 import * as path from 'path'
-import * as t from 'io-ts'
-import * as A from 'fp-ts/ReadonlyArray'
-import * as M from 'fp-ts/Map'
+
+import { LernaPackage, PackageName, Path } from '@typescript-tools/io-ts'
+import { lernaPackages as lernaPackages_ } from '@typescript-tools/lerna-packages'
+import { monorepoRoot } from '@typescript-tools/monorepo-root'
+import { DocoptOption } from 'docopt'
+import * as Console from 'fp-ts/Console'
 import * as E from 'fp-ts/Either'
+import { eqString } from 'fp-ts/Eq'
+import * as IO from 'fp-ts/IO'
+import * as M from 'fp-ts/Map'
 import * as O from 'fp-ts/Option'
+import * as A from 'fp-ts/ReadonlyArray'
+import { getFirstSemigroup } from 'fp-ts/Semigroup'
 import * as T from 'fp-ts/Task'
 import * as TE from 'fp-ts/TaskEither'
-import * as IO from 'fp-ts/IO'
-import * as Console from 'fp-ts/Console'
-import * as PathReporter from 'io-ts/lib/PathReporter'
-import { DocoptOption } from 'docopt'
-import { pipe, flow, Endomorphism, identity, constVoid } from 'fp-ts/function'
+import { pipe, flow } from 'fp-ts/function'
+import * as t from 'io-ts'
 import { withEncode, decodeDocopt as decodeDocopt_ } from 'io-ts-docopt'
-import { monorepoRoot, MonorepoRootError } from '@typescript-tools/monorepo-root'
-import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
-import { PackageDiscoveryError } from '@typescript-tools/lerna-packages'
-import { lernaPackages as lernaPackages_ } from '@typescript-tools/lerna-packages'
-import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
-import { eqString } from 'fp-ts/Eq'
-import { Path } from '@typescript-tools/io-ts/dist/lib/Path'
-import { getFirstSemigroup } from 'fp-ts/Semigroup'
+import * as PathReporter from 'io-ts/lib/PathReporter'
 
 const docstring = `
 Usage:
@@ -50,18 +48,11 @@ const CommandLineOptions = withEncode(
 
 type CommandLineOptions = t.OutputOf<typeof CommandLineOptions>
 
-type Err =
-  | MonorepoRootError
-  | PackageDiscoveryError
-  | { type: 'docopt decode'; error: string }
-
-// Widens the type of a particular Err into an Err
-const err: Endomorphism<Err> = identity
-
 const findMonorepoRoot = (a: CommandLineOptions) =>
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   pipe(
     O.fromNullable(a.root),
-    O.fold(flow(monorepoRoot, E.mapLeft(err)), E.right),
+    O.fold(monorepoRoot, E.right),
     E.map((root) => Object.assign(a, { root })),
     TE.fromEither,
   )
@@ -73,16 +64,20 @@ const decodeDocopt = <C extends t.Mixed>(
 ) =>
   pipe(
     decodeDocopt_(codec, docstring, options),
-    E.mapLeft((error) =>
-      err({
-        type: 'docopt decode',
-        error: PathReporter.failure(error).join('\n'),
-      }),
+    E.mapLeft(
+      (error) =>
+        ({
+          type: 'docopt decode',
+          error: PathReporter.failure(error).join('\n'),
+        } as const),
     ),
     TE.fromEither,
-    TE.chain(findMonorepoRoot),
+    TE.chainW(findMonorepoRoot),
   )
 
+/**
+ * Create a Map<PackageName | PackagePath, LernaPackage> for easy look-ups.
+ */
 const lernaPackages = flow(
   lernaPackages_,
   TE.map((packages) =>
@@ -96,7 +91,6 @@ const lernaPackages = flow(
       (packagesMap) => ({ list: packages, map: packagesMap }),
     ),
   ),
-  TE.mapLeft(err),
 )
 
 const containingPackage = (root: string, packages: Map<string, LernaPackage>) => (
@@ -122,13 +116,12 @@ const main: T.Task<void> = pipe(
   decodeDocopt(CommandLineOptions, docstring, {
     argv: [
       ...process.argv.slice(2),
-      // file descriptor '0' is stdin
       ...(!process.stdin.isTTY
         ? fs.readFileSync('/dev/stdin', 'utf-8').trim().split('\n')
         : []),
     ],
   }),
-  TE.chain((options) =>
+  TE.chainW((options) =>
     pipe(
       lernaPackages(),
       TE.map((packages) =>
@@ -151,11 +144,10 @@ const main: T.Task<void> = pipe(
   ),
   TE.fold(
     flow(
-      Console.error,
-      IO.chain(() => exit(1)),
-      T.fromIO,
+      T.fromIOK(Console.error),
+      T.chainIOK(() => exit(1)),
     ),
-    flow(Console.log, T.fromIO),
+    T.fromIOK(Console.log),
   ),
 )
 

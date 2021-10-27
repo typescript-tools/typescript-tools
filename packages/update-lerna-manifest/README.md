@@ -2,15 +2,15 @@
 
 [![License][]](https://opensource.org/licenses/ISC)
 [![NPM Package][]](https://npmjs.org/package/@typescript-tools/update-lerna-manifest)
-[![Build status][]](https://travis-ci.org/typescript-tools/update-lerna-manifest)
-[![Code Coverage][]](https://codecov.io/gh/typescript-tools/update-lerna-manifest)
+[![Build Status]](https://github.com/typescript-tools/typescript-tools/actions/workflows/ci.yml)
+[![semantic-release]](https://github.com/semantic-release/semantic-release)
 
 [license]: https://img.shields.io/badge/License-ISC-blue.svg
 [npm package]: https://img.shields.io/npm/v/@typescript-tools/update-lerna-manifest.svg
-[build status]: https://travis-ci.org/typescript-tools/update-lerna-manifest.svg?branch=master
-[code coverage]: https://codecov.io/gh/typescript-tools/update-lerna-manifest/branch/master/graph/badge.svg
+[build status]: https://github.com/typescript-tools/typescript-tools/actions/workflows/ci.yml/badge.svg
+[semantic-release]: https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg
 
-> Keep the lerna manifest up to date
+> Keep the Lerna manifest up to date
 
 This tool solves a very specific use-case:
 
@@ -22,10 +22,10 @@ You may get value from this tool if you:
 - cannot write regex-based package whitelists in your lerna.json manifest
 
 This is sometimes the case when e.g. retrofitting an existing monorepo
-with lerna.
+with Lerna, or using a monorepo containing projects in multiple languages.
 
 It is recommended to hook this tool automatically into the build
-process somehow, before running `lerna bootstrap`.
+process, before running `lerna bootstrap`.
 
 ## Install
 
@@ -37,10 +37,12 @@ npm install --save-dev @typescript-tools/update-lerna-manifest
 
 ```
 Usage:
-    update-lerna-manifest <glob>...
+    update-lerna-manifest [--root <root>] [--depth <depth>] <dirs>...
 
 Options:
-    <glob>    Glob of package directories to search for lerna packages
+    <dirs>             Directories to recursively search for lerna packages
+    --root=<root>      Root of lerna mono-repository
+    --depth=<depth>    Maximum directory depth in package search
 ```
 
 Example:
@@ -50,7 +52,7 @@ npx update-lerna-manifest packages
 ```
 
 Note that the glob only needs to point to a parent directory
-containing lerna packages, each glob will be scanned recursively.
+containing lerna packages; each glob will be scanned recursively.
 
 `update-lerna-manifest` will search for a `tsconfig.json` file
 extending a parent's tsconfig.json file, like the following:

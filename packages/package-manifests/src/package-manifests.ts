@@ -4,19 +4,20 @@
  */
 
 import * as path from 'path'
-import * as E from 'fp-ts/Either'
-import * as TE from 'fp-ts/TaskEither'
-import { pipe, flow } from 'fp-ts/function'
-import { readFile as readFile_ } from '@typescript-tools/lerna-utils'
+
+import { LernaPackage } from '@typescript-tools/io-ts'
 import {
   lernaPackages as lernaPackages_,
   PackageDiscoveryError,
 } from '@typescript-tools/lerna-packages'
-import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
+import { readFile as readFile_ } from '@typescript-tools/lerna-utils'
 import {
   monorepoRoot as monorepoRoot_,
   MonorepoRootError,
 } from '@typescript-tools/monorepo-root'
+import * as E from 'fp-ts/Either'
+import * as TE from 'fp-ts/TaskEither'
+import { pipe, flow } from 'fp-ts/function'
 
 export type PackageManifestsError =
   | MonorepoRootError

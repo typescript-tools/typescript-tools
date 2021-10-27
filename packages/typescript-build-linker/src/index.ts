@@ -6,54 +6,52 @@
  */
 
 import * as path from 'path'
-import * as t from 'io-ts'
-import * as A from 'fp-ts/Array'
-import * as E from 'fp-ts/Either'
-import * as O from 'fp-ts/Option'
-import * as T from 'fp-ts/Task'
-import * as R from 'fp-ts/Record'
-import * as S from 'fp-ts/Set'
-import * as IO from 'fp-ts/IO'
-import * as TE from 'fp-ts/TaskEither'
-import * as Console from 'fp-ts/Console'
-import * as D from 'io-ts-docopt'
-import * as PathReporter from 'io-ts/lib/PathReporter'
-import { withEncode } from 'io-ts-docopt'
-import { getLastSemigroup } from 'fp-ts/lib/Semigroup'
-import { sequenceS } from 'fp-ts/Apply'
-import { pipe, flow, constVoid, constant, Endomorphism, identity } from 'fp-ts/function'
+
+import { trace } from '@strong-roots-capital/trace'
+import {
+  dependencyGraph,
+  DependencyGraphError,
+} from '@typescript-tools/dependency-graph'
+import { LernaPackage, Path, StringifiedJSON, TsConfig } from '@typescript-tools/io-ts'
+import { lernaPackages, PackageDiscoveryError } from '@typescript-tools/lerna-packages'
 import {
   readFile as readFile_,
   writeFile as writeFile_,
 } from '@typescript-tools/lerna-utils'
-import { stringifyJSON as stringifyJSON_ } from '@typescript-tools/stringify-json'
-import {
-  lernaPackages as lernaPackages_,
-  PackageDiscoveryError,
-} from '@typescript-tools/lerna-packages'
 import {
   monorepoRoot as monorepoRoot_,
   MonorepoRootError,
 } from '@typescript-tools/monorepo-root'
-import { TsConfig } from '@typescript-tools/io-ts/dist/lib/TsConfig'
-import {
-  dependencyGraph as dependencyGraph_,
-  DependencyGraphError,
-} from '@typescript-tools/dependency-graph'
-import { withFallback } from 'io-ts-types/lib/withFallback'
-import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
-import { StringifiedJSON } from '@typescript-tools/io-ts/dist/lib/StringifiedJSON'
-import { Path } from '@typescript-tools/io-ts/dist/lib/Path'
-import { trace } from '@strong-roots-capital/trace'
-import relativePath from 'get-relative-path'
+import { stringifyJSON as stringifyJSON_ } from '@typescript-tools/stringify-json'
 import Debug from 'debug'
 import deepEqual from 'fast-deep-equal'
+import { sequenceS } from 'fp-ts/Apply'
+import * as A from 'fp-ts/Array'
+import * as Console from 'fp-ts/Console'
+import * as E from 'fp-ts/Either'
+import { eqString } from 'fp-ts/Eq'
+import * as IO from 'fp-ts/IO'
+import * as O from 'fp-ts/Option'
+import * as R from 'fp-ts/Record'
+import { getLastSemigroup } from 'fp-ts/Semigroup'
+import * as S from 'fp-ts/Set'
+import * as T from 'fp-ts/Task'
+import * as TE from 'fp-ts/TaskEither'
+import { pipe, flow, constVoid, constant } from 'fp-ts/function'
+import relativePath from 'get-relative-path'
+import * as t from 'io-ts'
+import * as D from 'io-ts-docopt'
+import { withEncode } from 'io-ts-docopt'
+import { withFallback } from 'io-ts-types/lib/withFallback'
+import * as PathReporter from 'io-ts/lib/PathReporter'
 import { match } from 'ts-pattern'
-import { eqString } from 'fp-ts/lib/Eq'
 
 const debug = {
   cmd: Debug('link'),
 }
+
+// log to stdout instead of the default stderr
+debug.cmd.log = console.log.bind(console)
 
 const docstring = `
 Usage:
@@ -82,26 +80,23 @@ type Err =
   | { type: 'unable to stringify json'; json: unknown; error: Error }
   | { type: 'unable to write file'; filename: string; error: NodeJS.ErrnoException }
 
-// Widens the type of a particular Err into Err
-const err: Endomorphism<Err> = identity
-
-const monorepoRoot = flow(monorepoRoot_, E.mapLeft(err), TE.fromEither)
-const lernaPackages = flow(lernaPackages_, TE.mapLeft(err))
-
-const dependencyGraph = (root?: string) =>
-  pipe(dependencyGraph_(root, { recursive: false }), TE.mapLeft(err))
+const monorepoRoot = flow(monorepoRoot_, TE.fromEither)
 
 const decodeDocopt = flow(
   D.decodeDocopt,
-  E.mapLeft((errors) => PathReporter.failure(errors).join('\n')),
-  E.mapLeft((error) => err({ type: 'docopt decode', error })),
+  E.mapLeft(
+    flow(
+      (errors) => PathReporter.failure(errors).join('\n'),
+      (error) => ({ type: 'docopt decode', error } as const),
+    ),
+  ),
   TE.fromEither,
 )
 
-const readFile = (filename: string): TE.TaskEither<Err, string> =>
+const readFile = (filename: string) =>
   pipe(
     readFile_(filename),
-    TE.mapLeft((error) => err({ type: 'unable to read file', filename, error })),
+    TE.mapLeft((error) => ({ type: 'unable to read file', filename, error } as const)),
   )
 
 const decodeFile = <C extends t.Mixed>(codec: C) => (filename: string) => (
@@ -109,8 +104,12 @@ const decodeFile = <C extends t.Mixed>(codec: C) => (filename: string) => (
 ): TE.TaskEither<Err, C['_A']> =>
   pipe(
     StringifiedJSON(codec).decode(contents),
-    E.mapLeft((errors) => PathReporter.failure(errors).join('\n')),
-    E.mapLeft((error) => err({ type: 'unexpected file contents', filename, error })),
+    E.mapLeft(
+      flow(
+        (errors) => PathReporter.failure(errors).join('\n'),
+        (error) => ({ type: 'unexpected file contents', filename, error } as const),
+      ),
+    ),
     TE.fromEither,
   )
 
@@ -119,7 +118,7 @@ const stringifyJSON = (onError: (reason: unknown) => Error) => (
 ): TE.TaskEither<Err, string> =>
   pipe(
     stringifyJSON_(onError)(json),
-    E.mapLeft((error) => err({ type: 'unable to stringify json', json, error })),
+    E.mapLeft((error) => ({ type: 'unable to stringify json', json, error } as const)),
     TE.fromEither,
   )
 
@@ -128,11 +127,11 @@ const writeFile = (filename: string) => (contents: string) =>
     contents,
     trace(debug.cmd, `Writing file ${filename}`),
     writeFile_(filename),
-    TE.mapLeft((error) => err({ type: 'unable to write file', filename, error })),
+    TE.mapLeft((error) => ({ type: 'unable to write file', filename, error } as const)),
   )
 
 const writeJson = (filename: string) => (value: unknown): TE.TaskEither<Err, void> =>
-  pipe(stringifyJSON(E.toError)(value), TE.chain(writeFile(filename)))
+  pipe(stringifyJSON(E.toError)(value), TE.chainW(writeFile(filename)))
 
 const writeJsonIfModified = <A>(
   filename: string,
@@ -248,10 +247,9 @@ const linkPackageDependencies = (root: string) =>
         pkg.location,
       ]),
     ),
-
     TE.chain((lernaPackages) =>
       pipe(
-        dependencyGraph(root),
+        dependencyGraph({ root, recursive: false }),
         TE.map(mapToRecord),
         TE.map(
           R.reduceWithIndex(
@@ -296,15 +294,14 @@ const exit = (code: 0 | 1): IO.IO<void> => () => process.exit(code)
 
 const main: T.Task<void> = pipe(
   decodeDocopt(CommandLineOptions, docstring),
-  TE.chain((options) => monorepoRoot(options.repository)),
+  TE.chainW((options) => monorepoRoot(options.repository)),
   TE.chain((root) =>
     pipe([linkChildrenPackages(root), linkPackageDependencies(root)], TE.sequenceArray),
   ),
   TE.fold(
     flow(
-      Console.error,
-      IO.chain(() => exit(1)),
-      T.fromIO,
+      T.fromIOK(Console.error),
+      T.chainIOK(() => exit(1)),
     ),
     constant(T.of(undefined)),
   ),

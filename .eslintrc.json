@@ -1,0 +1,18 @@
+{
+  "root": true,
+  "extends": [
+    "@ericcrosson/eslint-config"
+  ],
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": 6,
+    "tsconfigRootDir": ".",
+    "project": [
+      "./**/tsconfig.json"
+    ]
+  },
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint"
+  ]
+}

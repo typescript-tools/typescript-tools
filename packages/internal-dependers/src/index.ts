@@ -7,35 +7,26 @@
 
 import * as fs from 'fs'
 import * as path from 'path'
-import * as t from 'io-ts'
-import * as A from 'fp-ts/ReadonlyArray'
+
+import { dependerGraph } from '@typescript-tools/depender-graph'
+import { findPackageIn } from '@typescript-tools/find-package'
+import { PackageName } from '@typescript-tools/io-ts'
+import { lernaPackages } from '@typescript-tools/lerna-packages'
+import { monorepoRoot } from '@typescript-tools/monorepo-root'
+import { DocoptOption } from 'docopt'
+import * as Console from 'fp-ts/Console'
 import * as E from 'fp-ts/Either'
+import * as IO from 'fp-ts/IO'
 import * as O from 'fp-ts/Option'
+import { ordString } from 'fp-ts/Ord'
+import * as A from 'fp-ts/ReadonlyArray'
 import * as T from 'fp-ts/Task'
 import * as TE from 'fp-ts/TaskEither'
-import * as IO from 'fp-ts/IO'
-import * as Console from 'fp-ts/Console'
-import * as PathReporter from 'io-ts/lib/PathReporter'
-import { ordString } from 'fp-ts/Ord'
-import { match } from 'ts-pattern'
-import { pipe, flow, identity, constant, Endomorphism } from 'fp-ts/function'
-import {
-  dependerGraph as dependerGraph_,
-  DependerGraphError,
-} from '@typescript-tools/depender-graph'
+import { pipe, flow, constant } from 'fp-ts/function'
+import * as t from 'io-ts'
 import { withEncode, decodeDocopt as decodeDocopt_ } from 'io-ts-docopt'
-import { DocoptOption } from 'docopt'
-import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
-import { monorepoRoot, MonorepoRootError } from '@typescript-tools/monorepo-root'
-import {
-  FindPackageError,
-  findPackageIn as findPackageIn_,
-} from '@typescript-tools/find-package'
-import {
-  lernaPackages as lernaPackages_,
-  PackageDiscoveryError,
-} from '@typescript-tools/lerna-packages'
-import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
+import * as PathReporter from 'io-ts/lib/PathReporter'
+import { match } from 'ts-pattern'
 
 const docstring = `
 Usage:
@@ -64,20 +55,10 @@ type CommandLineOptions = t.OutputOf<typeof CommandLineOptions>
 
 const unary = <A, B>(f: (a: A) => B) => (a: A): B => f(a)
 
-type Err =
-  | DependerGraphError
-  | MonorepoRootError
-  | FindPackageError
-  | PackageDiscoveryError
-  | { type: 'docopt decode'; error: string }
-
-// Widens the type of a particular Err into an Err
-const err: Endomorphism<Err> = identity
-
 const findMonorepoRoot = (a: CommandLineOptions) =>
   pipe(
     O.fromNullable(a.root),
-    O.fold(flow(monorepoRoot, E.mapLeft(err)), E.right),
+    O.fold(monorepoRoot, E.right),
     E.map((root) => Object.assign(a, { root })),
     TE.fromEither,
   )
@@ -89,18 +70,16 @@ const decodeDocopt = <C extends t.Mixed>(
 ) =>
   pipe(
     decodeDocopt_(codec, docstring, options),
-    E.mapLeft((error) =>
-      err({ type: 'docopt decode', error: PathReporter.failure(error).join('\n') }),
+    E.mapLeft(
+      (error) =>
+        ({
+          type: 'docopt decode',
+          error: PathReporter.failure(error).join('\n'),
+        } as const),
     ),
     TE.fromEither,
-    TE.chain(findMonorepoRoot),
+    TE.chainW(findMonorepoRoot),
   )
-
-const dependerGraph = flow(dependerGraph_, TE.mapLeft(err))
-const lernaPackages = flow(lernaPackages_, TE.mapLeft(err))
-
-const findPackageIn = (packages: LernaPackage[]) =>
-  flow(findPackageIn_(packages), TE.mapLeft(err))
 
 const exit = (code: 0 | 1): IO.IO<void> => () => process.exit(code)
 
@@ -116,14 +95,14 @@ const main: T.Task<void> = pipe(
       ],
     }),
   ),
-  TE.bind('packages', ({ options }) => lernaPackages(options.root)),
-  TE.bind('dependencies', ({ options, packages }) =>
+  TE.bindW('packages', ({ options }) => lernaPackages(options.root)),
+  TE.bindW('dependencies', ({ options, packages }) =>
     pipe(
-      dependerGraph(options.root),
-      TE.chain((graph) =>
+      dependerGraph({ root: options.root }),
+      TE.chainW((graph) =>
         pipe(
           options.packages,
-          TE.traverseArray((pkg) => findPackageIn(packages)(pkg)),
+          TE.traverseArray(findPackageIn(packages)),
           TE.map(
             A.chain((pkg) =>
               pipe(

@@ -1,27 +1,30 @@
-# lerna-packages
+# package-manifests
 
 [![License][]](https://opensource.org/licenses/ISC)
-[![NPM Package][]](https://npmjs.org/package/@typescript-tools/lerna-packages)
+[![NPM Package][]](https://npmjs.org/package/@typescript-tools/package-manifests)
 [![Build Status]](https://github.com/typescript-tools/typescript-tools/actions/workflows/ci.yml)
 [![semantic-release]](https://github.com/semantic-release/semantic-release)
 
 [license]: https://img.shields.io/badge/License-ISC-blue.svg
-[npm package]: https://img.shields.io/npm/v/@typescript-tools/lerna-packages.svg
+[npm package]: https://img.shields.io/npm/v/@typescript-tools/package-manifests.svg
 [build status]: https://github.com/typescript-tools/typescript-tools/actions/workflows/ci.yml/badge.svg
 [semantic-release]: https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg
 
-> Discover internal packages
+> Read every package's package.json
 
 ## Install
 
 ```shell
-npm install @typescript-tools/lerna-packages
+npm install @typescript-tools/package-manifests
 ```
 
-## API
+## Use
 
 ```typescript
-export function lernaPackages(
-  findRootFrom?: string,
-): TE.TaskEither<PackageDiscoveryError, LernaPackage[]>
+export function packageManifests(
+  somePathInMonorepo?: string,
+): TE.TaskEither<
+  PackageManifestsError,
+  ReadonlyArray<{ package: LernaPackage; contents: E.Json }>
+>
 ```

@@ -1,12 +1,16 @@
-import * as t from 'io-ts'
 import * as E from 'fp-ts/Either'
-import { pipe } from 'fp-ts/pipeable'
+import { pipe } from 'fp-ts/function'
+import * as t from 'io-ts'
 
+/**
+ * @deprecated - use JSONFromString in io-ts-types
+ */
 export const StringifiedJSON = <C extends t.Mixed>(
   codec: C,
-): t.Type<t.TypeOf<C>, string, unknown> =>
+): t.Type<t.TypeOf<C>, string> =>
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   new t.Type(
-    `StringifiedJSON`.concat(codec.name),
+    'StringifiedJSON'.concat(codec.name),
     (u): u is C =>
       typeof u !== 'string'
         ? false

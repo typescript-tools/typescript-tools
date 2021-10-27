@@ -3,29 +3,31 @@
  * Install local lerna dependencies
  */
 
-import Debug from 'debug'
 import * as fs from 'fs'
 import * as path from 'path'
-import * as A from 'fp-ts/ReadonlyArray'
-import * as E from 'fp-ts/Either'
-import * as O from 'fp-ts/Option'
-import * as TE from 'fp-ts/TaskEither'
-import * as PathReporter from 'io-ts/lib/PathReporter'
-import { Endomorphism, identity, pipe, flow, constVoid } from 'fp-ts/function'
+
 import { trace } from '@strong-roots-capital/trace'
+import {
+  LernaPackage,
+  PackageJsonDependencies,
+  dependencies,
+  PackageName,
+  Path,
+} from '@typescript-tools/io-ts'
+import { PackageDiscoveryError } from '@typescript-tools/lerna-packages'
 import {
   packageManifest as packageManifest_,
   PackageManifestsError,
 } from '@typescript-tools/package-manifests'
-import { LernaPackage } from '@typescript-tools/io-ts/dist/lib/LernaPackage'
-import {
-  PackageJsonDependencies,
-  dependencies,
-} from '@typescript-tools/io-ts/dist/lib/PackageJsonDependencies'
-import { PackageName } from '@typescript-tools/io-ts/dist/lib/PackageName'
-import { Path } from '@typescript-tools/io-ts/dist/lib/Path'
-import { PackageDiscoveryError } from '@typescript-tools/lerna-packages'
-import { lernaPackages as lernaPackages_ } from './lerna-packages'
+import Debug from 'debug'
+import * as E from 'fp-ts/Either'
+import * as O from 'fp-ts/Option'
+import * as A from 'fp-ts/ReadonlyArray'
+import * as TE from 'fp-ts/TaskEither'
+import { pipe, flow, constVoid } from 'fp-ts/function'
+import * as PathReporter from 'io-ts/lib/PathReporter'
+
+import { lernaPackages } from './lerna-packages'
 
 const debug = {
   cmd: Debug('link'),
@@ -44,8 +46,6 @@ export type LinkLocalDependenciesError =
       error: Error
     }
 
-const err: Endomorphism<LinkLocalDependenciesError> = identity
-
 const findPackageIn = (packages: Map<string, LernaPackage>) => (
   packagePathOrName: string,
 ) =>
@@ -58,12 +58,12 @@ const findPackageIn = (packages: Map<string, LernaPackage>) => (
       }),
     ),
     TE.fromEither,
-    TE.bimap(err, trace(debug.cmd, 'Linking dependencies for package')),
+    TE.map(trace(debug.cmd, 'Linking dependencies for package')),
   )
 
 const packageManifest = flow(
   packageManifest_,
-  TE.bimap(err, ({ contents }) => contents),
+  TE.map(({ contents }) => contents),
 )
 
 const decodeManifest = (manifest: E.Json) =>
@@ -72,7 +72,7 @@ const decodeManifest = (manifest: E.Json) =>
     E.mapLeft(
       flow(
         (errors) => PathReporter.failure(errors).join('\n'),
-        (error) => err({ type: 'unable to decode package manifest', error }),
+        (error) => ({ type: 'unable to decode package manifest', error } as const),
       ),
     ),
     TE.fromEither,
@@ -96,7 +96,7 @@ const internalDependencies = (packages: Map<string, LernaPackage>) => (
 const internalPackageDependencies = (packages: Map<string, LernaPackage>) =>
   flow(
     packageManifest,
-    TE.chain(decodeManifest),
+    TE.chainW(decodeManifest),
     TE.map(
       flow(
         dependencies,
@@ -110,15 +110,19 @@ const mkdir = (target: string) =>
   pipe(
     TE.tryCatch(
       async () =>
-        new Promise<void>((resolve, reject) =>
-          fs.mkdir(target, { recursive: true }, (error) =>
-            error !== null && error !== undefined
-              ? reject(error)
-              : resolve(constVoid()),
-          ),
-        ),
-      flow(E.toError, (error) =>
-        err({ type: 'unable to create directory', path: target, error }),
+        new Promise<void>((resolve, reject) => {
+          fs.mkdir(target, { recursive: true }, (error) => {
+            if (error !== null && error !== undefined) {
+              reject(error)
+            } else {
+              resolve(constVoid())
+            }
+          })
+        }),
+      flow(
+        E.toError,
+        (error) =>
+          ({ type: 'unable to create directory', path: target, error } as const),
       ),
     ),
   )
@@ -130,30 +134,33 @@ const mkdir = (target: string) =>
 const symlink = (target: string, link: string) =>
   pipe(
     mkdir(path.dirname(link)),
-    TE.chain(() =>
+    TE.chainW(() =>
       pipe(
         TE.tryCatch(
           async () =>
-            new Promise<void>((resolve, reject) =>
-              fs.symlink(target, link, (error) =>
-                error !== null && error !== undefined
-                  ? reject(error)
-                  : resolve(constVoid()),
-              ),
-            ),
+            new Promise<void>((resolve, reject) => {
+              fs.symlink(target, link, (error) => {
+                if (error !== null && error !== undefined) {
+                  reject(error)
+                } else {
+                  resolve(constVoid())
+                }
+              })
+            }),
           E.toError,
         ),
         // recover from symlink-already-exists error
         TE.orElse((error) =>
           error.message.startsWith('EEXIST:') ? TE.right(constVoid()) : TE.left(error),
         ),
-        TE.mapLeft((error) =>
-          err({
-            type: 'unable to create symlink',
-            target,
-            path: link,
-            error,
-          }),
+        TE.mapLeft(
+          (error) =>
+            ({
+              type: 'unable to create symlink',
+              target,
+              path: link,
+              error,
+            } as const),
         ),
       ),
     ),
@@ -178,17 +185,16 @@ const symlinkPackage = (targetPackage: Path) => (lernaPackage: LernaPackage) => 
   )
 }
 
-const lernaPackages = flow(lernaPackages_, TE.mapLeft(err))
-
 export const linkLocalDependenciesIn = (packages: Map<string, LernaPackage>) => (
   packagePathOrName: string,
 ): TE.TaskEither<LinkLocalDependenciesError, void> =>
   pipe(
-    TE.bindTo('lernaPackage')(findPackageIn(packages)(packagePathOrName)),
-    TE.bind('dependencies', ({ lernaPackage }) =>
+    TE.Do,
+    TE.bind('lernaPackage', () => findPackageIn(packages)(packagePathOrName)),
+    TE.bindW('dependencies', ({ lernaPackage }) =>
       internalPackageDependencies(packages)(lernaPackage),
     ),
-    TE.chain(({ lernaPackage, dependencies }) =>
+    TE.chainW(({ lernaPackage, dependencies }) =>
       TE.traverseArray(symlinkPackage(lernaPackage.location))(dependencies),
     ),
     TE.map(constVoid),

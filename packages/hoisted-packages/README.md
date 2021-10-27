@@ -1,27 +1,27 @@
-# lerna-packages
+# hoisted-packages
 
 [![License][]](https://opensource.org/licenses/ISC)
-[![NPM Package][]](https://npmjs.org/package/@typescript-tools/lerna-packages)
+[![NPM Package][]](https://npmjs.org/package/@typescript-tools/hoisted-packages)
 [![Build Status]](https://github.com/typescript-tools/typescript-tools/actions/workflows/ci.yml)
 [![semantic-release]](https://github.com/semantic-release/semantic-release)
 
 [license]: https://img.shields.io/badge/License-ISC-blue.svg
-[npm package]: https://img.shields.io/npm/v/@typescript-tools/lerna-packages.svg
+[npm package]: https://img.shields.io/npm/v/@typescript-tools/hoisted-packages.svg
 [build status]: https://github.com/typescript-tools/typescript-tools/actions/workflows/ci.yml/badge.svg
 [semantic-release]: https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg
 
-> Discover internal packages
+> Determine packages `lerna bootstrap --hoist` will hoist
 
 ## Install
 
 ```shell
-npm install @typescript-tools/lerna-packages
+npm install @typescript-tools/hoisted-packages
 ```
 
 ## API
 
 ```typescript
-export function lernaPackages(
-  findRootFrom?: string,
-): TE.TaskEither<PackageDiscoveryError, LernaPackage[]>
+export function hoistedPackages(
+  root: string,
+): TE.TaskEither<PackageManifestsError, Map<PackageName, PackageVersion>>
 ```
