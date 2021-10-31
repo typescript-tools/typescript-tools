@@ -42,7 +42,7 @@ import relativePath from 'get-relative-path'
 import * as t from 'io-ts'
 import * as D from 'io-ts-docopt'
 import { withEncode } from 'io-ts-docopt'
-import { withFallback } from 'io-ts-types/lib/withFallback'
+import { withFallback } from 'io-ts-types'
 import * as PathReporter from 'io-ts/lib/PathReporter'
 import { match } from 'ts-pattern'
 
