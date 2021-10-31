@@ -38,11 +38,12 @@ import * as S from 'fp-ts/Set'
 import * as T from 'fp-ts/Task'
 import * as TE from 'fp-ts/TaskEither'
 import { pipe, flow, constVoid, constant } from 'fp-ts/function'
+import * as string from 'fp-ts/string'
 import relativePath from 'get-relative-path'
 import * as t from 'io-ts'
 import * as D from 'io-ts-docopt'
 import { withEncode } from 'io-ts-docopt'
-import { withFallback } from 'io-ts-types/lib/withFallback'
+import { withFallback } from 'io-ts-types'
 import * as PathReporter from 'io-ts/lib/PathReporter'
 import { match } from 'ts-pattern'
 
@@ -206,7 +207,15 @@ const linkChildrenPackages = (root: string) =>
       ),
     ),
     // map set of children packages to set of children project references
-    TE.map(R.map((packages) => Array.from(packages).map((pkg) => ({ path: pkg })))),
+    TE.map(
+      R.map((packages) =>
+        pipe(
+          Array.from(packages),
+          A.sort(string.Ord),
+          A.map((pkg) => ({ path: pkg })),
+        ),
+      ),
+    ),
     // map to write instructions
     TE.map(
       R.mapWithIndex((parentDirectory, references) => {
