@@ -32,7 +32,7 @@
   "pre-commit": "lint-staged",
   "dependencies": {
     "@typescript-tools/io-ts": "^0.0.0-semantically-released",
-    "fp-ts": "^2.9.3"
+    "fp-ts": "^2.11.5"
   },
   "devDependencies": {
     "@types/node": "^14.14.6",
