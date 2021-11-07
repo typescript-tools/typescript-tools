@@ -265,10 +265,17 @@ const linkPackageDependencies = (root: string) =>
             {} as Record<Path, string[]>,
             (packageName, acc, dependencies) =>
               Object.assign(acc, {
-                [lernaPackages[packageName]]: dependencies
-                  .map((d) => d.location)
-                  .map((p) => path.relative(lernaPackages[packageName], p))
-                  .map((path) => ({ path })),
+                [lernaPackages[packageName]]: pipe(
+                  dependencies,
+                  A.map(
+                    flow(
+                      (directory) => directory.location,
+                      (location) => path.relative(lernaPackages[packageName], location),
+                    ),
+                  ),
+                  A.sort(string.Ord),
+                  A.map((path) => ({ path })),
+                ),
               }),
           ),
         ),
