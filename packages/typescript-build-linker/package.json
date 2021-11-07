@@ -41,6 +41,7 @@
   },
   "pre-commit": "lint-staged",
   "dependencies": {
+    "@strong-roots-capital/trace": "^1.0.0",
     "@typescript-tools/dependency-graph": "^0.0.0-semantically-released",
     "@typescript-tools/io-ts": "^0.0.0-semantically-released",
     "@typescript-tools/lerna-packages": "^0.0.0-semantically-released",
