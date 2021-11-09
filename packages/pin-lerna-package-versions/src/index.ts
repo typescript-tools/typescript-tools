@@ -161,9 +161,16 @@ function updateDependencies(
                   deepEqual(originalJson, updatedJson) ? O.none : O.some(updatedJson),
               ),
             ),
-            E.mapLeft((errors) => PathReporter.failure(errors).join('\n')),
-            E.mapLeft((error) =>
-              err({ type: 'unexpected file contents', filename: packageJson, error }),
+            E.mapLeft(
+              flow(
+                (errors) => PathReporter.failure(errors).join('\n'),
+                (error) =>
+                  err({
+                    type: 'unexpected file contents',
+                    filename: packageJson,
+                    error,
+                  }),
+              ),
             ),
             TE.fromEither,
           ),
@@ -202,9 +209,12 @@ const main: T.Task<void> = pipe(
       TE.chain((packages) => {
         const dictionary = packageDictionary(packages)
 
-        const packageJsons = packages
-          .map((pkg) => pkg.location)
-          .map((dir) => path.resolve(dir, 'package.json'))
+        const packageJsons = packages.map(
+          flow(
+            (pkg) => pkg.location,
+            (dir) => path.resolve(dir, 'package.json'),
+          ),
+        )
 
         return TE.sequenceArray(
           packageJsons.map(updateDependencies(dictionary, options.distTag)),
