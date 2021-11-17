@@ -108,7 +108,7 @@ function packageDictionary(
   packages: LernaPackage[],
 ): Record<PackageName, PackageVersion> {
   return packages.reduce(
-    (acc, { name, version }) => Object.assign(acc, { [name]: `^${version}` }),
+    (acc, { name, version }) => Object.assign(acc, { [name]: version.toString() }),
     {} as Record<PackageName, PackageVersion>,
   )
 }
