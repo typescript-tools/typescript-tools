@@ -71,4 +71,4 @@ extending a parent's tsconfig.json file, like the following:
 Specifically, it considers a package to be a lerna package if the
 `extends` property ends with `/tsconfig.settings.json`. This may
 result in false positives with your monorepo, in which case tightening
-the `--package-dir` globs would be prudent.
+the `dirs` globs would be prudent.
