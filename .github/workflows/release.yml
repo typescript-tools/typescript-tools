@@ -5,6 +5,25 @@ on:
     branches: [ master, alpha, beta ]
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [12.x, 14.x]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: |
+          npm ci
+          npm run bootstrap
+          npm run build
+          npm test
+
   release:
     name: Release
 
@@ -20,12 +39,12 @@ jobs:
         with:
           node-version: 'lts/*'
           scope: typescript-tools
-      - name: Install dependencies
+      - name: Compile TypeScript
         run: |
           npm ci
           npm run bootstrap
-      - name: Build TypeScript
-        run: npm run build
+          npm run build
+          npm test
       - name: Release
         run: |
           find . -name 'index.js' | grep @semantic-release/npm/index.js | xargs -I {} npx patch-semantic-release-npm-for-msr --file {}
