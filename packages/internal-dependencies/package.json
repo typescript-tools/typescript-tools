@@ -50,7 +50,7 @@
     "ts-pattern": "^1.1.0"
   },
   "devDependencies": {
-    "@types/docopt": "^0.6.31",
+    "@types/docopt": "0.6.33",
     "@types/node": "^14.14.6",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
