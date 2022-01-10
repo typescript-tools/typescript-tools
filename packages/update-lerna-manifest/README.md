@@ -72,3 +72,13 @@ Specifically, it considers a package to be a lerna package if the
 `extends` property ends with `/tsconfig.settings.json`. This may
 result in false positives with your monorepo, in which case tightening
 the `dirs` globs would be prudent.
+
+### JSON compatibility
+
+Like the rest of the typescript-tools, `update-lerna-manifest` requires
+all package `tsconfig.json` files to be valid [JSON] documents, not [JSON5]
+or [json-c]. The TypeScript compiler accepts JSON5, but the typescript-tools do not.
+
+[json]: https://www.json.org/json-en.html
+[json5]: https://json5.org/
+[json-c]: https://github.com/json-c/json-c
