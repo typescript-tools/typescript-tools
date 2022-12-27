@@ -1,3 +1,5 @@
+/.direnv/
+/.pre-commit-config.yaml
 dist/
 node_modules
 node_modules.sentinel
