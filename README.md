@@ -1,15 +1,21 @@
 # TypeScript Tools
 
-[![License][]](https://opensource.org/licenses/ISC)
-[![Build Status]](https://github.com/typescript-tools/typescript-tools/actions/workflows/ci.yml)
-[![semantic-release]](https://github.com/semantic-release/semantic-release)
+[![Build Status]](https://github.com/typescript-tools/typescript-tools/actions/workflows/release.yml)
 
-[license]: https://img.shields.io/badge/License-ISC-blue.svg
-[build status]: https://github.com/typescript-tools/typescript-tools/actions/workflows/ci.yml/badge.svg
-[semantic-release]: https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg
+[build status]: https://github.com/typescript-tools/typescript-tools/actions/workflows/release.yml/badge.svg?event=push
 
-The `typescript-tools` are an opinionated collection of utilities for working with TypeScript
-monorepos.
+## State of This Monorepo
+
+This repository is **not** actively maintained.
+
+These days I am using this style of monorepo less than I was before, so there
+is not enough return on investment to justify further maintenance of this
+repository.
+
+For an alternative solution, see the [Rust implementation of the typescript-
+tools][rust-implementation].
+
+[rust-implementation]: https://github.com/typescript-tools/rust-implementation
 
 ## The Problem
 
@@ -27,11 +33,6 @@ tools.
 
 The goals of the `typescript-tools` are to give back the maximum amount of human time
 possibly; chiefly through stability and aggressive automation.
-
-## State of This Monorepo
-
-This repository is actively maintained. It has less code coverage than Lerna (read:
-none) but is implemented in TypeScript, which helps avoid some bugs.
 
 ## Acknowledgments
 
